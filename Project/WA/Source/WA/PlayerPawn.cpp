@@ -2,6 +2,7 @@
 
 
 #include "PlayerPawn.h"
+#include "PuzzleObject.h"
 #include "Engine/Classes/Components/InputComponent.h"
 #include "EngineGlobals.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
@@ -14,6 +15,7 @@ APlayerPawn::APlayerPawn()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+
 	move_speed = 300.f;
 	jump_power = 500.f;
 
@@ -21,6 +23,8 @@ APlayerPawn::APlayerPawn()
 
 	simultaneousX = false;
 	simultaneousY = false;
+
+	jumping = true;
 }
 
 // Called when the game starts or when spawned
@@ -37,13 +41,9 @@ void APlayerPawn::Tick(float DeltaTime)
 
 	SetActorLocation(GetActorLocation() + (velocity * DeltaTime));
 
-	if (GetActorLocation().Z > 80.f)
+	if (jumping)
 	{
 		velocity.Z -= 5.f;
-	}
-	else if (GetActorLocation().Z != 80.f)
-	{
-		velocity.Z = 0.f;
 	}
 }
 
@@ -67,6 +67,34 @@ void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputCo
 	InputComponent->BindAction("MoveJump", IE_Pressed, this, &APlayerPawn::MoveJump);
 
 	InputComponent->BindAction("Interaction", IE_Pressed, this, &APlayerPawn::Interaction);
+}
+
+
+void APlayerPawn::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	if (OtherActor->ActorHasTag(staticObjectTag))
+	{
+		if (OtherActor->GetActorLocation().Z < GetActorLocation().Z)
+		{
+			jumping = false;
+		}
+
+		SetActorLocation(GetActorLocation() + FVector(0, 0, 0));
+
+		velocity.Z = 0;
+
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("Start Overlap"));
+	}
+}
+
+void APlayerPawn::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	if (OtherActor->ActorHasTag(staticObjectTag))
+	{
+		jumping = true;
+
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("End Overlap"));
+	}
 }
 
 
@@ -161,5 +189,7 @@ void APlayerPawn::MoveJump()
 
 void APlayerPawn::Interaction()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("Interaction Key is pressed."));
+	/*void (APuzzleObject::*puzzleInteract)(void) = APuzzleObject::Interaction;
+
+	puzzleInteract;*/
 }
