@@ -51,6 +51,8 @@ public:
 	bool simultaneousX;
 	bool simultaneousY;
 
+	int num_overlappingObj;
+
 
 	void MoveForward();
 	void StopForward();

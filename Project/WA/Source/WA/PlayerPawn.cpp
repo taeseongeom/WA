@@ -10,7 +10,7 @@
 // Sets default values
 APlayerPawn::APlayerPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this pawn to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
@@ -23,6 +23,8 @@ APlayerPawn::APlayerPawn()
 
 	simultaneousX = false;
 	simultaneousY = false;
+
+	num_overlappingObj = 0;
 
 	jumping = true;
 }
@@ -74,6 +76,8 @@ void APlayerPawn::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor->ActorHasTag(staticObjectTag))
 	{
+		num_overlappingObj++;
+		
 		if (OtherActor->GetActorLocation().Z < GetActorLocation().Z)
 		{
 			jumping = false;
@@ -91,8 +95,13 @@ void APlayerPawn::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	if (OtherActor->ActorHasTag(staticObjectTag))
 	{
-		jumping = true;
-
+		num_overlappingObj--;
+		
+		if (num_overlappingObj < 1)
+		{
+			jumping = true;
+		}
+		
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("End Overlap"));
 	}
 }
