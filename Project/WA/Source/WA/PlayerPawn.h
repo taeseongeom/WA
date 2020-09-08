@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
+
+
 UCLASS()
 class WA_API APlayerPawn : public APawn
 {
@@ -31,6 +34,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 
+	const float Tolerance = 1.02f;
+	
 	// Speed of linear movement.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float move_speed;
@@ -52,6 +57,9 @@ public:
 	bool simultaneousY;
 
 	int num_overlappingObj;
+
+
+	FInteractDelegate InteractionWithPuzzle;
 
 
 	void MoveForward();

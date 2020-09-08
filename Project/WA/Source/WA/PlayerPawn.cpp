@@ -4,6 +4,8 @@
 #include "PlayerPawn.h"
 #include "PuzzleObject.h"
 #include "Engine/Classes/Components/InputComponent.h"
+#include <Engine/Classes/Components/BoxComponent.h>
+#include <Engine/Classes/Components/CapsuleComponent.h>
 #include "EngineGlobals.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 
@@ -19,14 +21,14 @@ APlayerPawn::APlayerPawn()
 	move_speed = 300.f;
 	jump_power = 500.f;
 
+	jumping = true;
+
 	velocity = velocity.ZeroVector;
 
 	simultaneousX = false;
 	simultaneousY = false;
 
 	num_overlappingObj = 0;
-
-	jumping = true;
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +78,44 @@ void APlayerPawn::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor->ActorHasTag(staticObjectTag))
 	{
+		UBoxComponent* OtherCollider = (UBoxComponent*)OtherActor->GetComponentsByClass(UBoxComponent::StaticClass())[0];
+		UCapsuleComponent* MyCollider = (UCapsuleComponent*)GetComponentsByClass(UCapsuleComponent::StaticClass())[0];
+
+		FVector PhaseDifference = GetActorLocation() - OtherActor->GetActorLocation();
+		FVector OtherBoxExtent = OtherCollider->GetScaledBoxExtent();
+		float PlayerHeight = MyCollider->GetScaledCapsuleHalfHeight();
+
+		if (PhaseDifference.Z > -((OtherBoxExtent.Z + PlayerHeight) * Tolerance) &&
+			PhaseDifference.Z < +((OtherBoxExtent.Z + PlayerHeight) * Tolerance))
+		{
+			if (PhaseDifference.X > -(OtherBoxExtent.X * Tolerance) && 
+				PhaseDifference.X < +(OtherBoxExtent.X * Tolerance))
+			{
+
+			}
+			else
+			{
+
+			}
+
+			if (PhaseDifference.Y > -(OtherBoxExtent.Y * Tolerance) && 
+				PhaseDifference.Y < +(OtherBoxExtent.Y * Tolerance))
+			{
+
+			}
+			else
+			{
+
+			}
+		}
+		
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, "OtherActor's Box Size = " + OtherCollider->GetScaledBoxExtent().ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, "Actor's Capsule Radius = " + FString::SanitizeFloat(MyCollider->GetScaledCapsuleRadius()));
+		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, "Player's Height = " + FString::SanitizeFloat(MyCollider->GetScaledCapsuleHalfHeight()));*/
+		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, "Object-Player Location = " + PhaseDifference.ToString());
+
+		
 		num_overlappingObj++;
 		
 		if (OtherActor->GetActorLocation().Z < GetActorLocation().Z)
@@ -87,7 +127,7 @@ void APlayerPawn::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		velocity.Z = 0;
 
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("Start Overlap"));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("Start Overlap"));
 	}
 }
 
@@ -102,11 +142,12 @@ void APlayerPawn::NotifyActorEndOverlap(AActor* OtherActor)
 			jumping = true;
 		}
 		
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("End Overlap"));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("End Overlap"));
 	}
 }
 
 
+#pragma region Input Reaction: Move
 void APlayerPawn::MoveForward()
 {
 	if (velocity.X != 0.f)
@@ -114,6 +155,7 @@ void APlayerPawn::MoveForward()
 		simultaneousX = true;
 	}
 	velocity.X = move_speed;
+	//SetActorRotation(FRotator(0, 0, 0));
 }
 void APlayerPawn::StopForward()
 {
@@ -135,6 +177,7 @@ void APlayerPawn::MoveBackward()
 		simultaneousX = true;
 	}
 	velocity.X = move_speed * -1;
+	//SetActorRotation(FRotator(0, 180, 0));
 }
 void APlayerPawn::StopBackward()
 {
@@ -195,10 +238,9 @@ void APlayerPawn::MoveJump()
 {
 	velocity.Z = jump_power;
 }
+#pragma endregion
 
 void APlayerPawn::Interaction()
 {
-	/*void (APuzzleObject::*puzzleInteract)(void) = APuzzleObject::Interaction;
-
-	puzzleInteract;*/
+	InteractionWithPuzzle.Broadcast();
 }
