@@ -2,19 +2,17 @@
 
 
 #include "PuzzleObject.h"
-#include "Engine/Classes/Components/InputComponent.h"
+#include "PlayerCharacter.h"
+
+#include "DrawDebugHelpers.h"
 #include "EngineGlobals.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
-#include <DrawDebugHelpers.h>
+#include "Runtime/Engine/Public/EngineUtils.h"
 
-#include "PlayerPawn.h"
 
-// Sets default values
 APuzzleObject::APuzzleObject()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+ 	PrimaryActorTick.bCanEverTick = true;
 
 	boxExtent = FVector(100, 100, 50);
 
@@ -28,18 +26,38 @@ APuzzleObject::APuzzleObject()
 	num_overlappingObj = 0;
 }
 
-// Called when the game starts or when spawned
 void APuzzleObject::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (m_Player != nullptr)
+	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
-		m_Player->InteractionWithPuzzle.AddUFunction(this, FName("Interaction"));
+		iter->InteractionWithPuzzle.AddUFunction(this, FName("Interaction"));
+		break;
 	}
 }
 
-// Called every frame
+void APuzzleObject::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	num_overlappingObj++;
+
+	if (OtherActor->GetActorLocation().Z < GetActorLocation().Z)
+	{
+		jumping = false;
+	}
+
+	velocity.Z = 0;
+}
+void APuzzleObject::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	num_overlappingObj--;
+
+	if (num_overlappingObj < 1)
+	{
+		jumping = true;
+	}
+}
+
 void APuzzleObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -58,37 +76,8 @@ void APuzzleObject::Tick(float DeltaTime)
 	}
 }
 
-// Called to bind functionality to input
-void APuzzleObject::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-void APuzzleObject::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	num_overlappingObj++;
-
-	if (OtherActor->GetActorLocation().Z < GetActorLocation().Z)
-	{
-		jumping = false;
-	}
-
-	velocity.Z = 0;
-}
-
-void APuzzleObject::NotifyActorEndOverlap(AActor* OtherActor)
-{
-	num_overlappingObj--;
-
-	if (num_overlappingObj < 1)
-	{
-		jumping = true;
-	}
-}
-
 
 void APuzzleObject::Interaction()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("PuzzleObject: Interaction Key is pressed."));
+	GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, GetName() + ": Interaction");
 }

@@ -2,7 +2,6 @@
 
 
 #include "PlayerPawn.h"
-#include "PuzzleObject.h"
 #include "Engine/Classes/Components/InputComponent.h"
 #include <Engine/Classes/Components/BoxComponent.h>
 #include <Engine/Classes/Components/CapsuleComponent.h>
@@ -52,25 +51,25 @@ void APlayerPawn::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	InputComponent->BindAction("MoveForward", IE_Pressed, this, &APlayerPawn::MoveForward);
-	InputComponent->BindAction("MoveForward", IE_Released, this, &APlayerPawn::StopForward);
+	PlayerInputComponent->BindAction("MoveForward", IE_Pressed, this, &APlayerPawn::MoveForward);
+	PlayerInputComponent->BindAction("MoveForward", IE_Released, this, &APlayerPawn::StopForward);
 
-	InputComponent->BindAction("MoveBackward", IE_Pressed, this, &APlayerPawn::MoveBackward);
-	InputComponent->BindAction("MoveBackward", IE_Released, this, &APlayerPawn::StopBackward);
+	PlayerInputComponent->BindAction("MoveBackward", IE_Pressed, this, &APlayerPawn::MoveBackward);
+	PlayerInputComponent->BindAction("MoveBackward", IE_Released, this, &APlayerPawn::StopBackward);
 
-	InputComponent->BindAction("MoveLeft", IE_Pressed, this, &APlayerPawn::MoveLeft);
-	InputComponent->BindAction("MoveLeft", IE_Released, this, &APlayerPawn::StopLeft);
+	PlayerInputComponent->BindAction("MoveLeft", IE_Pressed, this, &APlayerPawn::MoveLeft);
+	PlayerInputComponent->BindAction("MoveLeft", IE_Released, this, &APlayerPawn::StopLeft);
 
-	InputComponent->BindAction("MoveRight", IE_Pressed, this, &APlayerPawn::MoveRight);
-	InputComponent->BindAction("MoveRight", IE_Released, this, &APlayerPawn::StopRight);
+	PlayerInputComponent->BindAction("MoveRight", IE_Pressed, this, &APlayerPawn::MoveRight);
+	PlayerInputComponent->BindAction("MoveRight", IE_Released, this, &APlayerPawn::StopRight);
 
-	InputComponent->BindAction("MoveJump", IE_Pressed, this, &APlayerPawn::MoveJump);
+	PlayerInputComponent->BindAction("MoveJump", IE_Pressed, this, &APlayerPawn::MoveJump);
 
-	InputComponent->BindAction("Interaction", IE_Pressed, this, &APlayerPawn::Interaction);
+	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &APlayerPawn::Interaction);
 }
 
 
