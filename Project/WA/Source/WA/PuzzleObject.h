@@ -38,6 +38,7 @@ private:
 	FVector velocity;
 
 	int num_overlappingObj;
+	bool isInteractable;
 
 
 	// Be excuted by pressing interaction key.

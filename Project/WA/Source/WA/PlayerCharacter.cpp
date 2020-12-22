@@ -10,6 +10,8 @@ APlayerCharacter::APlayerCharacter()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	AutoReceiveInput = EAutoReceiveInput::Player0;
 
+	Tags.Add(FName("Character"));
+
 	move_speed = 300.0f;
 	jump_power = 500.0f;
 	jumping = true;
@@ -20,14 +22,13 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetActorLocation(GetActorLocation() + (velocity * DeltaTime));
+	AddMovementInput(velocity);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -52,7 +53,8 @@ void APlayerCharacter::MoveLeftRight(float value)
 }
 void APlayerCharacter::MoveJump()
 {
-	velocity.Z = jump_power;
+	Cast<UCharacterMovementComponent>(GetComponentByClass(UCharacterMovementComponent::StaticClass()))->JumpZVelocity = jump_power;
+	Jump();
 }
 
 void APlayerCharacter::Interaction()

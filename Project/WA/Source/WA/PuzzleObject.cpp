@@ -47,6 +47,12 @@ void APuzzleObject::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 
 	velocity.Z = 0;
+
+
+	if (OtherActor->ActorHasTag(FName("Character")))
+	{
+		isInteractable = true;
+	}
 }
 void APuzzleObject::NotifyActorEndOverlap(AActor* OtherActor)
 {
@@ -55,6 +61,12 @@ void APuzzleObject::NotifyActorEndOverlap(AActor* OtherActor)
 	if (num_overlappingObj < 1)
 	{
 		jumping = true;
+	}
+
+
+	if (OtherActor->ActorHasTag(FName("Character")))
+	{
+		isInteractable = false;
 	}
 }
 
@@ -79,5 +91,8 @@ void APuzzleObject::Tick(float DeltaTime)
 
 void APuzzleObject::Interaction()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, GetName() + ": Interaction");
+	if (isInteractable)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, GetName() + ": Interaction");
+	}
 }

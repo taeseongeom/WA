@@ -45,9 +45,6 @@ public:
 private:
 	FVector velocity;
 
-	int num_overlappingObj;
-
-
 
 	void MoveForwardBackward(float value);
 	void MoveLeftRight(float value);
