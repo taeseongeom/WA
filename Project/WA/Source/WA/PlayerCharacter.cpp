@@ -12,11 +12,16 @@ APlayerCharacter::APlayerCharacter()
 
 	Tags.Add(FName("Character"));
 
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = false;
+
 	move_speed = 300.0f;
 	jump_power = 500.0f;
 	jumping = true;
 
 	velocity = FVector::ZeroVector;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 900.0f, 0.0f);
+	GetCharacterMovement()->JumpZVelocity = jump_power;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -27,8 +32,6 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	AddMovementInput(velocity);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -45,15 +48,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::MoveForwardBackward(float value)
 {
-	velocity.X = value * move_speed;
+	velocity.X = value;
+	AddMovementInput(velocity.GetSafeNormal());
 }
 void APlayerCharacter::MoveLeftRight(float value)
 {
-	velocity.Y = value * move_speed;
+	velocity.Y = value;
+	AddMovementInput(velocity.GetSafeNormal());
 }
 void APlayerCharacter::MoveJump()
 {
-	Cast<UCharacterMovementComponent>(GetComponentByClass(UCharacterMovementComponent::StaticClass()))->JumpZVelocity = jump_power;
 	Jump();
 }
 

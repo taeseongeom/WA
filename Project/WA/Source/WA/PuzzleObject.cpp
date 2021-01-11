@@ -14,8 +14,6 @@ APuzzleObject::APuzzleObject()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-	boxExtent = FVector(100, 100, 50);
-
 	isShow = false;
 
 
@@ -29,6 +27,8 @@ APuzzleObject::APuzzleObject()
 void APuzzleObject::BeginPlay()
 {
 	Super::BeginPlay();
+
+	boxExtent = Cast<UBoxComponent>(GetComponentsByTag(UBoxComponent::StaticClass(), FName("Interaction Region"))[0])->GetScaledBoxExtent();
 	
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{

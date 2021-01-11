@@ -23,10 +23,6 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	// The size of box region that recognize overlapping to interact.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction Region")
-	FVector boxExtent;
-
 	// Whether interaction region gizmo is shown or not on game. It is false by default.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction Region")
 	bool isShow;
@@ -35,6 +31,8 @@ public:
 	bool jumping;
 
 private:
+	FVector boxExtent;
+	
 	FVector velocity;
 
 	int num_overlappingObj;
