@@ -3,43 +3,24 @@
 #pragma once
 
 #include "EngineMinimal.h"
-#include "GameFramework/Actor.h"
+#include "UObject/Interface.h"
 #include "PuzzleObject.generated.h"
 
-UCLASS()
-class WA_API APuzzleObject : public AActor
+UINTERFACE(MinimalAPI)
+class UPuzzleObject : public UInterface
 {
 	GENERATED_BODY()
-	
-public:	
-	APuzzleObject();
+};
+
+class WA_API IPuzzleObject
+{
+	GENERATED_BODY()
 
 protected:
-	virtual void BeginPlay() override;
-
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
-	virtual void NotifyActorEndOverlap(AActor* OtherActor);
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-	// Whether interaction region gizmo is shown or not on game. It is false by default.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction Region")
-	bool isShow;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	bool jumping;
-
-private:
 	FVector boxExtent;
-	
-	FVector velocity;
 
-	int num_overlappingObj;
 	bool isInteractable;
 
 
-	// Be excuted by pressing interaction key.
-	UFUNCTION()
-	void Interaction();
+	virtual void Interaction() = 0;
 };
