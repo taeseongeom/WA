@@ -4,3 +4,11 @@
 #include "PuzzleObject.h"
 
 
+void IPuzzleObject::SetInteractability(bool is_interactable)
+{
+	isInteractable = is_interactable;
+}
+bool IPuzzleObject::IsInteractable()
+{
+	return isInteractable;
+}

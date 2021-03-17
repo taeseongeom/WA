@@ -18,11 +18,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
+	virtual void NotifyActorEndOverlap(AActor* OtherActor);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	// Be excuted by pressing interaction key.
-	UFUNCTION()
-	virtual void Interaction() override;
+	virtual void Interact() override;
 };

@@ -16,11 +16,18 @@ class WA_API IPuzzleObject
 {
 	GENERATED_BODY()
 
+	
+private:
+	bool isInteractable;
+
 protected:
 	FVector boxExtent;
 
-	bool isInteractable;
 
+	void SetInteractability(bool is_interactable);
+	bool IsInteractable();
 
-	virtual void Interaction() = 0;
+public:
+	UFUNCTION()
+	virtual void Interact() = 0;
 };

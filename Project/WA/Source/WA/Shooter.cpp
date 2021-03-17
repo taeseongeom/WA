@@ -1,21 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DirectionChanger.h"
+#include "Shooter.h"
 #include "PlayerCharacter.h"
 
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 
 
-ADirectionChanger::ADirectionChanger()
+AShooter::AShooter()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
 	SetInteractability(false);
 }
 
-void ADirectionChanger::BeginPlay()
+void AShooter::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -26,14 +26,14 @@ void ADirectionChanger::BeginPlay()
 	}
 }
 
-void ADirectionChanger::NotifyActorBeginOverlap(AActor* OtherActor)
+void AShooter::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(true);
 	}
 }
-void ADirectionChanger::NotifyActorEndOverlap(AActor* OtherActor)
+void AShooter::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
@@ -41,13 +41,13 @@ void ADirectionChanger::NotifyActorEndOverlap(AActor* OtherActor)
 	}
 }
 
-void ADirectionChanger::Tick(float DeltaTime)
+void AShooter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void ADirectionChanger::Interact()
+void AShooter::Interact()
 {
 	if (IsInteractable())
 	{

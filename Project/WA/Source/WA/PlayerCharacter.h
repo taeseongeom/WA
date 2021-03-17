@@ -42,6 +42,9 @@ public:
 
 	FInteractDelegate InteractionWithPuzzle;
 
+
+	void HoldMovableBox(int dir_code, FVector box_pos);
+
 private:
 	FVector velocity;
 

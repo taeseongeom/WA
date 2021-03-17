@@ -5,24 +5,24 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PuzzleObject.h"
-#include "Shot.generated.h"
+#include "Shooter.generated.h"
 
 UCLASS()
-class WA_API AShot : public AActor, public IPuzzleObject
+class WA_API AShooter : public AActor, public IPuzzleObject
 {
 	GENERATED_BODY()
 	
 public:	
-	AShot();
+	AShooter();
 
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
+	virtual void NotifyActorEndOverlap(AActor* OtherActor);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	// Be excuted by pressing interaction key.
-	UFUNCTION()
-	virtual void Interaction() override;
+	virtual void Interact() override;
 };

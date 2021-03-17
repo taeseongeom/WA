@@ -15,6 +15,26 @@ class WA_API AMovableBox : public AActor, public IPuzzleObject
 public:	
 	AMovableBox();
 
+private:
+	UPROPERTY()
+	UStaticMeshComponent* boxBody;
+
+	UPROPERTY()
+	class APlayerCharacter* pc;
+
+	bool puzzleActive;
+
+	UPROPERTY(EditAnywhere, Category = "Gravity")
+	float gravitySpeed;
+
+	int overlapedObjectNum;
+
+	FVector velocity;
+	FVector distance;
+
+
+	void OutOfInteractionRange();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -24,20 +44,5 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	// Whether interaction region gizmo is shown or not on game. It is false by default.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction Region")
-	bool isShow;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	bool jumping;
-
-private:
-	FVector velocity;
-
-	int num_overlappingObj;
-
-
-	// Be excuted by pressing interaction key.
-	UFUNCTION()
-	virtual void Interaction() override;
+	virtual void Interact() override;
 };
