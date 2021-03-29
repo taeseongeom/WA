@@ -8,6 +8,13 @@
 
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
+UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{
+	Idle UMETA(DisplayName = "Idle"),
+	Shooting UMETA(DisplayName = "Shooting"),
+};
+
 UCLASS()
 class WA_API APlayerCharacter : public ACharacter
 {
@@ -24,7 +31,6 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
 	// Speed of linear movement.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float move_speed;
@@ -40,18 +46,27 @@ public:
 	FName staticObjectTag;
 
 
-	FInteractDelegate InteractionWithPuzzle;
-
+	FInteractDelegate BeginInteractionWithPuzzle;
+	FInteractDelegate EndInteractionWithPuzzle;
 
 	void HoldMovableBox(int dir_code, FVector box_pos);
+	void SetCharacterState(ECharacterState cs);
+	void SetInteractObject(AActor* obj);
+	void ClearInteractObject();
 
 private:
 	FVector velocity;
+	AActor* interactObject;
+	UPROPERTY(VisibleAnywhere)
+	ECharacterState state;
 
-
+	void InputForwardBackward(float value);
+	void InputLeftRight(float value);
 	void MoveForwardBackward(float value);
 	void MoveLeftRight(float value);
+	void RotateShooter(int dir);
 	void MoveJump();
 
-	void Interaction();
+	void BeginInteraction();
+	void EndInteraction();
 };
