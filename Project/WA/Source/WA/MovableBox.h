@@ -22,8 +22,6 @@ private:
 	UPROPERTY()
 	class APlayerCharacter* pc;
 
-	bool puzzleActive;
-
 	UPROPERTY(EditAnywhere, Category = "Gravity")
 	float gravitySpeed;
 
@@ -45,4 +43,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact() override;
+	virtual void Interacted() override;
 };

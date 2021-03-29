@@ -36,7 +36,7 @@ void AMovableBox::BeginPlay()
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
 		pc = *iter;
-		iter->InteractionWithPuzzle.AddUFunction(this, FName("Interact"));
+		iter->BeginInteractionWithPuzzle.AddUFunction(this, FName("Interact"));
 		break;
 	}
 }
@@ -121,6 +121,7 @@ void AMovableBox::Interact()
 		}
 		else
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Interact End"));
 			distance = FVector::ZeroVector;
 			OutOfInteractionRange();
 
@@ -129,6 +130,9 @@ void AMovableBox::Interact()
 	}
 }
 
+void AMovableBox::Interacted()
+{
+}
 
 void AMovableBox::OutOfInteractionRange()
 {

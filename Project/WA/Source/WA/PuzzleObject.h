@@ -23,6 +23,7 @@ private:
 protected:
 	FVector boxExtent;
 
+	bool puzzleActive;
 
 	void SetInteractability(bool is_interactable);
 	bool IsInteractable();
@@ -30,4 +31,7 @@ protected:
 public:
 	UFUNCTION()
 	virtual void Interact() = 0;
+
+	UFUNCTION()
+	virtual void Interacted() = 0;
 };
