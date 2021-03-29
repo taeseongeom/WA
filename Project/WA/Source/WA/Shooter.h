@@ -15,6 +15,19 @@ class WA_API AShooter : public AActor, public IPuzzleObject
 public:	
 	AShooter();
 
+private:
+	UPROPERTY()
+	class APlayerCharacter* pc;
+
+	UPROPERTY(EditAnywhere, Category = "Bullet")
+	TSubclassOf<class AActor> BulletBlueprint;
+
+	UPROPERTY(EditAnywhere, Category = "Bullet")
+	float BulletSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Bullet")
+	int Crash_count;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -22,7 +35,6 @@ protected:
 	virtual void NotifyActorEndOverlap(AActor* OtherActor);
 
 public:	
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void Interact() override;
+	virtual void Interacted() override;
 };
