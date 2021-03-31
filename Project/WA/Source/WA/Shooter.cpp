@@ -4,7 +4,6 @@
 #include "Shooter.h"
 #include "PlayerCharacter.h"
 #include "Shooter_Bullet.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 
@@ -95,4 +94,6 @@ void AShooter::RotateShooter()
 	}
 	direction.Normalize();
 	SetActorRotation(FRotator(0, FMath::RadiansToDegrees(FMath::Atan2(direction.Y, direction.X)), 0));
+	pc->SetActorRotation(GetActorRotation());
+	pc->SetActorLocation(GetActorLocation() + -GetActorForwardVector() * 40);
 }
