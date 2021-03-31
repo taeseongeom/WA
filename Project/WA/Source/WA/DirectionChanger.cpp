@@ -21,7 +21,7 @@ void ADirectionChanger::BeginPlay()
 	
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
-		iter->BeginInteractionWithPuzzle.AddUFunction(this, FName("Interact"));
+		iter->InteractionWithPuzzle.AddUFunction(this, FName("Interact"));
 		break;
 	}
 }
@@ -53,8 +53,4 @@ void ADirectionChanger::Interact()
 	{
 
 	}
-}
-
-void ADirectionChanger::Interacted()
-{
 }

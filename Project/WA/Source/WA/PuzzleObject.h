@@ -22,8 +22,9 @@ private:
 
 protected:
 	FVector boxExtent;
-
+	FVector startLocation; // 생성 or 초기화 시 위치좌표
 	bool puzzleActive;
+	bool IsCleared; // 재생성 방지 플래그
 
 	void SetInteractability(bool is_interactable);
 	bool IsInteractable();
@@ -31,7 +32,4 @@ protected:
 public:
 	UFUNCTION()
 	virtual void Interact() = 0;
-
-	UFUNCTION()
-	virtual void Interacted() = 0;
 };

@@ -19,6 +19,11 @@ private:
 	UPROPERTY()
 	class APlayerCharacter* pc;
 
+	UPROPERTY()
+	class APlayerController* pController;
+
+	FVector direction;
+
 	UPROPERTY(EditAnywhere, Category = "Bullet")
 	TSubclassOf<class AActor> BulletBlueprint;
 
@@ -34,7 +39,11 @@ protected:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 	virtual void NotifyActorEndOverlap(AActor* OtherActor);
 
-public:	
+public:
+	virtual void Tick(float DeltaTime) override;
 	virtual void Interact() override;
-	virtual void Interacted() override;
+
+private:
+	void ShootBullet();
+	void RotateShooter();
 };

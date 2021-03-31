@@ -45,28 +45,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	FName staticObjectTag;
 
-
-	FInteractDelegate BeginInteractionWithPuzzle;
-	FInteractDelegate EndInteractionWithPuzzle;
+	FInteractDelegate InteractionWithPuzzle;
 
 	void HoldMovableBox(int dir_code, FVector box_pos);
 	void SetCharacterState(ECharacterState cs);
-	void SetInteractObject(AActor* obj);
-	void ClearInteractObject();
 
 private:
 	FVector velocity;
-	AActor* interactObject;
 	UPROPERTY(VisibleAnywhere)
 	ECharacterState state;
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
-	void MoveForwardBackward(float value);
-	void MoveLeftRight(float value);
-	void RotateShooter(int dir);
 	void MoveJump();
 
-	void BeginInteraction();
-	void EndInteraction();
+	void Interaction();
 };
