@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PuzzleObject.h"
+#include "Initializable.h"
+#include "Interactable.h"
 #include "Shooter.generated.h"
 
 UCLASS()
-class WA_API AShooter : public AActor, public IPuzzleObject
+class WA_API AShooter : public AActor, public IInitializable, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -41,6 +42,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void InitializePuzzle(int room_number) override;
 	virtual void Interact() override;
 
 private:

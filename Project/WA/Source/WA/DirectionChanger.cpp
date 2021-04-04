@@ -47,10 +47,23 @@ void ADirectionChanger::Tick(float DeltaTime)
 
 }
 
+void ADirectionChanger::InitializePuzzle(int room_number)
+{
+	if (roomNum == room_number)
+	{
+
+	}
+}
+
 void ADirectionChanger::Interact()
 {
 	if (IsInteractable())
 	{
 
 	}
+}
+
+void ADirectionChanger::OnSwitch()
+{
+
 }

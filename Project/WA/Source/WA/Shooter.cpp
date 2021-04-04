@@ -56,6 +56,14 @@ void AShooter::Tick(float DeltaTime)
 	}
 }
 
+void AShooter::InitializePuzzle(int room_number)
+{
+	if (roomNum == room_number)
+	{
+
+	}
+}
+
 void AShooter::Interact()
 {
 	if (IsInteractable()) // Interact Begin
