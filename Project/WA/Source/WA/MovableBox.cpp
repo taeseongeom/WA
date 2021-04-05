@@ -76,6 +76,14 @@ void AMovableBox::Tick(float DeltaTime)
 	}
 }
 
+void AMovableBox::InitializePuzzle(int room_number)
+{
+	if (roomNum == room_number)
+	{
+
+	}
+}
+
 void AMovableBox::Interact()
 {
 	if (IsInteractable())
