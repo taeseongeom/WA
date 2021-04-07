@@ -20,8 +20,6 @@ private:
 	bool isInteractable;
 
 protected:
-	bool puzzleActive;
-
 	void SetInteractability(bool is_interactable);
 	bool IsInteractable();
 

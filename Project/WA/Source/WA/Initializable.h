@@ -21,6 +21,8 @@ private:
 	FRotator initRot;
 
 protected:
+	bool puzzleActive;
+
 	int roomNum;
 
 	/// <summary>
@@ -29,6 +31,9 @@ protected:
 	/// <param name="pos">initial position</param>
 	/// <param name="rot">initial rotator</param>
 	void BeginSetup(FVector pos, FRotator rot);
+
+	FVector GetInitPos() const;
+	FRotator GetInitRot() const;
 
 public:
 	virtual void InitializePuzzle(int room_number) = 0;

@@ -12,32 +12,35 @@ ADirectionChanger::ADirectionChanger()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-	SetInteractability(false);
+	puzzleActive = true;
+
+	revealTime = 3.0f;
+	isCounterclockwise = false;
+
+	currentTick = 0.0f;
 }
 
 void ADirectionChanger::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
-	{
-		iter->InteractionWithPuzzle.AddUFunction(this, FName("Interact"));
-		break;
-	}
+
+	BeginSetup(GetActorLocation(), GetActorRotation());
 }
 
 void ADirectionChanger::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (OtherActor->ActorHasTag(FName("Character")))
+	if (puzzleActive)
 	{
-		SetInteractability(true);
-	}
-}
-void ADirectionChanger::NotifyActorEndOverlap(AActor* OtherActor)
-{
-	if (OtherActor->ActorHasTag(FName("Character")))
-	{
-		SetInteractability(false);
+		if (OtherActor->ActorHasTag(FName("Bullet")))
+		{
+			OtherActor->SetActorRotation(GetActorRotation());
+			OtherActor->SetActorLocation(FVector(
+				GetActorLocation().X,
+				GetActorLocation().Y,
+				OtherActor->GetActorLocation().Z));
+
+			puzzleActive = false;
+		}
 	}
 }
 
@@ -45,25 +48,37 @@ void ADirectionChanger::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!puzzleActive)
+	{
+		currentTick += DeltaTime;
+		
+		if (currentTick >= revealTime)
+		{
+			currentTick = 0.0f;
+			puzzleActive = true;
+		}
+	}
 }
 
 void ADirectionChanger::InitializePuzzle(int room_number)
 {
 	if (roomNum == room_number)
 	{
+		puzzleActive = true;
+		SetActorLocation(GetInitPos());
+		SetActorRotation(GetInitRot());
 
-	}
-}
-
-void ADirectionChanger::Interact()
-{
-	if (IsInteractable())
-	{
-
+		currentTick = 0.0f;
 	}
 }
 
 void ADirectionChanger::OnSwitch()
 {
-
+	FRotator rot = FRotator(0.0f, 45.0f, 0.0f);
+	if (isCounterclockwise)
+	{
+		rot *= -1.0f;
+	}
+	
+	SetActorRotation(GetActorRotation() + rot);
 }

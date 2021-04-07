@@ -13,6 +13,8 @@ AShooter::AShooter()
  	PrimaryActorTick.bCanEverTick = true;
 
 	SetInteractability(false);
+
+	puzzleActive = false;
 }
 
 void AShooter::BeginPlay()
