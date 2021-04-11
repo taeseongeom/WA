@@ -14,21 +14,35 @@ APlayerCharacter::APlayerCharacter()
 
 	state = ECharacterState::Idle;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	bUseControllerRotationYaw = false;
-
-	move_speed = 300.0f;
+	health_point = 100.0f;
+	invincible_time = 1.0f;
+	move_speed = 600.0f;
+	move_accel = 6000.0f;
 	jump_power = 500.0f;
+	dash_speed = 1000.0f;
+	dash_time = 1.0f;
+	dash_cooldown = 3.0f;
+
 	jumping = true;
 
 	velocity = FVector::ZeroVector;
+
+	GetCharacterMovement()->MaxWalkSpeed = move_speed;
+	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 900.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = jump_power;
+	GetCharacterMovement()->AirControl = 1.0f;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = false;
 }
 
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = move_speed;
+	GetCharacterMovement()->MaxAcceleration = move_accel;
+	GetCharacterMovement()->JumpZVelocity = jump_power;
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
