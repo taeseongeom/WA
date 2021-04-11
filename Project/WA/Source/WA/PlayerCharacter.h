@@ -13,6 +13,7 @@ enum class ECharacterState : uint8
 {
 	Idle UMETA(DisplayName = "Idle"),
 	Shooting UMETA(DisplayName = "Shooting"),
+	Dash UMETA(DisplayName = "Dash")
 };
 
 UCLASS()
@@ -49,15 +50,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float jump_power;
 
-	// Speed of dash.
+	// Multiplier of the move_speed. dash_speed = move_speed * dash_multiplier.
 	UPROPERTY(EditAnywhere, Category = "Dash")
-	float dash_speed;
+	float dash_multiplier;
 	// Dash maintain during this time. Measure is a sec.
 	UPROPERTY(EditAnywhere, Category = "Dash")
 	float dash_time;
 	// Cool-time of the dash. Measure is a sec.
 	UPROPERTY(EditAnywhere, Category = "Dash")
 	float dash_cooldown;
+	bool can_dash;
+	float cur_dashTime;
+	float cur_dashCooltime;
 
 	// Character movement velocity
 	FVector velocity;
@@ -68,7 +72,8 @@ private:
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
 	void MoveJump();
-
+	void MoveDashBegin();
+	void MoveDashEnd();
 	void Interaction();
 
 public:

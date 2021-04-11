@@ -19,19 +19,24 @@ APlayerCharacter::APlayerCharacter()
 	move_speed = 600.0f;
 	move_accel = 6000.0f;
 	jump_power = 500.0f;
-	dash_speed = 1000.0f;
-	dash_time = 1.0f;
+	dash_multiplier = 4.0f;
+	dash_time = 0.4f;
 	dash_cooldown = 3.0f;
+	can_dash = true;
+	cur_dashTime = 0.0f;
+	cur_dashCooltime = 0.0f;
 
 	jumping = true;
 
 	velocity = FVector::ZeroVector;
 
+	// 캐릭터 이동 관련 초기값을 CharacterMovementComponent에 반영
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 900.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = jump_power;
 	GetCharacterMovement()->AirControl = 1.0f;
+	GetCharacterMovement()->FallingLateralFriction = GetCharacterMovement()->GroundFriction;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 }
@@ -48,6 +53,38 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Dash 실행
+	if (ECharacterState::Dash == state)
+	{
+		AddMovementInput(GetActorForwardVector(), dash_multiplier);
+
+		cur_dashTime += DeltaTime;
+		if (cur_dashTime >= dash_time)	// Dash 종료
+		{
+			can_dash = false;
+			cur_dashTime = 0.0f;
+			cur_dashCooltime = dash_cooldown;
+
+			// 최대 이동 속도 원상 복귀
+			GetCharacterMovement()->MaxWalkSpeed = move_speed;
+			GetCharacterMovement()->MaxAcceleration = move_accel;
+			// 중력 다시 활성화
+			GetCharacterMovement()->GravityScale = 1.0f;
+
+			state = ECharacterState::Idle;
+		}
+	}
+	// Dash 쿨다운 진행
+	if (!can_dash && cur_dashCooltime > 0)
+	{
+		cur_dashCooltime -= DeltaTime;
+		if (cur_dashCooltime <= 0)
+		{
+			cur_dashCooltime = 0;
+			can_dash = true;
+		}
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -57,6 +94,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::InputForwardBackward);
 	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::InputLeftRight);
 	PlayerInputComponent->BindAction(TEXT("MoveJump"), IE_Pressed, this, &APlayerCharacter::MoveJump);
+	PlayerInputComponent->BindAction(TEXT("MoveDash"), IE_Pressed, this, &APlayerCharacter::MoveDashBegin);
+	PlayerInputComponent->BindAction(TEXT("MoveDash"), IE_Released, this, &APlayerCharacter::MoveDashEnd);
 	PlayerInputComponent->BindAction(TEXT("Interaction"), IE_Pressed, this, &APlayerCharacter::Interaction);
 }
 
@@ -72,7 +111,6 @@ void APlayerCharacter::InputForwardBackward(float value)
 		break;
 	}
 }
-
 void APlayerCharacter::InputLeftRight(float value)
 {
 	switch (state)
@@ -89,7 +127,39 @@ void APlayerCharacter::MoveJump()
 {
 	Jump();
 }
+void APlayerCharacter::MoveDashBegin()
+{
+	if (can_dash)
+	{
+		cur_dashTime = 0.0f;
 
+		// 최대 이동 속도를 임시로 늘림
+		GetCharacterMovement()->MaxWalkSpeed = move_speed * dash_multiplier;
+		GetCharacterMovement()->MaxAcceleration = move_accel * dash_multiplier;
+		// 임시로 중력 제거
+		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->Velocity.Z = 0.0f;
+
+		state = ECharacterState::Dash;
+	}
+}
+void APlayerCharacter::MoveDashEnd()
+{
+	if (ECharacterState::Dash == state)
+	{
+		can_dash = false;
+		cur_dashTime = 0.0f;
+		cur_dashCooltime = dash_cooldown;
+
+		// 최대 이동 속도 원상 복귀
+		GetCharacterMovement()->MaxWalkSpeed = move_speed;
+		GetCharacterMovement()->MaxAcceleration = move_accel;
+		// 중력 다시 활성화
+		GetCharacterMovement()->GravityScale = 1.0f;
+
+		state = ECharacterState::Idle;
+	}
+}
 void APlayerCharacter::Interaction()
 {
 	InteractionWithPuzzle.Broadcast();
