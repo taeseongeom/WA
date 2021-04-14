@@ -22,7 +22,10 @@ APlayerCharacter::APlayerCharacter()
 	dash_multiplier = 4.0f;
 	dash_time = 0.4f;
 	dash_cooldown = 3.0f;
-	can_dash = true;
+
+	dash_count = 0;
+	has_landed = false;
+	cur_dashCount = dash_count;
 	cur_dashTime = 0.0f;
 	cur_dashCooltime = 0.0f;
 
@@ -50,6 +53,16 @@ void APlayerCharacter::BeginPlay()
 	GetCharacterMovement()->JumpZVelocity = jump_power;
 }
 
+void APlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	if (cur_dashCount < dash_count)
+	{
+		has_landed = true;
+	}
+}
+
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -62,9 +75,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 		cur_dashTime += DeltaTime;
 		if (cur_dashTime >= dash_time)	// Dash 종료
 		{
-			can_dash = false;
+			cur_dashCount--;
 			cur_dashTime = 0.0f;
-			cur_dashCooltime = dash_cooldown;
+			cur_dashCooltime = 0.0f;
 
 			// 최대 이동 속도 원상 복귀
 			GetCharacterMovement()->MaxWalkSpeed = move_speed;
@@ -76,13 +89,21 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 	// Dash 쿨다운 진행
-	if (!can_dash && cur_dashCooltime > 0)
+	if (cur_dashCount < dash_count)
 	{
-		cur_dashCooltime -= DeltaTime;
-		if (cur_dashCooltime <= 0)
+		cur_dashCooltime += DeltaTime;
+		if (cur_dashCooltime >= dash_cooldown)
 		{
-			cur_dashCooltime = 0;
-			can_dash = true;
+			if (!GetCharacterMovement()->IsFalling() || has_landed)
+			{
+				cur_dashCount++;
+				cur_dashCooltime = cur_dashCooltime - dash_cooldown;
+				if (cur_dashCount >= dash_count)
+				{
+					cur_dashCooltime = 0.0f;
+				}
+				has_landed = false;
+			}
 		}
 	}
 }
@@ -129,7 +150,7 @@ void APlayerCharacter::MoveJump()
 }
 void APlayerCharacter::MoveDashBegin()
 {
-	if (can_dash)
+	if (cur_dashCount > 0 && ECharacterState::Dash != state)
 	{
 		cur_dashTime = 0.0f;
 
@@ -147,9 +168,9 @@ void APlayerCharacter::MoveDashEnd()
 {
 	if (ECharacterState::Dash == state)
 	{
-		can_dash = false;
+		cur_dashCount--;
 		cur_dashTime = 0.0f;
-		cur_dashCooltime = dash_cooldown;
+		cur_dashCooltime = 0.0f;
 
 		// 최대 이동 속도 원상 복귀
 		GetCharacterMovement()->MaxWalkSpeed = move_speed;
@@ -194,4 +215,19 @@ void APlayerCharacter::HoldMovableBox(int dir_code, FVector box_pos)
 
 void APlayerCharacter::SetCharacterState(ECharacterState cs) {
 	state = cs;
+}
+
+void APlayerCharacter::IncreaseDashCount(int increase_num)
+{
+	dash_count += increase_num;
+	cur_dashCount = dash_count;
+}
+void APlayerCharacter::DecreaseDashCount(int decrease_num)
+{
+	dash_count -= decrease_num;
+	if (cur_dashCount > dash_count)
+	{
+		cur_dashCount = dash_count;
+		cur_dashCooltime = 0.0f;
+	}
 }

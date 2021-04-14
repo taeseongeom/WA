@@ -27,6 +27,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Landed(const FHitResult& Hit) override;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -59,7 +61,12 @@ private:
 	// Cool-time of the dash. Measure is a sec.
 	UPROPERTY(EditAnywhere, Category = "Dash")
 	float dash_cooldown;
-	bool can_dash;
+
+	// The counts of dashes that a character can do. (UPROPERTY is for the test)
+	UPROPERTY(EditAnywhere, Category = "Dash")
+	int dash_count;
+	bool has_landed;
+	int cur_dashCount;
 	float cur_dashTime;
 	float cur_dashCooltime;
 
@@ -88,4 +95,7 @@ public:
 
 	void HoldMovableBox(int dir_code, FVector box_pos);
 	void SetCharacterState(ECharacterState cs);
+
+	void IncreaseDashCount(int increase_num);
+	void DecreaseDashCount(int decrease_num);
 };
