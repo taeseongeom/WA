@@ -51,7 +51,7 @@ void AShooter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (puzzleActive)
 	{
-		if (pController->WasInputKeyJustReleased(EKeys::X))
+		if (pController->WasInputKeyJustReleased(EKeys::C))
 			ShootBullet();
 		else
 			RotateShooter();
