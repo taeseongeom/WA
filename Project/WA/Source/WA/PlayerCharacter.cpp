@@ -63,6 +63,20 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	}
 }
 
+float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	
+	health_point -= Damage;
+
+	if (health_point <= 0)
+	{
+		Death();
+	}
+
+	return health_point;
+}
+
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -184,6 +198,12 @@ void APlayerCharacter::MoveDashEnd()
 void APlayerCharacter::Interaction()
 {
 	InteractionWithPuzzle.Broadcast();
+}
+
+void APlayerCharacter::Death()
+{
+	// 최기화 코드 삽입
+	UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
 }
 
 void APlayerCharacter::HoldMovableBox(int dir_code, FVector box_pos)
