@@ -29,6 +29,8 @@ protected:
 
 	virtual void Landed(const FHitResult& Hit) override;
 
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -82,6 +84,8 @@ private:
 	void MoveDashBegin();
 	void MoveDashEnd();
 	void Interaction();
+
+	void Death();
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Movement")
