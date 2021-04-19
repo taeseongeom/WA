@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Initializable.h"
+#include "Switchable.h"
+#include "DefaultPuzzle.h"
 #include "PlatformWayPoint.h"
 #include "MovingPlatform.generated.h"
 
 UCLASS()
-class WA_API AMovingPlatform : public AActor, public IInitializable
+class WA_API AMovingPlatform : public ADefaultPuzzle, public ISwitchable
 {
 	GENERATED_BODY()
 	
@@ -19,9 +20,6 @@ public:
 private:
 	UPROPERTY(EditAnywhere, Category = "WayPoint")
 	APlatformWayPoint* WayPoint;
-
-	UPROPERTY(EditAnywhere)
-	bool isTurnOn;
 
 	UPROPERTY(EditAnywhere)
 	bool isArrive;
@@ -36,6 +34,6 @@ private:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void InitializePuzzle(int room_number) override;
-	void TurnOnAndOffPlatform(bool value);
+	virtual void InitializePuzzle() override;
+	virtual void OnSwitch() override;
 };

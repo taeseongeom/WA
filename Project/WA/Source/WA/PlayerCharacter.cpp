@@ -2,6 +2,7 @@
 
 
 #include "PlayerCharacter.h"
+#include "WAGameModeBase.h"
 
 
 APlayerCharacter::APlayerCharacter()
@@ -119,6 +120,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 				has_landed = false;
 			}
 		}
+	}
+	if (GetActorLocation().Z < -300)
+	{
+		((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->RoomReset();
+		SetActorLocation(FVector(50.0f, 30.0f, 325.0f));
 	}
 }
 
