@@ -3,7 +3,6 @@
 
 #include "MovableBox.h"
 #include "PlayerCharacter.h"
-
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 
@@ -27,6 +26,7 @@ void AMovableBox::BeginPlay()
 	Super::BeginPlay();
 
 	SetTickGroup(TG_PostUpdateWork);
+	BeginSetup(GetActorLocation(), GetActorRotation());
 
 	boxBody = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass()));
 	if (boxBody != nullptr)
@@ -57,7 +57,7 @@ void AMovableBox::NotifyActorEndOverlap(AActor* OtherActor)
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(false);
-		puzzleActive = false;
+		//puzzleActive = false;
 		OutOfInteractionRange();
 	}
 	else
@@ -76,12 +76,12 @@ void AMovableBox::Tick(float DeltaTime)
 	}
 }
 
-void AMovableBox::InitializePuzzle(int room_number)
+void AMovableBox::InitializePuzzle()
 {
-	if (roomNum == room_number)
-	{
-
-	}
+	Super::InitializePuzzle();
+	SetInteractability(false);
+	velocity = FVector::ZeroVector;
+	distance = FVector::ZeroVector;
 }
 
 void AMovableBox::Interact()

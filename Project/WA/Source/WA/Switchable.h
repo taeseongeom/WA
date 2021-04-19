@@ -16,6 +16,10 @@ class WA_API ISwitchable
 {
 	GENERATED_BODY()
 
+protected:
+	bool isTurnOn;
 public:
 	virtual void OnSwitch() = 0;
+	bool GetIsTurnOn() const;
+	void SetIsTurnOn(bool value);
 };

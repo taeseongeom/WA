@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Initializable.h"
 #include "Switchable.h"
+#include "DefaultPuzzle.h"
 #include "DirectionChanger.generated.h"
 
 UCLASS()
-class WA_API ADirectionChanger : public AActor, public IInitializable, public ISwitchable
+class WA_API ADirectionChanger : public ADefaultPuzzle, public ISwitchable
 {
 	GENERATED_BODY()
 	
@@ -24,6 +23,7 @@ private:
 
 	float currentTick;
 
+	bool changeActive;
 protected:
 	virtual void BeginPlay() override;
 
@@ -32,6 +32,6 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void InitializePuzzle(int room_number) override;
+	virtual void InitializePuzzle() override;
 	virtual void OnSwitch() override;
 };

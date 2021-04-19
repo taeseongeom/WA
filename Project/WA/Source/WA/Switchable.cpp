@@ -3,4 +3,10 @@
 
 #include "Switchable.h"
 
+bool ISwitchable::GetIsTurnOn() const{
+	return isTurnOn;
+}
 
+void ISwitchable::SetIsTurnOn(bool value){
+	isTurnOn = value;
+}
