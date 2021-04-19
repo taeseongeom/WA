@@ -21,3 +21,7 @@ void AWAGameModeBase::RoomReset(){
 		iter; ++iter)
 		iter.Value()->InitializePuzzle();
 }
+
+void AWAGameModeBase::SetCurrentRoomNumber(int8 value) {
+	CurrentRoomNum = value;
+}
