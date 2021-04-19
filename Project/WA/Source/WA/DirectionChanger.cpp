@@ -3,7 +3,6 @@
 
 #include "DirectionChanger.h"
 #include "PlayerCharacter.h"
-
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 
@@ -12,7 +11,7 @@ ADirectionChanger::ADirectionChanger()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-	puzzleActive = true;
+	changeActive = true;
 
 	revealTime = 3.0f;
 	isCounterclockwise = false;
@@ -29,7 +28,7 @@ void ADirectionChanger::BeginPlay()
 
 void ADirectionChanger::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (puzzleActive)
+	if (changeActive)
 	{
 		if (OtherActor->ActorHasTag(FName("Bullet")))
 		{
@@ -39,7 +38,7 @@ void ADirectionChanger::NotifyActorBeginOverlap(AActor* OtherActor)
 				GetActorLocation().Y,
 				OtherActor->GetActorLocation().Z));
 
-			puzzleActive = false;
+			changeActive = false;
 		}
 	}
 }
@@ -48,28 +47,22 @@ void ADirectionChanger::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!puzzleActive)
+	if (!changeActive)
 	{
 		currentTick += DeltaTime;
 		
 		if (currentTick >= revealTime)
 		{
 			currentTick = 0.0f;
-			puzzleActive = true;
+			changeActive = true;
 		}
 	}
 }
 
-void ADirectionChanger::InitializePuzzle(int room_number)
+void ADirectionChanger::InitializePuzzle()
 {
-	if (roomNum == room_number)
-	{
-		puzzleActive = true;
-		SetActorLocation(GetInitPos());
-		SetActorRotation(GetInitRot());
-
-		currentTick = 0.0f;
-	}
+	Super::InitializePuzzle();
+	currentTick = 0.0f;
 }
 
 void ADirectionChanger::OnSwitch()

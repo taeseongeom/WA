@@ -13,13 +13,12 @@ AShooter::AShooter()
  	PrimaryActorTick.bCanEverTick = true;
 
 	SetInteractability(false);
-
-	puzzleActive = false;
 }
 
 void AShooter::BeginPlay()
 {
 	Super::BeginPlay();
+	BeginSetup(GetActorLocation(), GetActorRotation());
 	
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
@@ -58,26 +57,23 @@ void AShooter::Tick(float DeltaTime)
 	}
 }
 
-void AShooter::InitializePuzzle(int room_number)
+void AShooter::InitializePuzzle()
 {
-	if (roomNum == room_number)
-	{
-
-	}
+	Super::InitializePuzzle();
 }
 
 void AShooter::Interact()
 {
 	if (IsInteractable()) // Interact Begin
 	{
-		puzzleActive = !puzzleActive;
+		puzzleActive = true;
 		pc->SetCharacterState(ECharacterState::Shooting);
 	}
 }
 
 void AShooter::ShootBullet()
 {
-	puzzleActive = !puzzleActive;
+	puzzleActive = false;
 	pc->SetCharacterState(ECharacterState::Idle);
 	AShooter_Bullet* bullet = (AShooter_Bullet*)GetWorld()->SpawnActor<AActor>(BulletBlueprint, GetActorLocation(), GetActorRotation());
 	bullet->SetStack(BulletSpeed, Crash_count);

@@ -16,6 +16,7 @@ AMovingPlatform::AMovingPlatform()
 void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
+	BeginSetup(GetActorLocation(), GetActorRotation());
 }
 
 void AMovingPlatform::MovePlatform(float DeltaTime)
@@ -26,8 +27,9 @@ void AMovingPlatform::MovePlatform(float DeltaTime)
 			(WayPoint->GetActorLocation() - GetActorLocation()).GetSafeNormal()
 			* DeltaTime * WayPoint->GetSpeed());
 	}
-	if (FVector::Distance(GetActorLocation(), WayPoint->GetActorLocation()) < 1.5f && !isArrive)
+	if (FVector::Distance(GetActorLocation(), WayPoint->GetActorLocation()) < 5.0f && !isArrive)
 	{
+		SetActorLocation(WayPoint->GetActorLocation());
 		isArrive = true;
 		GetWorldTimerManager().SetTimer(CountdownTimerHandle,
 			this, &AMovingPlatform::MoveNextWayPoint, WayPoint->GetDelayTime(), true);
@@ -49,12 +51,22 @@ void AMovingPlatform::Tick(float DeltaTime)
 	if(isTurnOn) MovePlatform(DeltaTime);
 }
 
-void AMovingPlatform::InitializePuzzle(int room_number)
+void AMovingPlatform::InitializePuzzle()
 {
+	Super::InitializePuzzle();
 }
 
-void AMovingPlatform::TurnOnAndOffPlatform(bool value)
+void AMovingPlatform::OnSwitch()
 {
-	isTurnOn = value;
+	if (isTurnOn)
+	{
+		isTurnOn = false;
+	}
+	else
+	{
+		isTurnOn = true;
+		UE_LOG(LogTemp, Warning, TEXT("StartMoving"));
+	}
+	puzzleActive = isTurnOn;
 }
 
