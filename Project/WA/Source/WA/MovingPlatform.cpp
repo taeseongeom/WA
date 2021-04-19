@@ -48,7 +48,7 @@ void AMovingPlatform::MoveNextWayPoint()
 void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(isTurnOn) MovePlatform(DeltaTime);
+	if(isTurnOn && puzzleActive) MovePlatform(DeltaTime);
 }
 
 void AMovingPlatform::InitializePuzzle()
