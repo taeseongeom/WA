@@ -18,14 +18,14 @@ public:
 	// Sets default values for this actor's properties
 	ASwitchlever();
 private:
-	UPROPERTY(EditAnywhere)
-	ADefaultPuzzle* TurnOnTarget;
+	UPROPERTY(EditAnywhere, Category = "SwitchTarget")
+	TArray<ADefaultPuzzle*> TurnOnTargets;
+
+	UPROPERTY(EditAnywhere, Category = "SwitchTarget")
+	TArray<bool> initIsTurnOn;
 
 	UPROPERTY()
 	class APlayerCharacter* pc;
-
-	UPROPERTY(EditAnywhere, Category = "Init")
-	bool initIsTurnOn;
 
 protected:
 	// Called when the game starts or when spawned

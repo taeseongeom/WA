@@ -47,12 +47,14 @@ void ASwitchlever::Interact()
 {
 	if (IsInteractable()) // Interact Begin
 	{
-		Cast<ISwitchable>(TurnOnTarget)->OnSwitch();
+		for (int8 i = 0; i < TurnOnTargets.Num(); i++)
+			Cast<ISwitchable>(TurnOnTargets[i])->OnSwitch();
 	}
 }
 
 void ASwitchlever::InitializePuzzle()
 {
 	Super::InitializePuzzle();
-	Cast<ISwitchable>(TurnOnTarget)->SetIsTurnOn(initIsTurnOn);
+	for (int8 i = 0; i < TurnOnTargets.Num(); i++)
+		Cast<ISwitchable>(TurnOnTargets[i])->SetIsTurnOn(initIsTurnOn[i]);
 }
