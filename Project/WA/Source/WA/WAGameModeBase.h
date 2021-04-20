@@ -15,10 +15,11 @@ class WA_API AWAGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
-	void AddInitPuzzle(ADefaultPuzzle* value, int roomNum);
-	void RoomReset();
 	AWAGameModeBase();
 	virtual void BeginPlay() override;
+	void AddInitPuzzle(ADefaultPuzzle* value, int roomNum);
+	void RoomReset();
+	void SetCurrentRoomNumber(int8 value);
 private:
 	//UPROPERTY 사용 불가능한데 추후 수정필요
 	TMultiMap<int8, ADefaultPuzzle*> InitPuzzles;
