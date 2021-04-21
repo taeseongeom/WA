@@ -17,6 +17,7 @@ void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	BeginSetup(GetActorLocation(), GetActorRotation());
+	isTurnOn = initIsTurnOn;
 }
 
 void AMovingPlatform::MovePlatform(float DeltaTime)
@@ -54,6 +55,7 @@ void AMovingPlatform::Tick(float DeltaTime)
 void AMovingPlatform::InitializePuzzle()
 {
 	Super::InitializePuzzle();
+	isTurnOn = initIsTurnOn;
 }
 
 void AMovingPlatform::OnSwitch()
