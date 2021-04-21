@@ -21,6 +21,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "WayPoint")
 	APlatformWayPoint* WayPoint;
 
+	UPROPERTY(EditAnywhere, Category = "Init")
+	bool initIsTurnOn;
+
 	UPROPERTY(EditAnywhere)
 	bool isArrive;
 
