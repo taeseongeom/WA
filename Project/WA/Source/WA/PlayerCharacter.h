@@ -75,6 +75,11 @@ private:
 	// Character movement velocity
 	FVector velocity;
 
+	/// <summary>
+	/// 카메라 생성 여부. 첫 착지 시에 카메라가 생성됩니다.
+	/// </summary>
+	bool camera_init;
+
 	UPROPERTY(VisibleAnywhere)
 	ECharacterState state;
 
