@@ -2,6 +2,8 @@
 
 
 #include "PlayerCharacter.h"
+
+#include "PlayerCamera.h"
 #include "WAGameModeBase.h"
 
 
@@ -17,7 +19,7 @@ APlayerCharacter::APlayerCharacter()
 
 	health_point = 100.0f;
 	invincible_time = 1.0f;
-	move_speed = 600.0f;
+	move_speed = 800.0f;
 	move_accel = 6000.0f;
 	jump_power = 500.0f;
 	dash_multiplier = 4.0f;
@@ -33,6 +35,8 @@ APlayerCharacter::APlayerCharacter()
 	jumping = true;
 
 	velocity = FVector::ZeroVector;
+
+	camera_init = false;
 
 	// 캐릭터 이동 관련 초기값을 CharacterMovementComponent에 반영
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
@@ -58,6 +62,23 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
+	// 첫 착지 시, 카메라 생성
+	if (!camera_init)
+	{
+		camera_init = true;
+
+		UCameraComponent* camera = Cast<UCameraComponent>(GetComponentByClass(UCameraComponent::StaticClass()));
+
+		APlayerCamera* new_camera = GetWorld()->SpawnActor<APlayerCamera>(
+			camera->GetComponentTransform().GetLocation(),
+			camera->GetComponentTransform().GetRotation().Rotator());
+		GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(new_camera);
+		new_camera->SetInitialize(this, camera->GetComponentTransform().GetLocation() - GetActorLocation());
+
+		camera->DestroyComponent();
+	}
+	
+	// dash 횟수 충전
 	if (cur_dashCount < dash_count)
 	{
 		has_landed = true;
