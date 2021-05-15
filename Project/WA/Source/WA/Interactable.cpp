@@ -8,7 +8,7 @@ void IInteractable::SetInteractability(bool is_interactable)
 {
 	isInteractable = is_interactable;
 }
-bool IInteractable::IsInteractable()
+bool IInteractable::IsInteractable() const
 {
 	return isInteractable;
 }

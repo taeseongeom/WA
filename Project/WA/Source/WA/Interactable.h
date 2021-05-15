@@ -21,7 +21,7 @@ private:
 
 protected:
 	void SetInteractability(bool is_interactable);
-	bool IsInteractable();
+	bool IsInteractable() const;
 
 public:
 	UFUNCTION()

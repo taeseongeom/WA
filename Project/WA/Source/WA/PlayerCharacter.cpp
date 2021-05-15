@@ -90,7 +90,14 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	
 	health_point -= Damage;
+	
+	// 넉백
+	// ForwardVector 기준으로 반대 방향에 목적지 잡아놓고, 선형보간 연산으로 이동시키는 것도 좋다. 지속시간은 invincible과 동일하다.
+	// 이동을 금지해야 하므로 state 변경이 필요할 것이며, Tick에 내용 구현이 이루어져야 할 것이다.
 
+	UE_LOG(LogTemp, Warning, TEXT("Player Damaged."));
+
+	// 사망
 	if (health_point <= 0)
 	{
 		Death();
