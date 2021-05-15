@@ -13,7 +13,8 @@ enum class ECharacterState : uint8
 {
 	Idle UMETA(DisplayName = "Idle"),
 	Shooting UMETA(DisplayName = "Shooting"),
-	Dash UMETA(DisplayName = "Dash")
+	Dash UMETA(DisplayName = "Dash"),
+	KnockBack UMETA(DisplayName = "Knock-Back")
 };
 
 UCLASS()
@@ -55,33 +56,40 @@ private:
 	float jump_power;
 
 	// Multiplier of the move_speed. dash_speed = move_speed * dash_multiplier.
-	UPROPERTY(EditAnywhere, Category = "Dash")
+	UPROPERTY(EditAnywhere, Category = "Movement|Dash")
 	float dash_multiplier;
 	// Dash maintain during this time. Measure is a sec.
-	UPROPERTY(EditAnywhere, Category = "Dash")
+	UPROPERTY(EditAnywhere, Category = "Movement|Dash")
 	float dash_time;
 	// Cool-time of the dash. Measure is a sec.
-	UPROPERTY(EditAnywhere, Category = "Dash")
+	UPROPERTY(EditAnywhere, Category = "Movement|Dash")
 	float dash_cooldown;
-
 	// The counts of dashes that a character can do. (UPROPERTY is for the test)
-	UPROPERTY(EditAnywhere, Category = "Dash")
+	UPROPERTY(EditAnywhere, Category = "Movement|Dash")
 	int dash_count;
-	bool has_landed;
-	int cur_dashCount;
-	float cur_dashTime;
-	float cur_dashCooltime;
 
-	// Character movement velocity
+	// 카메라 생성 여부. 첫 착지 시에 카메라가 생성됩니다.
+	bool camera_init;
+	
+	// 캐릭터 이동 속도
 	FVector velocity;
 
-	/// <summary>
-	/// 카메라 생성 여부. 첫 착지 시에 카메라가 생성됩니다.
-	/// </summary>
-	bool camera_init;
-
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	// 캐릭터 상태
 	ECharacterState state;
+
+	// 캐릭터의 착지 여부. 대시 카운트 회복 여부를 판단할 때 사용됩니다.
+	bool has_landed;
+	// 현재 남은 대시 사용가능 횟수
+	int cur_dashCount;
+	// 현재 경과된 대시 지속 시간
+	float cur_dashTime;
+	// 현재 경과된 대시 쿨타임
+	float cur_dashCooltime;
+
+	// 현재 경과된 무적 시간(피격 지속 시간)
+	float cur_invincibleTime;
+
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
@@ -93,13 +101,6 @@ private:
 	void Death();
 
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Movement")
-	bool jumping;
-
-	// A tag of objects which do not affect by this object. Floors, walls, and other blocks that block the path or can be stepped on MUST contain this tag.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	FName staticObjectTag;
-
 	FInteractDelegate InteractionWithPuzzle;
 
 	void HoldMovableBox(int dir_code, FVector box_pos);

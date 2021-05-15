@@ -15,6 +15,7 @@ APlayerCharacter::APlayerCharacter()
 
 	Tags.Add(FName("Character"));
 
+	velocity = FVector::ZeroVector;
 	state = ECharacterState::Idle;
 
 	health_point = 100.0f;
@@ -25,18 +26,16 @@ APlayerCharacter::APlayerCharacter()
 	dash_multiplier = 4.0f;
 	dash_time = 0.4f;
 	dash_cooldown = 3.0f;
-
 	dash_count = 0;
+
+	camera_init = false;
+
 	has_landed = false;
 	cur_dashCount = dash_count;
 	cur_dashTime = 0.0f;
 	cur_dashCooltime = 0.0f;
 
-	jumping = true;
-
-	velocity = FVector::ZeroVector;
-
-	camera_init = false;
+	cur_invincibleTime = 0.0f;
 
 	// 캐릭터 이동 관련 초기값을 CharacterMovementComponent에 반영
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
@@ -89,13 +88,16 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	
-	health_point -= Damage;
-	
-	// 넉백
-	// ForwardVector 기준으로 반대 방향에 목적지 잡아놓고, 선형보간 연산으로 이동시키는 것도 좋다. 지속시간은 invincible과 동일하다.
-	// 이동을 금지해야 하므로 state 변경이 필요할 것이며, Tick에 내용 구현이 이루어져야 할 것이다.
+	if (ECharacterState::KnockBack != state)
+	{
+		health_point -= Damage;
 
-	UE_LOG(LogTemp, Warning, TEXT("Player Damaged."));
+		// 넉백
+		// 단순 뒤로 이동도 좋고, ForwardVector 기준으로 반대 방향에 목적지 잡아놓고 선형보간 연산으로 이동시키는 것도 좋다.
+		// 지속시간은 invincible과 동일. 이동을 금지해야 하므로 state 변경이 필요하며, Tick에 내용 구현이 이루어져야 한다.
+		state = ECharacterState::KnockBack;
+		velocity = GetActorForwardVector() * -2.0f;
+	}
 
 	// 사망
 	if (health_point <= 0)
@@ -149,10 +151,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	// 넉백
+	if (ECharacterState::KnockBack == state)
+	{
+		cur_invincibleTime += DeltaTime;
+		if (cur_invincibleTime > invincible_time)
+		{
+			cur_invincibleTime = 0.0f;
+			state = ECharacterState::Idle;
+		}
+
+		velocity *= 0.99f;
+		SetActorLocation(GetActorLocation() + velocity);
+	}
+
+	// 아래로 떨어지면 사망
 	if (GetActorLocation().Z < -300)
 	{
-		((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->RoomReset();
-		SetActorLocation(FVector(50.0f, 30.0f, 325.0f));
+		Death();
 	}
 }
 
@@ -236,8 +253,18 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::Death()
 {
-	// 최기화 코드 삽입
-	UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
+	// 초기화
+	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
+	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->RoomReset();
+	SetActorLocation(FVector(50.0f, 30.0f, 325.0f));
+
+	health_point = 3;
+
+	velocity = FVector::ZeroVector;
+
+	state = ECharacterState::Idle;
+
+	cur_invincibleTime = 0.0f;
 }
 
 void APlayerCharacter::HoldMovableBox(int dir_code, FVector box_pos)

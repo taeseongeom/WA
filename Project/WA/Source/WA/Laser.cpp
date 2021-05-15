@@ -28,7 +28,8 @@ void ALaser::Tick(float DeltaTime)
 		FVector laser_target = laser_start + GetActorForwardVector() * 10000.0f;
 
 		FHitResult hit;
-		bool hit_res = GetWorld()->LineTraceSingleByChannel(hit, laser_start, laser_target, ECollisionChannel::ECC_GameTraceChannel3);
+		//bool hit_res = GetWorld()->LineTraceSingleByChannel(hit, laser_start, laser_target, ECollisionChannel::ECC_GameTraceChannel3);
+		bool hit_res = GetWorld()->LineTraceSingleByProfile(hit, laser_start, laser_target, FName("Laser"));
 		if (hit_res)
 		{
 			if (hit.Actor->ActorHasTag(FName("Character")))
