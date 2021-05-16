@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "HideOnBox.h"
 #include "DefaultPuzzle.generated.h"
 
 UCLASS()
-class WA_API ADefaultPuzzle : public AActor
+class WA_API ADefaultPuzzle : public AActor, public IHideOnBox
 {
 	GENERATED_BODY()
 	
@@ -37,4 +38,10 @@ private: // Reset Property
 	bool initpuzzleActive;
 	UPROPERTY(EditAnywhere, Category = "Init")
 	int32 roomNum;
+	UPROPERTY(EditAnywhere, Category = "Init")
+	bool isInitBreakableBox;
+	UPROPERTY()
+	TSubclassOf<class ABreakableBox> breakableBoxBlueprint;
+	UPROPERTY()
+	class ABreakableBox* breakableBox;
 };
