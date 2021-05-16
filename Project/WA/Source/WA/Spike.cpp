@@ -28,6 +28,10 @@ void ASpike::BeginPlay()
 	
 	spikeMesh = Cast<USceneComponent>(GetComponentsByTag(USceneComponent::StaticClass(), FName("SpikeMesh"))[0]);
 
+	if (ESpikeType::FIXED == spikeType)
+	{
+		puzzleActive = true;
+	}
 	SwitchActive(puzzleActive);
 }
 
