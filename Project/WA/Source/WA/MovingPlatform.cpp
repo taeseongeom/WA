@@ -39,7 +39,6 @@ void AMovingPlatform::MovePlatform(float DeltaTime)
 
 void AMovingPlatform::MoveNextWayPoint()
 {
-	UE_LOG(LogTemp, Warning, TEXT("switch"));
 	WayPoint = WayPoint->SwitchPlatformWayPoint();
 	GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
 	isArrive = false;

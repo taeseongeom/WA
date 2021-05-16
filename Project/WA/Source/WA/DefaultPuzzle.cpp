@@ -3,6 +3,8 @@
 
 #include "DefaultPuzzle.h"
 #include "WA.h"
+#include "BreakableBox.h"
+#include "UObject/ConstructorHelpers.h"
 #include "WAGameModeBase.h"
 
 // Sets default values
@@ -12,12 +14,37 @@ ADefaultPuzzle::ADefaultPuzzle()
 	PrimaryActorTick.bCanEverTick = true;
 	initPos = FVector::ZeroVector;
 	initRot = FRotator::ZeroRotator;
+	static ConstructorHelpers::FObjectFinder<UBlueprint> boxBlueprint(
+		TEXT("Blueprint'/Game/BluePrints/BP_BreakableBox.BP_BreakableBox'"));
+	if (boxBlueprint.Object)
+	{
+		breakableBoxBlueprint = (UClass*)boxBlueprint.Object->GeneratedClass;
+	}
 }
 
 // Called when the game starts or when spawned
 void ADefaultPuzzle::BeginPlay()
 {
 	Super::BeginPlay();
+	if (isInitBreakableBox)
+	{
+		UWorld* const World = GetWorld();
+		if (World)
+		{
+			breakableBox = World->SpawnActor<ABreakableBox>
+				(breakableBoxBlueprint, GetActorLocation(), FRotator::ZeroRotator);
+
+			if (breakableBox != nullptr)
+			{
+				breakableBox->target = this;
+				breakableBox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+				SetActorEnableCollision(false);
+				SetHide(true);
+			}
+			else
+				UE_LOG(LogTemp, Warning, TEXT("Not Init"));
+		}
+	}
 	puzzleActive = initpuzzleActive;
 	BeginSetup(GetActorLocation(), GetActorRotation());
 	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->AddInitPuzzle(this, roomNum);
@@ -40,4 +67,10 @@ void ADefaultPuzzle::InitializePuzzle()
 	SetActorLocation(initPos);
 	SetActorRotation(initRot);
 	puzzleActive = initpuzzleActive;
+	if (isInitBreakableBox && breakableBox != nullptr)
+	{
+		SetActorHiddenInGame(true);
+		SetActorEnableCollision(true);
+		SetHide(true);
+	}
 }

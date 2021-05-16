@@ -4,27 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interactable.h"
 #include "SwitchPuzzle.h"
-#include "Switchlever.generated.h"
+#include "SwitchTarget.generated.h"
 
 UCLASS()
-class WA_API ASwitchlever : public ASwitchPuzzle, public IInteractable
+class WA_API ASwitchTarget : public ASwitchPuzzle
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ASwitchlever();
-private:
-	UPROPERTY()
-	class APlayerCharacter* pc;
+	ASwitchTarget();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
-	virtual void NotifyActorEndOverlap(AActor* OtherActor);
-public:	
-	// Called every frame
-	virtual void Interact() override;
+public:
 };
