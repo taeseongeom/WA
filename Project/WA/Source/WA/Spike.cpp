@@ -96,7 +96,7 @@ void ASpike::Tick(float DeltaTime)
 		}
 		else
 		{
-			spikeMesh->SetRelativeLocation(FMath::Lerp(spikeMesh->GetRelativeLocation(), FVector(0.0f, 0.0f, -20.0f), DeltaTime * 10.0f));
+			spikeMesh->SetRelativeLocation(FMath::Lerp(spikeMesh->GetRelativeLocation(), FVector(0.0f, 0.0f, -100.0f), DeltaTime * 10.0f));
 
 			if (spikeMesh->GetRelativeLocation() == FVector(0.0f, 0.0f, 0.0f))
 			{
