@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class APlayerCamera;
+
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
 UENUM(BlueprintType)
@@ -78,6 +80,10 @@ private:
 	// 캐릭터 상태
 	ECharacterState state;
 
+	UPROPERTY()
+	// 플레이어 카메라 액터
+	APlayerCamera* playerCamera;
+
 	// 캐릭터의 착지 여부. 대시 카운트 회복 여부를 판단할 때 사용됩니다.
 	bool has_landed;
 	// 현재 남은 대시 사용가능 횟수
@@ -108,4 +114,6 @@ public:
 
 	void IncreaseDashCount(int increase_num);
 	void DecreaseDashCount(int decrease_num);
+
+	APlayerCamera* GetPlayerCamera() const;
 };

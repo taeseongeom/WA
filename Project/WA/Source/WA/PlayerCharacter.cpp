@@ -17,6 +17,7 @@ APlayerCharacter::APlayerCharacter()
 
 	velocity = FVector::ZeroVector;
 	state = ECharacterState::Idle;
+	playerCamera = nullptr;
 
 	health_point = 100.0f;
 	invincible_time = 1.0f;
@@ -68,11 +69,14 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 		UCameraComponent* camera = Cast<UCameraComponent>(GetComponentByClass(UCameraComponent::StaticClass()));
 
-		APlayerCamera* new_camera = GetWorld()->SpawnActor<APlayerCamera>(
+		playerCamera = GetWorld()->SpawnActor<APlayerCamera>(
 			camera->GetComponentTransform().GetLocation(),
 			camera->GetComponentTransform().GetRotation().Rotator());
-		GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(new_camera);
-		new_camera->SetInitialize(this, camera->GetComponentTransform().GetLocation() - GetActorLocation());
+		GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(playerCamera);
+		playerCamera->SetInitialize(
+			this, 
+			camera->GetComponentTransform().GetLocation() - GetActorLocation(), 
+			camera->GetComponentTransform().GetRotation().Rotator());
 
 		camera->DestroyComponent();
 	}
@@ -311,4 +315,9 @@ void APlayerCharacter::DecreaseDashCount(int decrease_num)
 		cur_dashCount = dash_count;
 		cur_dashCooltime = 0.0f;
 	}
+}
+
+APlayerCamera* APlayerCharacter::GetPlayerCamera() const
+{
+	return playerCamera;
 }
