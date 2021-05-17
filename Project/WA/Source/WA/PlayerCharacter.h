@@ -70,6 +70,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement|Dash")
 	int dash_count;
 
+	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
+	float knockBack_speed;
+	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
+	float knockBack_decrease;
+
 	// 카메라 생성 여부. 첫 착지 시에 카메라가 생성됩니다.
 	bool camera_init;
 	
@@ -81,7 +86,6 @@ private:
 	ECharacterState state;
 
 	UPROPERTY()
-	// 플레이어 카메라 액터
 	APlayerCamera* playerCamera;
 
 	// 캐릭터의 착지 여부. 대시 카운트 회복 여부를 판단할 때 사용됩니다.

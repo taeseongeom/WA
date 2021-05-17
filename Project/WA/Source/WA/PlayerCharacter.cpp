@@ -21,13 +21,18 @@ APlayerCharacter::APlayerCharacter()
 
 	health_point = 100.0f;
 	invincible_time = 1.0f;
+
 	move_speed = 800.0f;
 	move_accel = 6000.0f;
 	jump_power = 500.0f;
+
 	dash_multiplier = 4.0f;
 	dash_time = 0.4f;
 	dash_cooldown = 3.0f;
 	dash_count = 0;
+
+	knockBack_speed = 2.0f;
+	knockBack_decrease = 0.01f;
 
 	camera_init = false;
 
@@ -100,7 +105,7 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		// 단순 뒤로 이동도 좋고, ForwardVector 기준으로 반대 방향에 목적지 잡아놓고 선형보간 연산으로 이동시키는 것도 좋다.
 		// 지속시간은 invincible과 동일. 이동을 금지해야 하므로 state 변경이 필요하며, Tick에 내용 구현이 이루어져야 한다.
 		state = ECharacterState::KnockBack;
-		velocity = GetActorForwardVector() * -2.0f;
+		velocity = GetActorForwardVector() * -knockBack_speed;
 	}
 
 	// 사망
@@ -166,7 +171,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			state = ECharacterState::Idle;
 		}
 
-		velocity *= 0.99f;
+		velocity *= (1.0f - knockBack_decrease);
 		SetActorLocation(GetActorLocation() + velocity);
 	}
 
