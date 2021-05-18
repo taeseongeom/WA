@@ -24,9 +24,12 @@ void APlayerCamera::Tick(float DeltaTime)
 
 	if (playerCharacter)
 	{
+		FVector target_pos = playerCharacter->GetActorLocation() + relativeLocation;
+		target_pos.Z = relativeLocation.Z;	// 높이 고정
+		
 		SetActorLocation(FMath::Lerp(
 			GetActorLocation(), 
-			playerCharacter->GetActorLocation() + relativeLocation, 
+			target_pos, 
 			DeltaTime * speedLevel));
 
 		// 회전 상태가 다를 때에만 회전

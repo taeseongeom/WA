@@ -31,7 +31,7 @@ APlayerCharacter::APlayerCharacter()
 	dash_cooldown = 3.0f;
 	dash_count = 0;
 
-	knockBack_speed = 2.0f;
+	knockBack_speed = 5000.0f;
 	knockBack_decrease = 0.01f;
 
 	camera_init = false;
@@ -61,6 +61,12 @@ void APlayerCharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->JumpZVelocity = jump_power;
+
+	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	if (WaGMB)
+	{
+		WaGMB->SetRespawnPoint(GetActorLocation());
+	}
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -102,8 +108,7 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		health_point -= Damage;
 
 		// 넉백
-		// 단순 뒤로 이동도 좋고, ForwardVector 기준으로 반대 방향에 목적지 잡아놓고 선형보간 연산으로 이동시키는 것도 좋다.
-		// 지속시간은 invincible과 동일. 이동을 금지해야 하므로 state 변경이 필요하며, Tick에 내용 구현이 이루어져야 한다.
+		MoveDashEnd();	// state를 IDLE로 만드므로, KnockBack으로 만들기 전에 선언되어야 함
 		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
 	}
@@ -129,17 +134,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		cur_dashTime += DeltaTime;
 		if (cur_dashTime >= dash_time)	// Dash 종료
 		{
-			cur_dashCount--;
-			cur_dashTime = 0.0f;
-			cur_dashCooltime = 0.0f;
-
-			// 최대 이동 속도 원상 복귀
-			GetCharacterMovement()->MaxWalkSpeed = move_speed;
-			GetCharacterMovement()->MaxAcceleration = move_accel;
-			// 중력 다시 활성화
-			GetCharacterMovement()->GravityScale = 1.0f;
-
-			state = ECharacterState::Idle;
+			MoveDashEnd();
 		}
 	}
 	// Dash 쿨다운 진행
@@ -172,7 +167,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 
 		velocity *= (1.0f - knockBack_decrease);
-		SetActorLocation(GetActorLocation() + velocity);
+		GetCharacterMovement()->AddImpulse(velocity);
 	}
 
 	// 아래로 떨어지면 사망
@@ -199,8 +194,11 @@ void APlayerCharacter::InputForwardBackward(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		velocity.X = value;
-		AddMovementInput(velocity.GetSafeNormal());
+		if (!isblockForwardBackwardMove)
+		{
+			velocity.X = value;
+			AddMovementInput(velocity.GetSafeNormal());
+		}
 		break;
 	case ECharacterState::Shooting:
 		break;
@@ -211,8 +209,11 @@ void APlayerCharacter::InputLeftRight(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		velocity.Y = value;
-		AddMovementInput(velocity.GetSafeNormal());
+		if (!isblockLeftRightMove)
+		{
+			velocity.Y = value;
+			AddMovementInput(velocity.GetSafeNormal());
+		}
 		break;
 	case ECharacterState::Shooting:
 		break;
@@ -264,8 +265,9 @@ void APlayerCharacter::Death()
 {
 	// 초기화
 	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
-	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->RoomReset();
-	SetActorLocation(FVector(50.0f, 30.0f, 325.0f));
+	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	WaGMB->RoomReset();
+	SetActorLocation(WaGMB->GetRespawnPoint());
 
 	health_point = 3;
 
@@ -325,4 +327,12 @@ void APlayerCharacter::DecreaseDashCount(int decrease_num)
 APlayerCamera* APlayerCharacter::GetPlayerCamera() const
 {
 	return playerCamera;
+}
+
+void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
+{
+	if (isHorizon)
+		isblockLeftRightMove = value;
+	else
+		isblockForwardBackwardMove = value;
 }

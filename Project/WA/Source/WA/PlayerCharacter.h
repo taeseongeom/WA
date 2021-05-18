@@ -100,6 +100,9 @@ private:
 	// 현재 경과된 무적 시간(피격 지속 시간)
 	float cur_invincibleTime;
 
+	bool isblockLeftRightMove;
+	bool isblockForwardBackwardMove;
+
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
@@ -120,4 +123,6 @@ public:
 	void DecreaseDashCount(int decrease_num);
 
 	APlayerCamera* GetPlayerCamera() const;
+
+	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
 };
