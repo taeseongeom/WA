@@ -17,22 +17,16 @@ APlayerCharacter::APlayerCharacter()
 
 	velocity = FVector::ZeroVector;
 	state = ECharacterState::Idle;
-	playerCamera = nullptr;
 
 	health_point = 100.0f;
 	invincible_time = 1.0f;
-
 	move_speed = 800.0f;
 	move_accel = 6000.0f;
 	jump_power = 500.0f;
-
 	dash_multiplier = 4.0f;
 	dash_time = 0.4f;
 	dash_cooldown = 3.0f;
 	dash_count = 0;
-
-	knockBack_speed = 2.0f;
-	knockBack_decrease = 0.01f;
 
 	camera_init = false;
 
@@ -61,6 +55,12 @@ void APlayerCharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->JumpZVelocity = jump_power;
+
+	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	if (WaGMB)
+	{
+		WaGMB->SetRespawnPoint(GetActorLocation());
+	}
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -74,14 +74,11 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 		UCameraComponent* camera = Cast<UCameraComponent>(GetComponentByClass(UCameraComponent::StaticClass()));
 
-		playerCamera = GetWorld()->SpawnActor<APlayerCamera>(
+		APlayerCamera* new_camera = GetWorld()->SpawnActor<APlayerCamera>(
 			camera->GetComponentTransform().GetLocation(),
 			camera->GetComponentTransform().GetRotation().Rotator());
-		GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(playerCamera);
-		playerCamera->SetInitialize(
-			this, 
-			camera->GetComponentTransform().GetLocation() - GetActorLocation(), 
-			camera->GetComponentTransform().GetRotation().Rotator());
+		GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(new_camera);
+		new_camera->SetInitialize(this, camera->GetComponentTransform().GetLocation() - GetActorLocation());
 
 		camera->DestroyComponent();
 	}
@@ -105,7 +102,7 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		// 단순 뒤로 이동도 좋고, ForwardVector 기준으로 반대 방향에 목적지 잡아놓고 선형보간 연산으로 이동시키는 것도 좋다.
 		// 지속시간은 invincible과 동일. 이동을 금지해야 하므로 state 변경이 필요하며, Tick에 내용 구현이 이루어져야 한다.
 		state = ECharacterState::KnockBack;
-		velocity = GetActorForwardVector() * -knockBack_speed;
+		velocity = GetActorForwardVector() * -2.0f;
 	}
 
 	// 사망
@@ -171,7 +168,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			state = ECharacterState::Idle;
 		}
 
-		velocity *= (1.0f - knockBack_decrease);
+		velocity *= 0.99f;
 		SetActorLocation(GetActorLocation() + velocity);
 	}
 
@@ -199,8 +196,11 @@ void APlayerCharacter::InputForwardBackward(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		velocity.X = value;
-		AddMovementInput(velocity.GetSafeNormal());
+		if (!isblockForwardBackwardMove)
+		{
+			velocity.X = value;
+			AddMovementInput(velocity.GetSafeNormal());
+		}
 		break;
 	case ECharacterState::Shooting:
 		break;
@@ -211,8 +211,11 @@ void APlayerCharacter::InputLeftRight(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		velocity.Y = value;
-		AddMovementInput(velocity.GetSafeNormal());
+		if (!isblockLeftRightMove)
+		{
+			velocity.Y = value;
+			AddMovementInput(velocity.GetSafeNormal());
+		}
 		break;
 	case ECharacterState::Shooting:
 		break;
@@ -264,8 +267,9 @@ void APlayerCharacter::Death()
 {
 	// 초기화
 	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
-	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->RoomReset();
-	SetActorLocation(FVector(50.0f, 30.0f, 325.0f));
+	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	WaGMB->RoomReset();
+	SetActorLocation(WaGMB->GetRespawnPoint());
 
 	health_point = 3;
 
@@ -322,7 +326,10 @@ void APlayerCharacter::DecreaseDashCount(int decrease_num)
 	}
 }
 
-APlayerCamera* APlayerCharacter::GetPlayerCamera() const
+void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
 {
-	return playerCamera;
+	if (isHorizon)
+		isblockLeftRightMove = value;
+	else
+		isblockForwardBackwardMove = value;
 }

@@ -6,8 +6,6 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
-class APlayerCamera;
-
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
 UENUM(BlueprintType)
@@ -70,11 +68,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement|Dash")
 	int dash_count;
 
-	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
-	float knockBack_speed;
-	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
-	float knockBack_decrease;
-
 	// 카메라 생성 여부. 첫 착지 시에 카메라가 생성됩니다.
 	bool camera_init;
 	
@@ -84,9 +77,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	// 캐릭터 상태
 	ECharacterState state;
-
-	UPROPERTY()
-	APlayerCamera* playerCamera;
 
 	// 캐릭터의 착지 여부. 대시 카운트 회복 여부를 판단할 때 사용됩니다.
 	bool has_landed;
@@ -99,6 +89,10 @@ private:
 
 	// 현재 경과된 무적 시간(피격 지속 시간)
 	float cur_invincibleTime;
+
+	// 무버블 블록 상호작용 시 이동 제한용 flag
+	bool isblockLeftRightMove;
+	bool isblockForwardBackwardMove;
 
 
 	void InputForwardBackward(float value);
@@ -119,5 +113,5 @@ public:
 	void IncreaseDashCount(int increase_num);
 	void DecreaseDashCount(int decrease_num);
 
-	APlayerCamera* GetPlayerCamera() const;
+	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
 };
