@@ -22,6 +22,7 @@ private:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 
 public:	
 	// Called every frame

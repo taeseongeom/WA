@@ -55,6 +55,12 @@ void APlayerCharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->JumpZVelocity = jump_power;
+
+	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	if (WaGMB)
+	{
+		WaGMB->SetRespawnPoint(GetActorLocation());
+	}
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -190,8 +196,11 @@ void APlayerCharacter::InputForwardBackward(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		velocity.X = value;
-		AddMovementInput(velocity.GetSafeNormal());
+		if (!isblockForwardBackwardMove)
+		{
+			velocity.X = value;
+			AddMovementInput(velocity.GetSafeNormal());
+		}
 		break;
 	case ECharacterState::Shooting:
 		break;
@@ -202,8 +211,11 @@ void APlayerCharacter::InputLeftRight(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		velocity.Y = value;
-		AddMovementInput(velocity.GetSafeNormal());
+		if (!isblockLeftRightMove)
+		{
+			velocity.Y = value;
+			AddMovementInput(velocity.GetSafeNormal());
+		}
 		break;
 	case ECharacterState::Shooting:
 		break;
@@ -255,8 +267,9 @@ void APlayerCharacter::Death()
 {
 	// ÃÊ±âÈ­
 	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
-	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->RoomReset();
-	SetActorLocation(FVector(50.0f, 30.0f, 325.0f));
+	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	WaGMB->RoomReset();
+	SetActorLocation(WaGMB->GetRespawnPoint());
 
 	health_point = 3;
 
@@ -311,4 +324,12 @@ void APlayerCharacter::DecreaseDashCount(int decrease_num)
 		cur_dashCount = dash_count;
 		cur_dashCooltime = 0.0f;
 	}
+}
+
+void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
+{
+	if (isHorizon)
+		isblockLeftRightMove = value;
+	else
+		isblockForwardBackwardMove = value;
 }

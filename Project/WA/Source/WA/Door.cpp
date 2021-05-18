@@ -13,8 +13,10 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	if (puzzleActive)
 	{
+		AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 		OtherActor->SetActorLocation(spawnPoint->GetComponentLocation());
-		((AWAGameModeBase*)GetWorld()->GetAuthGameMode())->SetCurrentRoomNumber(TransferRoomNumber);
+		WaGMB->SetCurrentRoomNumber(TransferRoomNumber);
+		WaGMB->SetRespawnPoint(spawnPoint->GetComponentLocation());
 	}
 }
 void ADoor::BeginSetup(FVector pos, FRotator rot)

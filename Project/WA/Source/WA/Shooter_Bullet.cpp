@@ -17,6 +17,14 @@ void AShooter_Bullet::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	if (!OtherActor->ActorHasTag(FName("Direction_Changer")))
+	{
+		Destroy();
+	}
+}
+
 // Called every frame
 void AShooter_Bullet::Tick(float DeltaTime)
 {

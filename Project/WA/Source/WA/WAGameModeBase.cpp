@@ -25,3 +25,13 @@ void AWAGameModeBase::RoomReset(){
 void AWAGameModeBase::SetCurrentRoomNumber(int8 value) {
 	CurrentRoomNum = value;
 }
+
+void AWAGameModeBase::SetRespawnPoint(FVector point)
+{
+	respawnPoint = point;
+}
+
+FVector AWAGameModeBase::GetRespawnPoint() const
+{
+	return respawnPoint;
+}

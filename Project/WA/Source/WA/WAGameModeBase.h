@@ -20,9 +20,12 @@ public:
 	void AddInitPuzzle(ADefaultPuzzle* value, int roomNum);
 	void RoomReset();
 	void SetCurrentRoomNumber(int8 value);
+	void SetRespawnPoint(FVector point);
+	FVector GetRespawnPoint() const;
 private:
 	//UPROPERTY 사용 불가능한데 추후 수정필요
 	TMultiMap<int8, ADefaultPuzzle*> InitPuzzles;
+	FVector respawnPoint;
 public:
 	UPROPERTY(EditAnywhere)
 	int8 MaxRoomCount;
