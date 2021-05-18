@@ -90,6 +90,10 @@ private:
 	// 현재 경과된 무적 시간(피격 지속 시간)
 	float cur_invincibleTime;
 
+	// 무버블 블록 상호작용 시 이동 제한용 flag
+	bool isblockLeftRightMove;
+	bool isblockForwardBackwardMove;
+
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
@@ -108,4 +112,6 @@ public:
 
 	void IncreaseDashCount(int increase_num);
 	void DecreaseDashCount(int decrease_num);
+
+	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
 };

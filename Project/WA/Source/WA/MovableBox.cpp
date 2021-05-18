@@ -103,21 +103,25 @@ void AMovableBox::Interact()
 				{
 					// forward
 					pc->HoldMovableBox(0, GetActorLocation());
+					pc->SetBlockPlayerMoveDirection(true, true);
 				}
 				else if (temp_dist.X < -50.0f)
 				{
 					// backward
 					pc->HoldMovableBox(1, GetActorLocation());
+					pc->SetBlockPlayerMoveDirection(true, true);
 				}
 				else if (temp_dist.Y > 50.0f)
 				{
 					// right
 					pc->HoldMovableBox(2, GetActorLocation());
+					pc->SetBlockPlayerMoveDirection(false, true);
 				}
 				else if (temp_dist.Y < -50.0f)
 				{
 					// left
 					pc->HoldMovableBox(3, GetActorLocation());
+					pc->SetBlockPlayerMoveDirection(false, true);
 				}
 			}
 
@@ -132,6 +136,8 @@ void AMovableBox::Interact()
 			UE_LOG(LogTemp, Warning, TEXT("Interact End"));
 			distance = FVector::ZeroVector;
 			OutOfInteractionRange();
+			pc->SetBlockPlayerMoveDirection(true, false);
+			pc->SetBlockPlayerMoveDirection(false, false);
 
 			boxBody->SetSimulatePhysics(true);
 		}
