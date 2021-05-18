@@ -31,7 +31,7 @@ APlayerCharacter::APlayerCharacter()
 	dash_cooldown = 3.0f;
 	dash_count = 0;
 
-	knockBack_speed = 2.0f;
+	knockBack_speed = 5000.0f;
 	knockBack_decrease = 0.01f;
 
 	camera_init = false;
@@ -167,7 +167,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 
 		velocity *= (1.0f - knockBack_decrease);
-		SetActorLocation(GetActorLocation() + velocity);
+		GetCharacterMovement()->AddImpulse(velocity);
 	}
 
 	// 아래로 떨어지면 사망
