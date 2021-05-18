@@ -8,28 +8,59 @@ APlayerCamera::APlayerCamera()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	player_character = nullptr;
-	speed_level = 8.0f;
+	playerCharacter = nullptr;
+	speedLevel = 8.0f;
 
-	relative_location = FVector::ZeroVector;
+	defaultRelativeLocation = FVector::ZeroVector;
+	defaultRelativeRotation = FRotator::ZeroRotator;
+
+	relativeLocation = FVector::ZeroVector;
+	relativeRotation = FRotator::ZeroRotator;
 }
 
 void APlayerCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (player_character)
+	if (playerCharacter)
 	{
-		FVector target_pos = player_character->GetActorLocation();
-		target_pos.X += relative_location.X;
-		target_pos.Z = GetActorLocation().Z;
+		SetActorLocation(FMath::Lerp(
+			GetActorLocation(), 
+			playerCharacter->GetActorLocation() + relativeLocation, 
+			DeltaTime * speedLevel));
 
-		SetActorLocation(FMath::Lerp(GetActorLocation(), target_pos, DeltaTime * speed_level));
+		// 회전 상태가 다를 때에만 회전
+		if (GetActorRotation() != relativeRotation)
+		{
+			SetActorRotation(FMath::Lerp(
+				GetActorRotation(),
+				relativeRotation,
+				DeltaTime * speedLevel));
+		}
 	}
 }
 
-void APlayerCamera::SetInitialize(AActor* Player, FVector RelativeLocation)
+void APlayerCamera::SetInitialize(AActor* Player, const FVector& RelativeLocation, const FRotator& RelativeRotation)
 {
-	player_character = Player;
-	relative_location = RelativeLocation;
+	playerCharacter = Player;
+
+	defaultRelativeLocation = RelativeLocation;
+	defaultRelativeRotation = RelativeRotation;
+
+	relativeLocation = RelativeLocation;
+	relativeRotation = RelativeRotation;
+}
+
+void APlayerCamera::ChangeViewport(const FVector& Position, const FRotator& Rotation, bool IsStart)
+{
+	if (IsStart)
+	{
+		relativeLocation = Position;
+		relativeRotation = Rotation;
+	}
+	else
+	{
+		relativeLocation = defaultRelativeLocation;
+		relativeRotation = defaultRelativeRotation;
+	}
 }
