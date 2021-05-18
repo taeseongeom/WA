@@ -15,7 +15,7 @@ ADefaultPuzzle::ADefaultPuzzle()
 	initPos = FVector::ZeroVector;
 	initRot = FRotator::ZeroRotator;
 	static ConstructorHelpers::FObjectFinder<UBlueprint> boxBlueprint(
-		TEXT("Blueprint'/Game/BluePrints/BP_BreakableBox.BP_BreakableBox'"));
+		TEXT("Blueprint'/Game/BluePrints/Puzzles/BP_BreakableBox.BP_BreakableBox'"));
 	if (boxBlueprint.Object)
 	{
 		breakableBoxBlueprint = (UClass*)boxBlueprint.Object->GeneratedClass;
