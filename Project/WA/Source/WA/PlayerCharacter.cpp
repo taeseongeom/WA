@@ -108,8 +108,7 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		health_point -= Damage;
 
 		// 넉백
-		// 단순 뒤로 이동도 좋고, ForwardVector 기준으로 반대 방향에 목적지 잡아놓고 선형보간 연산으로 이동시키는 것도 좋다.
-		// 지속시간은 invincible과 동일. 이동을 금지해야 하므로 state 변경이 필요하며, Tick에 내용 구현이 이루어져야 한다.
+		MoveDashEnd();	// state를 IDLE로 만드므로, KnockBack으로 만들기 전에 선언되어야 함
 		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
 	}
@@ -135,17 +134,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		cur_dashTime += DeltaTime;
 		if (cur_dashTime >= dash_time)	// Dash 종료
 		{
-			cur_dashCount--;
-			cur_dashTime = 0.0f;
-			cur_dashCooltime = 0.0f;
-
-			// 최대 이동 속도 원상 복귀
-			GetCharacterMovement()->MaxWalkSpeed = move_speed;
-			GetCharacterMovement()->MaxAcceleration = move_accel;
-			// 중력 다시 활성화
-			GetCharacterMovement()->GravityScale = 1.0f;
-
-			state = ECharacterState::Idle;
+			MoveDashEnd();
 		}
 	}
 	// Dash 쿨다운 진행
