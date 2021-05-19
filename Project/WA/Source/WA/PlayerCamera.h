@@ -34,6 +34,14 @@ private:
 	// 현재 카메라 회전 (상대)
 	FRotator relativeRotation;
 
+	// 이전 카메라 위치 (상대)
+	FVector prevRelativeLocation;
+	// 이전 카메라 회전 (상대)
+	FRotator prevRelativeRotation;
+
+	// 뷰포트 체인저 중첩 수
+	int overlapCount;
+
 public:
 	/// <summary>
 	/// 카메라에 초기 정보를 전달합니다.
@@ -48,6 +56,11 @@ public:
 	/// </summary>
 	/// <param name="Position">새로 지정할 상대적 위치</param>
 	/// <param name="Rotation">새로 지정할 상대적 회전</param>
-	/// <param name="IsStart">상태 변경 여부. true면 앞의 트랜스폼으로, false면 원래의 트랜스폼으로 변경</param>
-	void ChangeViewport(const FVector& Position, const FRotator& Rotation, bool IsStart);
+	void ChangeViewport(const FVector& Position, const FRotator& Rotation);
+	/// <summary>
+	/// 카메라 시야를 원래대로 되돌립니다.
+	/// </summary>
+	/// <param name="Position">ViewportChanger에 지정된 상대적 위치</param>
+	/// <param name="Rotation">ViewportChanger에 지정된 상대적 회전</param>
+	void RevertViewport(const FVector& Position, const FRotator& Rotation);
 };
