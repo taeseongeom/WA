@@ -19,12 +19,15 @@ public:
 	virtual void BeginPlay() override;
 	void AddInitPuzzle(ADefaultPuzzle* value, int roomNum);
 	void RoomReset();
-	void SetCurrentRoomNumber(int8 value);
 	void SetRespawnPoint(FVector point);
+	void SetCurrentRoomData(int8 roomNum, FVector resPoint);
+	void DisableActor(AActor* target);
+	void EnableActor(AActor* target);
 	FVector GetRespawnPoint() const;
 private:
 	//UPROPERTY 사용 불가능한데 추후 수정필요
 	TMultiMap<int8, ADefaultPuzzle*> InitPuzzles;
+	TArray<AActor*> rooms;
 	FVector respawnPoint;
 public:
 	UPROPERTY(EditAnywhere)
@@ -32,4 +35,6 @@ public:
 
 	UPROPERTY()
 	int8 CurrentRoomNum;
+
+	int8 maxRoomNumber;
 };

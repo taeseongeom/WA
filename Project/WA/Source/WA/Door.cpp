@@ -15,8 +15,7 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 	{
 		AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 		OtherActor->SetActorLocation(spawnPoint->GetComponentLocation());
-		WaGMB->SetCurrentRoomNumber(TransferRoomNumber);
-		WaGMB->SetRespawnPoint(spawnPoint->GetComponentLocation());
+		WaGMB->SetCurrentRoomData(TransferRoomNumber, spawnPoint->GetComponentLocation());
 	}
 }
 void ADoor::BeginSetup(FVector pos, FRotator rot)
