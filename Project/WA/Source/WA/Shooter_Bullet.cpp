@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Shooter_Bullet.h"
 
 // Sets default values
@@ -19,9 +16,11 @@ void AShooter_Bullet::BeginPlay()
 
 void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
 {
-	if (!OtherActor->ActorHasTag(FName("Direction_Changer")))
+	if (!OtherActor->ActorHasTag(FName("Direction_Changer")) &&
+		!OtherActor->ActorHasTag(FName("Shooter")) &&
+		!OtherActor->ActorHasTag(FName("Character")))
 	{
-		Destroy();
+		SetActorHiddenInGame(true);
 	}
 }
 
