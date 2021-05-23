@@ -166,8 +166,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 			state = ECharacterState::Idle;
 		}
 
-		velocity *= (1.0f - knockBack_decrease);
-		GetCharacterMovement()->AddImpulse(velocity);
+		velocity *= (1.0f - (knockBack_decrease * DeltaTime * 500.0f));
+		GetCharacterMovement()->AddImpulse(velocity * DeltaTime * 500.0f);
 	}
 
 	// 아래로 떨어지면 사망
