@@ -11,7 +11,7 @@ void ADoor::BeginPlay()
 }
 void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 {
-	if (puzzleActive)
+	if (puzzleActive && OtherActor->ActorHasTag(FName("Character")))
 	{
 		AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 		OtherActor->SetActorLocation(spawnPoint->GetComponentLocation());
