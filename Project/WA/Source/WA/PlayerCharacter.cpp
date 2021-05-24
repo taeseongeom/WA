@@ -78,7 +78,7 @@ void APlayerCharacter::BeginPlay()
 		UUserWidget* tempInGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempInGameWidgetClass);
 		inGameUI = Cast<UInGameUI>(tempInGameWidget);
 		inGameUI->AddToViewport();
-		inGameUI->DisplayText("Love Live! Sunshine!!");
+		inGameUI->DisplayText("");
 	}
 }
 

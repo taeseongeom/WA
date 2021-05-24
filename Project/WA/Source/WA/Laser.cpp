@@ -22,7 +22,7 @@ void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (puzzleActive)
+	if (puzzleActive && !IsHidden())
 	{
 		FVector laser_start = GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
 		FVector laser_target = laser_start + GetActorForwardVector() * 10000.0f;
