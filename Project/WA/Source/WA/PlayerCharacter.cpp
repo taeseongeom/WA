@@ -299,26 +299,27 @@ void APlayerCharacter::Death()
 void APlayerCharacter::HoldMovableBox(int dir_code, FVector box_pos)
 {
 	FVector dist = GetActorLocation() - box_pos;
+	float value = 184.0f;
 	switch (dir_code)
 	{
 	case 0:
 		//SetActorLocation(GetActorLocation() + FVector(-10.0f, 0.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(-92.0f, dist.Y, dist.Z));
+		SetActorLocation(box_pos + FVector(-value, dist.Y, dist.Z));
 		break;
 
 	case 1:
 		//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(92.0f, dist.Y, dist.Z));
+		SetActorLocation(box_pos + FVector(value, dist.Y, dist.Z));
 		break;
 
 	case 2:
 		//SetActorLocation(GetActorLocation() + FVector(0.0f, -10.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(dist.X, -92.0f, dist.Z));
+		SetActorLocation(box_pos + FVector(dist.X, -value, dist.Z));
 		break;
 
 	case 3:
 		//SetActorLocation(GetActorLocation() + FVector(0.0f, 10.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(dist.X, 92.0f, dist.Z));
+		SetActorLocation(box_pos + FVector(dist.X, value, dist.Z));
 		break;
 	}
 }
