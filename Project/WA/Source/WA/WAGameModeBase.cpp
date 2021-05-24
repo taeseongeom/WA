@@ -24,13 +24,19 @@ void AWAGameModeBase::BeginPlay()
 		}
 		for (int i = 0; i < rooms.Num(); i++)
 		{
-			for (int j = i; j < rooms.Num(); j++)
+			/*for (int j = i; j < rooms.Num(); j++)
 			{
 				if (rooms[j]->GetName().Contains(FString::FromInt(i + 1)))
 				{
 					rooms.Swap(j, i);
 				}
-			}
+			}*/
+			if (i != CurrentRoomNum - 1)
+				DisableActor(rooms[i]);
+		}
+		for (int i = 0; i < rooms.Num(); i++)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *(rooms[i])->GetName());
 		}
 		maxRoomNumber = rooms.Num();
 	}
