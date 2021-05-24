@@ -7,6 +7,7 @@
 #include "PlayerCharacter.generated.h"
 
 class APlayerCamera;
+class UInGameUI;
 
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
@@ -82,11 +83,13 @@ private:
 	FVector velocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "State")
-	// 캐릭터 상태
 	ECharacterState state;
 
 	UPROPERTY()
 	APlayerCamera* playerCamera;
+
+	UPROPERTY()
+	UInGameUI* inGameUI;
 
 	// 캐릭터의 착지 여부. 대시 카운트 회복 여부를 판단할 때 사용됩니다.
 	bool has_landed;

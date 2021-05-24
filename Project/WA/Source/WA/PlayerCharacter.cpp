@@ -3,8 +3,11 @@
 
 #include "PlayerCharacter.h"
 
-#include "PlayerCamera.h"
 #include "WAGameModeBase.h"
+#include "PlayerCamera.h"
+#include "InGameUI.h"
+
+#include "Blueprint/UserWidget.h"
 
 
 APlayerCharacter::APlayerCharacter()
@@ -67,6 +70,16 @@ void APlayerCharacter::BeginPlay()
 	{
 		WaGMB->SetRespawnPoint(GetActorLocation());
 	}
+
+	// 인게임 위젯 블루프린트를 찾아 위젯을 생성하고 등록
+	FStringClassReference tempInGameWidgetClassRef(TEXT("/Game/BluePrints/BP_InGameUI.BP_InGameUI_C"));
+	if (UClass* tempInGameWidgetClass = tempInGameWidgetClassRef.TryLoadClass<UUserWidget>())
+	{
+		UUserWidget* tempInGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempInGameWidgetClass);
+		inGameUI = Cast<UInGameUI>(tempInGameWidget);
+		inGameUI->AddToViewport();
+		inGameUI->DisplayText("Love Live! Sunshine!!");
+	}
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -108,9 +121,13 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		health_point -= Damage;
 
 		// 넉백
+		GetCharacterMovement()->StopMovementImmediately();
 		MoveDashEnd();	// state를 IDLE로 만드므로, KnockBack으로 만들기 전에 선언되어야 함
 		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
+
+		// 체력 인터페이스 업데이트
+		inGameUI->UpdateHealthBar(health_point);
 	}
 
 	// 사망
@@ -146,7 +163,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			if (!GetCharacterMovement()->IsFalling() || has_landed)
 			{
 				cur_dashCount++;
-				cur_dashCooltime = cur_dashCooltime - dash_cooldown;
+				cur_dashCooltime -= dash_cooldown;
 				if (cur_dashCount >= dash_count)
 				{
 					cur_dashCooltime = 0.0f;
@@ -270,6 +287,7 @@ void APlayerCharacter::Death()
 	SetActorLocation(WaGMB->GetRespawnPoint());
 
 	health_point = 3;
+	inGameUI->UpdateHealthBar(health_point);
 
 	velocity = FVector::ZeroVector;
 
