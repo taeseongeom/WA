@@ -28,7 +28,7 @@ void AMovingPlatform::MovePlatform(float DeltaTime)
 			(WayPoint->GetActorLocation() - GetActorLocation()).GetSafeNormal()
 			* DeltaTime * WayPoint->GetSpeed());
 	}
-	if (FVector::Distance(GetActorLocation(), WayPoint->GetActorLocation()) < 5.0f && !isArrive)
+	if (FVector::Distance(GetActorLocation(), WayPoint->GetActorLocation()) < 10.0f && !isArrive)
 	{
 		SetActorLocation(WayPoint->GetActorLocation());
 		isArrive = true;
