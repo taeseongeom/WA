@@ -82,13 +82,10 @@ void AWAGameModeBase::DisableActor(AActor * target)
 			DisableActor(children[i]);
 		}
 	}
-	else
-	{
-		if(!target->IsHidden())
-			target->SetActorHiddenInGame(true);
-		if (target->GetActorEnableCollision())
-			target->SetActorEnableCollision(false);
-	}
+	if (!target->IsHidden())
+		target->SetActorHiddenInGame(true);
+	if (target->GetActorEnableCollision())
+		target->SetActorEnableCollision(false);
 }
 
 void AWAGameModeBase::EnableActor(AActor * target)
@@ -104,13 +101,11 @@ void AWAGameModeBase::EnableActor(AActor * target)
 			EnableActor(children[i]);
 		}
 	}
-	else
-	{
-		if (target->IsHidden())
-			target->SetActorHiddenInGame(false);
-		if (!target->GetActorEnableCollision())
-			target->SetActorEnableCollision(true);
-	}
+	if (target->IsHidden())
+		target->SetActorHiddenInGame(false);
+	if (!target->GetActorEnableCollision())
+		target->SetActorEnableCollision(true);
+
 }
 
 FVector AWAGameModeBase::GetRespawnPoint() const
