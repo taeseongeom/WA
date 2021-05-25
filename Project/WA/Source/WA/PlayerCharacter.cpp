@@ -238,7 +238,11 @@ void APlayerCharacter::InputLeftRight(float value)
 }
 void APlayerCharacter::MoveJump()
 {
-	Jump();
+	if (!isblockForwardBackwardMove &&
+		!isblockLeftRightMove)
+	{
+		Jump();
+	}
 }
 void APlayerCharacter::MoveDashBegin()
 {
