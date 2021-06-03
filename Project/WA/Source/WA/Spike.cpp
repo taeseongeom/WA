@@ -53,7 +53,7 @@ void ASpike::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 시간경과 타입의 가시 - 시간에 따른 상태변화
-	if (ESpikeType::TIMELAPSE == spikeType)
+	if (ESpikeType::TIMELAPSE == spikeType && !IsHidden())
 	{
 		currentTime += DeltaTime;
 
