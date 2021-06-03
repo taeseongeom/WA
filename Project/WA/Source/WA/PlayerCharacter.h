@@ -128,4 +128,7 @@ public:
 	APlayerCamera* GetPlayerCamera() const;
 
 	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
+
+	void ActivateInGameUI();
+	void DeactivateInGameUI();
 };

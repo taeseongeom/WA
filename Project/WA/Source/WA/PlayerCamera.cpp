@@ -20,6 +20,8 @@ APlayerCamera::APlayerCamera()
 	prevRelativeLocation = FVector::ZeroVector;
 	prevRelativeRotation = FRotator::ZeroRotator;
 
+	isMovementActive = true;
+
 	overlapCount = 0;
 }
 
@@ -27,11 +29,12 @@ void APlayerCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (playerCharacter)
+	if (playerCharacter && isMovementActive)
 	{
 		FVector target_pos = playerCharacter->GetActorLocation() + relativeLocation;
 		target_pos.Z = relativeLocation.Z;	// 높이 고정
 		
+		// 선형 보간 이동
 		SetActorLocation(FMath::Lerp(
 			GetActorLocation(), 
 			target_pos, 
@@ -62,6 +65,22 @@ void APlayerCamera::SetInitialize(AActor* Player, const FVector& RelativeLocatio
 	prevRelativeRotation = RelativeRotation;
 }
 
+void APlayerCamera::SetRelativeTransform(const FVector& Position, const FRotator& Rotation)
+{
+	relativeLocation = Position;
+	relativeRotation = Rotation;
+}
+void APlayerCamera::BlockCameraMovement()
+{
+	isMovementActive = false;
+}
+void APlayerCamera::RevertToDefault()
+{
+	relativeLocation = defaultRelativeLocation;
+	relativeRotation = defaultRelativeRotation;
+	isMovementActive = true;
+}
+
 void APlayerCamera::ChangeViewport(const FVector& Position, const FRotator& Rotation)
 {
 	prevRelativeLocation = relativeLocation;
@@ -89,4 +108,15 @@ void APlayerCamera::RevertViewport(const FVector& Position, const FRotator& Rota
 	}
 
 	overlapCount--;
+}
+
+void APlayerCamera::AddLight()
+{
+	UPointLightComponent* light = CreateDefaultSubobject<UPointLightComponent>(FName("Light"));
+	light->InitializeComponent();
+	light->SetupAttachment(RootComponent);
+}
+void APlayerCamera::RemoveLight()
+{
+	GetComponentByClass(UPointLightComponent::StaticClass())->DestroyComponent();
 }
