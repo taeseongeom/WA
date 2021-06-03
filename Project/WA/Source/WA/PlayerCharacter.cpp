@@ -328,7 +328,8 @@ void APlayerCharacter::HoldMovableBox(int dir_code, FVector box_pos)
 	}
 }
 
-void APlayerCharacter::SetCharacterState(ECharacterState cs) {
+void APlayerCharacter::SetCharacterState(ECharacterState cs)
+{
 	state = cs;
 }
 
@@ -358,4 +359,25 @@ void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
 		isblockLeftRightMove = value;
 	else
 		isblockForwardBackwardMove = value;
+}
+
+void APlayerCharacter::ActivateInGameUI()
+{
+	if (inGameUI)
+	{
+		if (!inGameUI->IsInViewport())
+		{
+			inGameUI->AddToViewport();
+		}
+	}
+}
+void APlayerCharacter::DeactivateInGameUI()
+{
+	if (inGameUI)
+	{
+		if (inGameUI->IsInViewport())
+		{
+			inGameUI->RemoveFromViewport();
+		}
+	}
 }
