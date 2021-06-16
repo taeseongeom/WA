@@ -359,3 +359,8 @@ void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
 	else
 		isblockForwardBackwardMove = value;
 }
+
+void APlayerCharacter::SetHealthPoint(float value)
+{
+	health_point = value;
+}

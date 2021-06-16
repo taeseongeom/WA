@@ -128,4 +128,6 @@ public:
 	APlayerCamera* GetPlayerCamera() const;
 
 	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
+
+	void SetHealthPoint(float value);
 };
