@@ -129,5 +129,10 @@ public:
 
 	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
 
+<<<<<<< HEAD
 	void SetHealthPoint(float value);
+=======
+	void ActivateInGameUI();
+	void DeactivateInGameUI();
+>>>>>>> 2ad65af141711a75c097e2a8af13f2bfd4363f63
 };

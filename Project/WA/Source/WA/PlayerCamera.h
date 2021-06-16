@@ -39,6 +39,8 @@ private:
 	// 이전 카메라 회전 (상대)
 	FRotator prevRelativeRotation;
 
+	bool isMovementActive;
+
 	// 뷰포트 체인저 중첩 수
 	int overlapCount;
 
@@ -50,6 +52,13 @@ public:
 	/// <param name="RelativeLocation">카메라의 상대적 위치</param>
 	/// <param name="RelativeRotation">카메라의 상대적 회전</param>
 	void SetInitialize(AActor* Player, const FVector& RelativeLocation, const FRotator& RelativeRotation);
+
+	void SetRelativeTransform(const FVector& Position, const FRotator& Rotation);
+	void BlockCameraMovement();
+	/// <summary>
+	/// 강제로 카메라의 시야를 원래 상태로 되돌립니다. ViewportChanger 내부에 있었을 경우 버그를 야기할 수 있습니다.
+	/// </summary>
+	void RevertToDefault();
 
 	/// <summary>
 	/// 카메라 시야를 변경합니다.
@@ -63,4 +72,7 @@ public:
 	/// <param name="Position">ViewportChanger에 지정된 상대적 위치</param>
 	/// <param name="Rotation">ViewportChanger에 지정된 상대적 회전</param>
 	void RevertViewport(const FVector& Position, const FRotator& Rotation);
+
+	void AddLight();
+	void RemoveLight();
 };
