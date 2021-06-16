@@ -76,10 +76,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
 	float knockBack_decrease;
 
-	// Ä«¸Þ¶ó »ý¼º ¿©ºÎ. Ã¹ ÂøÁö ½Ã¿¡ Ä«¸Þ¶ó°¡ »ý¼ºµË´Ï´Ù.
+	// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½. Ã¹ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¿ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ë´Ï´ï¿½.
 	bool camera_init;
 	
-	// Ä³¸¯ÅÍ ÀÌµ¿ ¼Óµµ
+	// Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½
 	FVector velocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "State")
@@ -91,16 +91,16 @@ private:
 	UPROPERTY()
 	UInGameUI* inGameUI;
 
-	// Ä³¸¯ÅÍÀÇ ÂøÁö ¿©ºÎ. ´ë½Ã Ä«¿îÆ® È¸º¹ ¿©ºÎ¸¦ ÆÇ´ÜÇÒ ¶§ »ç¿ëµË´Ï´Ù.
+	// Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½. ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½Æ® È¸ï¿½ï¿½ ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½Ç´ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ë´Ï´ï¿½.
 	bool has_landed;
-	// ÇöÀç ³²Àº ´ë½Ã »ç¿ë°¡´É È½¼ö
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ë°¡ï¿½ï¿½ È½ï¿½ï¿½
 	int cur_dashCount;
-	// ÇöÀç °æ°úµÈ ´ë½Ã Áö¼Ó ½Ã°£
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
 	float cur_dashTime;
-	// ÇöÀç °æ°úµÈ ´ë½Ã ÄðÅ¸ÀÓ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
 	float cur_dashCooltime;
 
-	// ÇöÀç °æ°úµÈ ¹«Àû ½Ã°£(ÇÇ°Ý Áö¼Ó ½Ã°£)
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½(ï¿½Ç°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½)
 	float cur_invincibleTime;
 
 	bool isblockLeftRightMove;
@@ -129,10 +129,7 @@ public:
 
 	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
 
-<<<<<<< HEAD
 	void SetHealthPoint(float value);
-=======
 	void ActivateInGameUI();
 	void DeactivateInGameUI();
->>>>>>> 2ad65af141711a75c097e2a8af13f2bfd4363f63
 };
