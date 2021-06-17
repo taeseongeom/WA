@@ -1,6 +1,11 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "WAGameModeBase.h"
+#include "WASaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerCharacter.h"
+#include "Components/BillboardComponent.h"
+#include "Door.h"
 #include "Runtime/Engine//Public/EngineUtils.h"
 
 AWAGameModeBase::AWAGameModeBase()
@@ -8,13 +13,19 @@ AWAGameModeBase::AWAGameModeBase()
 	CurrentRoomNum = 1;
 }
 
-void AWAGameModeBase::BeginPlay()
+void AWAGameModeBase::Init()
 {
-	Super::BeginPlay();
 	UWorld* world = GetWorld();
 
 	if (world)
 	{
+		//GameLoad
+		auto WASaveGame = Cast<UWASaveGame>(UGameplayStatics::LoadGameFromSlot(saveSlotName, 0));
+		if (WASaveGame)
+		{
+			// 타이틀 화면에서 데이터 가져오기
+		}
+		//Init room data and Disable not current room
 		for (const auto& entity : FActorRange(world))
 		{
 			if (entity->GetName().Contains(TEXT("Room")))
@@ -36,12 +47,25 @@ void AWAGameModeBase::BeginPlay()
 			if (i != CurrentRoomNum - 1)
 				DisableActor(rooms[i]);
 		}
-		for (int k = 0; k < rooms.Num(); k++)
+		for (TActorIterator<ADoor> iter(GetWorld()); iter; ++iter)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *(rooms[k])->GetName());
+			if (iter->GetName() ==
+				FString("Gate" + FString::FromInt(CurrentRoomNum) +
+					"_1"))
+			{
+				respawnPoint = iter->FindComponentByClass<UBillboardComponent>()
+					->GetComponentLocation();
+				break;
+			}
 		}
 		maxRoomNumber = rooms.Num();
 	}
+}
+
+void AWAGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	Init();
 }
 
 void AWAGameModeBase::AddInitPuzzle(ADefaultPuzzle* value, int roomNum){
@@ -59,7 +83,7 @@ void AWAGameModeBase::SetRespawnPoint(FVector point)
 	respawnPoint = point;
 }
 
-void AWAGameModeBase::SetCurrentRoomData(int8 roomNum, FVector resPoint)
+void AWAGameModeBase::ChangeRoom(int8 roomNum, FVector resPoint)
 {
 	if ((roomNum > 0 || roomNum < maxRoomNumber)
 		|| (CurrentRoomNum > 0 || CurrentRoomNum < maxRoomNumber))
@@ -69,6 +93,11 @@ void AWAGameModeBase::SetCurrentRoomData(int8 roomNum, FVector resPoint)
 	}
 	CurrentRoomNum = roomNum;
 	respawnPoint = resPoint;
+}
+
+void AWAGameModeBase::SetCurrentRoomNum(int8 value)
+{
+	CurrentRoomNum = value;
 }
 
 void AWAGameModeBase::DisableActor(AActor * target)

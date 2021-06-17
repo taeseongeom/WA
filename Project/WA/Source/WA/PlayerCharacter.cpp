@@ -46,7 +46,7 @@ APlayerCharacter::APlayerCharacter()
 
 	cur_invincibleTime = 0.0f;
 
-	// Ä³¸¯ÅÍ ÀÌµ¿ °ü·Ã ÃÊ±â°ªÀ» CharacterMovementComponent¿¡ ¹Ý¿µ
+	// Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±â°ªï¿½ï¿½ CharacterMovementComponentï¿½ï¿½ ï¿½Ý¿ï¿½
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 900.0f, 0.0f);
@@ -71,7 +71,7 @@ void APlayerCharacter::BeginPlay()
 		WaGMB->SetRespawnPoint(GetActorLocation());
 	}
 
-	// ÀÎ°ÔÀÓ À§Á¬ ºí·çÇÁ¸°Æ®¸¦ Ã£¾Æ À§Á¬À» »ý¼ºÇÏ°í µî·Ï
+	// ï¿½Î°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½
 	FStringClassReference tempInGameWidgetClassRef(TEXT("/Game/BluePrints/BP_InGameUI.BP_InGameUI_C"));
 	if (UClass* tempInGameWidgetClass = tempInGameWidgetClassRef.TryLoadClass<UUserWidget>())
 	{
@@ -86,7 +86,7 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	// Ã¹ ÂøÁö ½Ã, Ä«¸Þ¶ó »ý¼º
+	// Ã¹ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (!camera_init)
 	{
 		camera_init = true;
@@ -105,7 +105,7 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 		camera->DestroyComponent();
 	}
 	
-	// dash È½¼ö ÃæÀü
+	// dash È½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (cur_dashCount < dash_count)
 	{
 		has_landed = true;
@@ -120,17 +120,17 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	{
 		health_point -= Damage;
 
-		// ³Ë¹é
+		// ï¿½Ë¹ï¿½
 		GetCharacterMovement()->StopMovementImmediately();
-		MoveDashEnd();	// state¸¦ IDLE·Î ¸¸µå¹Ç·Î, KnockBackÀ¸·Î ¸¸µé±â Àü¿¡ ¼±¾ðµÇ¾î¾ß ÇÔ
+		MoveDashEnd();	// stateï¿½ï¿½ IDLEï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç·ï¿½, KnockBackï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ ï¿½ï¿½
 		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
 
-		// Ã¼·Â ÀÎÅÍÆäÀÌ½º ¾÷µ¥ÀÌÆ®
+		// Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 		inGameUI->UpdateHealthBar(health_point);
 	}
 
-	// »ç¸Á
+	// ï¿½ï¿½ï¿½
 	if (health_point <= 0)
 	{
 		Death();
@@ -143,18 +143,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Dash ½ÇÇà
+	// Dash ï¿½ï¿½ï¿½ï¿½
 	if (ECharacterState::Dash == state)
 	{
 		AddMovementInput(GetActorForwardVector(), dash_multiplier);
 
 		cur_dashTime += DeltaTime;
-		if (cur_dashTime >= dash_time)	// Dash Á¾·á
+		if (cur_dashTime >= dash_time)	// Dash ï¿½ï¿½ï¿½ï¿½
 		{
 			MoveDashEnd();
 		}
 	}
-	// Dash Äð´Ù¿î ÁøÇà
+	// Dash ï¿½ï¿½Ù¿ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (cur_dashCount < dash_count)
 	{
 		cur_dashCooltime += DeltaTime;
@@ -173,7 +173,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	// ³Ë¹é
+	// ï¿½Ë¹ï¿½
 	if (ECharacterState::KnockBack == state)
 	{
 		cur_invincibleTime += DeltaTime;
@@ -187,7 +187,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		GetCharacterMovement()->AddImpulse(velocity * DeltaTime * 500.0f);
 	}
 
-	// ¾Æ·¡·Î ¶³¾îÁö¸é »ç¸Á
+	// ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 	if (GetActorLocation().Z < -300)
 	{
 		Death();
@@ -250,10 +250,10 @@ void APlayerCharacter::MoveDashBegin()
 	{
 		cur_dashTime = 0.0f;
 
-		// ÃÖ´ë ÀÌµ¿ ¼Óµµ¸¦ ÀÓ½Ã·Î ´Ã¸²
+		// ï¿½Ö´ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½Ó½Ã·ï¿½ ï¿½Ã¸ï¿½
 		GetCharacterMovement()->MaxWalkSpeed = move_speed * dash_multiplier;
 		GetCharacterMovement()->MaxAcceleration = move_accel * dash_multiplier;
-		// ÀÓ½Ã·Î Áß·Â Á¦°Å
+		// ï¿½Ó½Ã·ï¿½ ï¿½ß·ï¿½ ï¿½ï¿½ï¿½ï¿½
 		GetCharacterMovement()->GravityScale = 0.0f;
 		GetCharacterMovement()->Velocity.Z = 0.0f;
 
@@ -268,10 +268,10 @@ void APlayerCharacter::MoveDashEnd()
 		cur_dashTime = 0.0f;
 		cur_dashCooltime = 0.0f;
 
-		// ÃÖ´ë ÀÌµ¿ ¼Óµµ ¿ø»ó º¹±Í
+		// ï¿½Ö´ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		GetCharacterMovement()->MaxWalkSpeed = move_speed;
 		GetCharacterMovement()->MaxAcceleration = move_accel;
-		// Áß·Â ´Ù½Ã È°¼ºÈ­
+		// ï¿½ß·ï¿½ ï¿½Ù½ï¿½ È°ï¿½ï¿½È­
 		GetCharacterMovement()->GravityScale = 1.0f;
 
 		state = ECharacterState::Idle;
@@ -284,7 +284,7 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::Death()
 {
-	// ÃÊ±âÈ­
+	// ï¿½Ê±ï¿½È­
 	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
 	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 	WaGMB->RoomReset();
@@ -361,6 +361,10 @@ void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
 		isblockForwardBackwardMove = value;
 }
 
+void APlayerCharacter::SetHealthPoint(float value)
+{
+	health_point = value;
+}
 void APlayerCharacter::ActivateInGameUI()
 {
 	if (inGameUI)
