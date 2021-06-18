@@ -12,12 +12,8 @@ ALaserBarrel::ALaserBarrel()
 
 	damage = 1;
 	distance = 1000.0f;
-}
 
-void ALaserBarrel::BeginPlay()
-{
-	Super::BeginPlay();
-	
+	active = false;
 }
 
 void ALaserBarrel::Tick(float DeltaTime)
@@ -30,7 +26,7 @@ void ALaserBarrel::Tick(float DeltaTime)
 		FVector laser_target_up = laser_start + GetActorForwardVector() * distance;
 		FVector laser_target_down = laser_start + (-GetActorForwardVector() * distance);
 		FVector laser_target_right = laser_start + GetActorRightVector() * distance;
-		FVector laser_target_left = laser_start + (-GetActorForwardVector() * distance);
+		FVector laser_target_left = laser_start + (-GetActorRightVector() * distance);
 
 		// 레이저 피격 판정
 		{

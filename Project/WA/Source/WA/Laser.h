@@ -16,9 +16,6 @@ class WA_API ALaser : public ADefaultPuzzle, public ISwitchable
 public:	
 	ALaser();
 
-protected:
-	virtual void BeginPlay() override;
-
 public:	
 	virtual void Tick(float DeltaTime) override;
 

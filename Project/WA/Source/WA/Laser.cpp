@@ -14,12 +14,6 @@ ALaser::ALaser()
 	distance = 10000.0f;
 }
 
-void ALaser::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
 void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

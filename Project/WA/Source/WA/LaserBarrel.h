@@ -14,9 +14,6 @@ class WA_API ALaserBarrel : public AActor
 public:	
 	ALaserBarrel();
 
-protected:
-	virtual void BeginPlay() override;
-
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -26,6 +23,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Laser")
 	float distance;
 
+	// 레이저 활성화 여부
 	bool active;
 
 public:
