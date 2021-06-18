@@ -31,7 +31,7 @@ void AMovableBox::BeginPlay()
 	boxBody = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass()));
 	if (boxBody != nullptr)
 	{
-		boxBody->SetSimulatePhysics(true);
+		boxBody->SetSimulatePhysics(false);
 	}
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
