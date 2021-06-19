@@ -64,7 +64,7 @@ private:
 	float shooterActiveTime;
 	// 현재 생성된 모든 레이저 배럴
 	TArray<ALaserBarrel*> lasers;
-	// 임시로 생성되는 슈터 오브젝트
+	UPROPERTY()
 	AShooter* tempShooter;
 
 	// Collision box object to use for the region of spreaded bullets.

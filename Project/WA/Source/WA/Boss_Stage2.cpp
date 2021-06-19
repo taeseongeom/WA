@@ -102,11 +102,7 @@ void ABoss_Stage2::Pattern_1()
 	* 1. 존재하는 모든 LaserBarrel을 비활성화
 	* 2. 무작위 위치에 Shooter와 LaserBarrel을 각각 1개 설치
 	* 3. 일정 시간 이후 Shooter를 제거하고, 모든 LaserBarrel을 활성화
-	* @ LaserBarrel은 4방향으로 레이저를 발사하는 원통형 오브젝트이다.
-	*	리스트로 관리해야 하므로, 별도의 블루프린트나 클래스로 만들어야 할 것 같다.
-	* @ 해당 보스가 Shooter의 Bullet에 피격되면 피해를 입는다.
 	* @ 무작위 위치에 생성되는 Shooter와 LaserBarrel은 이미 생성된 구조물의 일정 범위 내에 위치해서는 안 된다.
-	*	바닥에 태그를 등록하고, SingleTrace로 판별하여 바닥에 닿았을 때에만 생성하게끔 하면 될 것 같다.
 	*/
 
 	switch (state)
@@ -137,7 +133,9 @@ void ABoss_Stage2::Pattern_1()
 
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
+			{
 				lasers.Add(GetWorld()->SpawnActor<ALaserBarrel>(laserBarrelBlueprint, spawn_pos, FRotator::ZeroRotator));
+			}
 
 			limit_try = 0;
 			do
@@ -153,7 +151,11 @@ void ABoss_Stage2::Pattern_1()
 
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
+			{
 				tempShooter = GetWorld()->SpawnActor<AShooter>(shooterBlueprint, spawn_pos + FVector(0, 0, 88.0f), FRotator::ZeroRotator);
+				tempShooter->SetUsageLimit(1);
+			}
+				
 		}
 		else
 		{
@@ -170,8 +172,8 @@ void ABoss_Stage2::Pattern_1()
 			lasers[i]->SwitchActive(true);
 		}
 
-		// 슈터 파괴. 플레이어가 탑승 중이었을 경우 별도의 대처 필요
-		tempShooter->Destroy();
+		if (tempShooter)
+			tempShooter->Destroy();
 
 		// 다음 패턴으로 전환
 		curTimer = patternInterval;
@@ -269,7 +271,7 @@ void ABoss_Stage2::Pattern_3()
 {
 	/*
 	* 1. 지형 전체를 덮을 가시 장벽을 양쪽에 생성. 단, 가시 장벽은 무작위 위치에 가시가 없다.
-	* 2. 가시 장벽은 지형을 가로질러 반대편 장벽이 생성된 위치로 이동하여 소멸
+	* 2. 일정 시간 후 가시 장벽은 지형을 가로질러 반대편 장벽이 생성된 위치로 이동하여 소멸
 	*/
 
 	switch (state)
@@ -352,7 +354,7 @@ void ABoss_Stage2::Death()
 	lasers.Empty();
 
 	if (tempShooter)
-		tempShooter->Destroy();	// 플레이어가 탑승 중이었을 경우 별도의 대처 필요
+		tempShooter->Destroy();
 
 	for (int32 i = 0; i < bullets.Num(); i++)
 		bullets[i]->Destroy();
