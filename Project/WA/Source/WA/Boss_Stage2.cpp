@@ -3,6 +3,7 @@
 
 #include "Boss_Stage2.h"
 
+#include "Boss_Stage2_Anim.h"
 #include "PlayerCharacter.h"
 #include "LaserBarrel.h"
 #include "Shooter.h"
@@ -22,6 +23,8 @@ ABoss_Stage2::ABoss_Stage2()
 
 	healthPoint = 5;
 	patternInterval = 1.0f;
+
+	bossStandPosition = FVector::ZeroVector;
 
 	laserPlaceRegion = nullptr;
 	laserBarrelBlueprint = nullptr;
@@ -53,7 +56,7 @@ ABoss_Stage2::ABoss_Stage2()
 
 	playerCharacter = nullptr;
 
-	currentPattern.BindUFunction(this, FName("Pattern_1"));
+	currentPattern.BindUFunction(this, FName("AppearanceDirecting"));
 	state = EBossState::STEP1;
 	curTimer = 2.0f;
 }
@@ -62,6 +65,8 @@ void ABoss_Stage2::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	animInstance = Cast<UBoss_Stage2_Anim>(GetMesh()->GetAnimInstance());
+
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
 		playerCharacter = *iter;
@@ -77,6 +82,8 @@ float ABoss_Stage2::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 
 	if (healthPoint <= 0)
 		Death();
+	else
+		animInstance->GetHit();
 
 	return (float)healthPoint;
 }
@@ -94,8 +101,42 @@ void ABoss_Stage2::Tick(float DeltaTime)
 void ABoss_Stage2::AppearanceDirecting()
 {
 	// 등장연출
-}
+	switch (state)
+	{
+	case EBossState::STEP1:
+		animInstance->StartMoving();
 
+		state = EBossState::STEP2;
+		break;
+
+	case EBossState::STEP2:
+		SetActorLocation(FMath::Lerp<FVector>(GetActorLocation(), bossStandPosition, 0.005f));
+
+		if (FVector::DistSquared(GetActorLocation(), bossStandPosition) < 50.0f * 50.0f)
+		{
+			animInstance->StopMoving();
+			state = EBossState::STEP3;
+		}
+		break;
+
+	case EBossState::STEP3:
+		SetActorLocation(FMath::Lerp<FVector>(GetActorLocation(), bossStandPosition, 0.05f));
+
+		if (FVector::DistSquared(GetActorLocation(), bossStandPosition) < 1.0f)
+		{
+			SetActorLocation(bossStandPosition);
+			state = EBossState::STEP4;
+		}
+		break;
+
+	case EBossState::STEP4:
+		curTimer = patternInterval;
+		state = EBossState::STEP1;
+		currentPattern.Unbind();
+		currentPattern.BindUFunction(this, FName("Pattern_1"));
+		break;
+	}
+}
 void ABoss_Stage2::Pattern_1()
 {
 	/*
@@ -108,6 +149,8 @@ void ABoss_Stage2::Pattern_1()
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(1);
+
 		if (laserPlaceRegion && laserBarrelBlueprint && shooterBlueprint)
 		{
 			for (int32 i = 0; i < lasers.Num(); i++)
@@ -194,6 +237,8 @@ void ABoss_Stage2::Pattern_2()
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(2);
+
 		if (bulletSpreadRegion && bossBulletBlueprint)
 		{
 			bullets.Empty(bulletCount);
@@ -208,7 +253,10 @@ void ABoss_Stage2::Pattern_2()
 					FMath::FRandRange(region_pos.Y - region_box.Y, region_pos.Y + region_box.Y),
 					88.0f);
 
-				ABossBullet* bullet = GetWorld()->SpawnActor<ABossBullet>(bossBulletBlueprint, GetActorLocation() + FVector(0, 0, 88.0f), FRotator::ZeroRotator);
+				ABossBullet* bullet = GetWorld()->SpawnActor<ABossBullet>(
+					bossBulletBlueprint, 
+					GetMesh()->GetSocketLocation(FName("hand_r_railSocket")), 
+					FRotator::ZeroRotator);
 				if (bullet)
 				{
 					bullet->MoveToLocation(target_pos, bulletPlacementTime);
@@ -277,6 +325,8 @@ void ABoss_Stage2::Pattern_3()
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(3);
+
 		if (spikeWallBlueprint && !spikeWallLeftSpawnPos.IsZero() && !spikeWallRightSpawnPos.IsZero())
 		{
 			leftSpikeWall = GetWorld()->SpawnActor<ASpikeWall>(spikeWallBlueprint, spikeWallLeftSpawnPos, FRotator(0, 90.0f, 0));
@@ -320,9 +370,19 @@ void ABoss_Stage2::Pattern_4()
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(4);
+
+		curTimer = 0.5f;
+		state = EBossState::STEP2;
+		break;
+
+	case EBossState::STEP2:
 		if (jumpingBombBlueprint)
 		{
-			AJumpingBomb* bomb = GetWorld()->SpawnActor<AJumpingBomb>(jumpingBombBlueprint, GetActorLocation(), FRotator::ZeroRotator);
+			AJumpingBomb* bomb = GetWorld()->SpawnActor<AJumpingBomb>(
+				jumpingBombBlueprint,
+				GetMesh()->GetSocketLocation(FName("hand_r_railSocket")),
+				FRotator::ZeroRotator);
 			bomb->FireBomb(playerCharacter, bombMoveTime, bombJumpCount);
 		}
 		else
@@ -331,10 +391,10 @@ void ABoss_Stage2::Pattern_4()
 		}
 
 		curTimer = bombMoveTime * bombJumpCount;
-		state = EBossState::STEP2;
+		state = EBossState::STEP3;
 		break;
 
-	case EBossState::STEP2:
+	case EBossState::STEP3:
 		bombJumpCount++;
 
 		curTimer = patternInterval;
@@ -360,5 +420,6 @@ void ABoss_Stage2::Death()
 		bullets[i]->Destroy();
 	bullets.Empty();
 	
-	Destroy();
+	animInstance->Die();
+	SetLifeSpan(3.0f);
 }

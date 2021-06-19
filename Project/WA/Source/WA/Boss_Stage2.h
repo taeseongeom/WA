@@ -18,7 +18,6 @@ DECLARE_DELEGATE(FPatternDelegate);
 UENUM(BlueprintType)
 enum class EBossState : uint8
 {
-	APPEARANCE UMETA(DisplayName = "Appearance"),
 	STEP1 UMETA(DisplayName = "Step 1"),
 	STEP2 UMETA(DisplayName = "Step 2"),
 	STEP3 UMETA(DisplayName = "Step 3"),
@@ -49,6 +48,9 @@ private:
 	// Waiting time for the next pattern begin.
 	UPROPERTY(EditAnywhere, Category = "Pattern")
 	float patternInterval;
+
+	UPROPERTY(EditAnywhere, Category = "Pattern|Appearance")
+	FVector bossStandPosition;
 
 	// Collision box object to use for the region of placement laser barrel and shooter.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 1")
@@ -126,6 +128,8 @@ private:
 	float bombMoveTime;
 
 	UPROPERTY()
+	class UBoss_Stage2_Anim* animInstance;
+	UPROPERTY()
 	APlayerCharacter* playerCharacter;
 
 	// 현재 패턴 함수를 가리키는 델리게이트
@@ -136,9 +140,8 @@ private:
 	float curTimer;
 
 
-
+	UFUNCTION()
 	void AppearanceDirecting();
-	
 	UFUNCTION()
 	void Pattern_1();
 	UFUNCTION()
