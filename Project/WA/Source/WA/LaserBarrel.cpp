@@ -11,7 +11,7 @@ ALaserBarrel::ALaserBarrel()
  	PrimaryActorTick.bCanEverTick = true;
 
 	damage = 1;
-	distance = 1000.0f;
+	distance = 3000.0f;
 
 	active = false;
 }
