@@ -22,6 +22,11 @@ void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
 	{
 		SetActorHiddenInGame(true);
 	}
+
+	if (OtherActor->ActorHasTag(FName("Boss")))
+	{
+		OtherActor->TakeDamage(1, FDamageEvent(), nullptr, this);
+	}
 }
 
 // Called every frame
