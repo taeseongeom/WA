@@ -36,7 +36,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	int8 MaxRoomCount;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int8 CurrentRoomNum;
 
 	int8 maxRoomNumber;
