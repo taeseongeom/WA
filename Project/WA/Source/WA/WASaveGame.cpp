@@ -6,6 +6,11 @@ UWASaveGame::UWASaveGame()
 {
 	SlotName = TEXT("WASave");
 	playerIndex = 0;
+	for (int i = 0; i < 2; i++)
+	{
+		FStageRoomData srData;
+		stageDatas.Add(i + 1, srData);
+	}
 }
 
 void UWASaveGame::Save(FVector respawnPoint, int _health_point, int _loadRoomNum, int saveSlotIndex, int currentStage)
