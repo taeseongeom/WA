@@ -49,5 +49,6 @@ public:
 	void CreateFile(int saveSlotIndex);
 	void Save(FVector respawnPoint, int health_point, int loadRoomNum, int saveSlotIndex, int currentStage);
 	void Load(int saveSlotIndex);
+	void IsStageDatas(int stage);
 	//void SaveRoomData(int saveSlotIndex, FRoomData data, int Stage, int RoomNum);
 };
