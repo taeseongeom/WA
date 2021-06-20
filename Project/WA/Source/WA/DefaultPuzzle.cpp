@@ -51,7 +51,6 @@ void ADefaultPuzzle::BeginPlay()
 	if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
 		UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(waInstance->GetSaveSlotIndex()), 0)))
 	{
-		LoadedGame->IsStageDatas(waInstance->GetCurrentStage());
 		if (!LoadedGame->stageDatas[waInstance->GetCurrentStage()].isOnSwitchs.Contains(GetName()))
 		{
 			puzzleActive = initpuzzleActive;
