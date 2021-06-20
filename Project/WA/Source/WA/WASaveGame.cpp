@@ -8,6 +8,8 @@ UWASaveGame::UWASaveGame()
 	playerIndex = 0;
 	for (int i = 0; i < 2; i++)
 	{
+		FStageRoomData srData;
+		stageDatas.Add(i + 1, srData);
 	}
 }
 

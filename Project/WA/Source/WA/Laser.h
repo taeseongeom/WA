@@ -16,16 +16,15 @@ class WA_API ALaser : public ADefaultPuzzle, public ISwitchable
 public:	
 	ALaser();
 
+protected:
+	virtual void BeginPlay() override;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnSwitch() override;
 
 private:
-	// The lasers damage per hit.
 	UPROPERTY(EditAnywhere, Category = "Laser")
 	int damage;
-	// The length of laser.
-	UPROPERTY(EditAnywhere, Category = "Laser")
-	float distance;
 };
