@@ -5,13 +5,17 @@
 
 #include "Components/LineBatchComponent.h"
 
-
 ALaser::ALaser()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
 	damage = 1;
-	distance = 10000.0f;
+}
+
+void ALaser::BeginPlay()
+{
+	Super::BeginPlay();
+	
 }
 
 void ALaser::Tick(float DeltaTime)
@@ -21,7 +25,7 @@ void ALaser::Tick(float DeltaTime)
 	if (puzzleActive && !IsHidden())
 	{
 		FVector laser_start = GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
-		FVector laser_target = laser_start + GetActorForwardVector() * distance;
+		FVector laser_target = laser_start + GetActorForwardVector() * 10000.0f;
 
 		FHitResult hit;
 		//bool hit_res = GetWorld()->LineTraceSingleByChannel(hit, laser_start, laser_target, ECollisionChannel::ECC_GameTraceChannel3);
