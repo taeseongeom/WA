@@ -5,11 +5,21 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "DefaultPuzzle.h"
+#include "RoomActor.h"
 #include "WAGameModeBase.generated.h"
 
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EGameState : uint8
+{
+	Load UMETA(DisplayName = "Load"),
+	Play UMETA(DisplayName = "Play"),
+	End UMETA(DisplayName = "End"),
+};
+
 UCLASS()
 class WA_API AWAGameModeBase : public AGameModeBase
 {
@@ -17,6 +27,7 @@ class WA_API AWAGameModeBase : public AGameModeBase
 public:
 	AWAGameModeBase();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	void AddInitPuzzle(ADefaultPuzzle* value, int roomNum);
 	void RoomReset();
 	void SetRespawnPoint(FVector point);
@@ -30,8 +41,10 @@ private:
 private:
 	//UPROPERTY 사용 불가능한데 추후 수정필요
 	TMultiMap<int8, ADefaultPuzzle*> InitPuzzles;
-	TArray<AActor*> rooms;
+	TArray<ARoomActor*> rooms;
 	FVector respawnPoint;
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	EGameState state;
 public:
 	UPROPERTY(EditAnywhere)
 	int8 MaxRoomCount;

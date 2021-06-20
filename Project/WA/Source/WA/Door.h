@@ -6,13 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "DefaultPuzzle.h"
 #include "Switchable.h"
+#include "CheckRoomClear.h"
 #include "Door.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WA_API ADoor : public ADefaultPuzzle, public ISwitchable
+class WA_API ADoor : public ADefaultPuzzle, public ISwitchable, public ICheckRoomClear
 {
 	GENERATED_BODY()
 public:
@@ -29,6 +30,9 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	int8 TransferRoomNumber;
+
+	UPROPERTY(EditAnywhere, Category = "Clear")
+	bool isClearCheckObject;
 
 	class UBillboardComponent* spawnPoint;
 };

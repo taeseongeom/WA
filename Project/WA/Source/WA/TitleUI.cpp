@@ -62,7 +62,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 				if (GetWorld()->GetGameInstance())
 				{
 					if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
-						UGameplayStatics::LoadGameFromSlot("WA_" + FString::FromInt(slotIndex), 0)))
+						UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(slotIndex), 0)))
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Load"));
 						UWAGameInstance* instance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
@@ -78,7 +78,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 							UGameplayStatics::CreateSaveGameObject(UWASaveGame::StaticClass())
 							))
 						{
-							SaveGame->Save(slotIndex, 1, 3, 1);
+							SaveGame->CreateFile(slotIndex);
 							UGameplayStatics::OpenLevel(GetWorld(), FName("Stage1"));
 							UE_LOG(LogTemp, Warning, TEXT("NEW"));
 						}
