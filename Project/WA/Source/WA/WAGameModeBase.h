@@ -32,6 +32,7 @@ public:
 	void RoomReset();
 	void SetRespawnPoint(FVector point);
 	void ChangeRoom(int8 roomNum, FVector resPoint);
+	void SetRoomSpawnPoint(int roomNum, FVector location);
 	void SetCurrentRoomNum(int8 value);
 	void DisableActor(AActor* target);
 	void EnableActor(AActor* target);

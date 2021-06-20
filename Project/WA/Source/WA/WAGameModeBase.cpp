@@ -25,6 +25,7 @@ void AWAGameModeBase::Init()
 		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
 			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
+		CurrentRoomNum = WASaveGameInstance->loadRoomNum;
 		for (int i = 0; i < rooms.Num(); i++)
 		{
 			for (int j = 0; j < rooms.Num(); j++)
@@ -53,6 +54,17 @@ void AWAGameModeBase::Init()
 			}
 		}
 		maxRoomNumber = rooms.Num();
+		for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Init SpawnPoint"), WASaveGameInstance->loadRoomNum);
+			if (WASaveGameInstance->loadRoomNum == 1)
+				respawnPoint = iter->GetActorLocation();
+			else
+				respawnPoint = WASaveGameInstance->saveRespawnPoint;
+			iter->SetHealthPoint(WASaveGameInstance->health_point);
+			iter->SetActorLocation(respawnPoint);
+			break;
+		}
 	}
 	state = EGameState::Play;
 }
@@ -146,3 +158,9 @@ FVector AWAGameModeBase::GetRespawnPoint() const
 {
 	return respawnPoint;
 }
+
+void AWAGameModeBase::SetRoomSpawnPoint(int roomNum, FVector location)
+{
+	rooms[roomNum - 1]->SetRoomSpawnPoint(location);
+}
+

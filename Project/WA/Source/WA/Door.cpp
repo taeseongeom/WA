@@ -54,6 +54,7 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 		}
 		AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 		OtherActor->SetActorLocation(spawnPoint->GetComponentLocation());
+		WaGMB->SetRoomSpawnPoint(TransferRoomNumber, spawnPoint->GetComponentLocation());
 		WaGMB->ChangeRoom(TransferRoomNumber, spawnPoint->GetComponentLocation());
 	}
 }
@@ -74,7 +75,6 @@ void ADoor::OnSwitch()
 	else
 	{
 		isTurnOn = true;
-		UE_LOG(LogTemp, Warning, TEXT("OpenDoor"));
 	}
 	puzzleActive = isTurnOn;
 }
