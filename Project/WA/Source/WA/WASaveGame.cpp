@@ -8,8 +8,6 @@ UWASaveGame::UWASaveGame()
 	playerIndex = 0;
 	for (int i = 0; i < 2; i++)
 	{
-		FStageRoomData srData;
-		stageDatas.Add(i + 1, srData);
 	}
 }
 
@@ -25,6 +23,15 @@ void UWASaveGame::Save(FVector respawnPoint, int _health_point, int _loadRoomNum
 
 void UWASaveGame::Load(int saveSlotIndex)
 {
+}
+
+void UWASaveGame::IsStageDatas(int stage)
+{
+	if (!stageDatas.Contains(stage))
+	{
+		FStageRoomData srData;
+		stageDatas.Add(stage, srData);
+	}
 }
 
 //void UWASaveGame::SaveRoomData(int saveSlotIndex, FRoomData data, int Stage, int RoomNum)
