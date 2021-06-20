@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DefaultPuzzle.h"
+#include "CheckRoomClear.h"
 #include "SwitchPuzzle.generated.h"
 
 UCLASS()
-class WA_API ASwitchPuzzle : public ADefaultPuzzle
+class WA_API ASwitchPuzzle : public ADefaultPuzzle, public ICheckRoomClear
 {
 	GENERATED_BODY()
 	
@@ -30,12 +31,17 @@ protected:
 
 	bool timerFlag;
 
+	UPROPERTY()
+	bool isInteracted;
+
 	FTimerHandle CountdownTimerHandle;
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void OnSwitchTarget();
 	virtual void BeginPlay() override;
 public:
 	virtual void InitializePuzzle() override;
+	virtual void OnSwitchTarget();
+	virtual bool IsInteracted();
+	virtual void SetInteractedFlag(bool value);
 };

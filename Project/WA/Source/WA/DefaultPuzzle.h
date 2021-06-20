@@ -7,6 +7,8 @@
 #include "HideOnBox.h"
 #include "DefaultPuzzle.generated.h"
 
+class ARoomActor;
+
 UCLASS()
 class WA_API ADefaultPuzzle : public AActor, public IHideOnBox
 {
@@ -25,10 +27,14 @@ protected:
 public:
 	// Reset Function
 	virtual void InitializePuzzle();
+	virtual bool GetPuzzleActive();
+	virtual void SetParentRoom(ARoomActor* value);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
+	UPROPERTY(EditAnywhere)
+	ARoomActor* parentRoom;
 	UPROPERTY(VisibleAnywhere)
 	bool puzzleActive;
 private: // Reset Property

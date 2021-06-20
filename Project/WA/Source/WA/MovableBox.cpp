@@ -13,8 +13,6 @@ AMovableBox::AMovableBox()
 
 	SetInteractability(false);
 
-	puzzleActive = false;
-
 	gravitySpeed = 0.1f;
 	overlapedObjectNum = 0;
 	velocity = FVector::ZeroVector;
@@ -24,7 +22,6 @@ AMovableBox::AMovableBox()
 void AMovableBox::BeginPlay()
 {
 	Super::BeginPlay();
-
 	SetTickGroup(TG_PostUpdateWork);
 	BeginSetup(GetActorLocation(), GetActorRotation());
 
@@ -69,7 +66,6 @@ void AMovableBox::NotifyActorEndOverlap(AActor* OtherActor)
 void AMovableBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (puzzleActive)
 	{
 		SetActorLocation(pc->GetActorLocation() + distance);
