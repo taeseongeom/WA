@@ -365,6 +365,10 @@ void APlayerCharacter::SetHealthPoint(float value)
 {
 	health_point = value;
 }
+float APlayerCharacter::GetHealthPoint() const
+{
+	return health_point;
+}
 void APlayerCharacter::ActivateInGameUI()
 {
 	if (inGameUI)

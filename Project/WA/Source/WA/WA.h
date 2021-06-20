@@ -8,4 +8,5 @@
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
-
+#include "WAGameInstance.h"
+#include "WASaveGame.h"
