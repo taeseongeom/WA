@@ -41,4 +41,6 @@ public:
 	/// </summary>
 	/// <param name="PatternCode">공격 패턴의 번호 (1, 2, 3, 4)</param>
 	void Attack(int32 PatternCode);
+
+	void Initialize();
 };

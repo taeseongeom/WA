@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Boss_Stage2.generated.h"
 
+class UBoss_Stage2_Anim;
 class APlayerCharacter;
 class ALaserBarrel;
 class AShooter;
@@ -43,14 +44,19 @@ public:
 private:
 	// Health Point of the Boss Character.
 	UPROPERTY(EditAnywhere, Category = "Health")
+	int32 maxHealthPoint;
+	// 보스의 현재 체력
 	int32 healthPoint;
+
+	// 보스 초기 위치
+	FVector bossStartPosition;
+	// Boss character will fight against you at this position.
+	UPROPERTY(EditAnywhere, Category = "Entrance")
+	FVector bossStandPosition;
 
 	// Waiting time for the next pattern begin.
 	UPROPERTY(EditAnywhere, Category = "Pattern")
 	float patternInterval;
-
-	UPROPERTY(EditAnywhere, Category = "Pattern|Appearance")
-	FVector bossStandPosition;
 
 	// Collision box object to use for the region of placement laser barrel and shooter.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 1")
@@ -75,8 +81,10 @@ private:
 	// Blueprint class of BossBullet object.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 2")
 	TSubclassOf<ABossBullet> bossBulletBlueprint;
-	// Count of bullet that are fired by Boss character when this pattern work first time.
+	// Initial counts of bullet.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 2")
+	int32 initBulletCount;
+	// 현재 총알 개수
 	int32 bulletCount;
 	// Increased count of bullet when each pattern passed.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 2")
@@ -95,6 +103,7 @@ private:
 	float bulletSpeed;
 	// 현재 생성한 모든 총알
 	TArray<ABossBullet*> bullets;
+	// 현재 발사 중인 총알 인덱스. 초기화의 용이성을 위해 마지막 원소부터 시작
 	int32 bulletIndex;
 
 	// Blueprint class of SpikeWall object.
@@ -120,28 +129,32 @@ private:
 	// Blueprint class of JumpingBomb object.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 4")
 	TSubclassOf<AJumpingBomb> jumpingBombBlueprint;
-	// Count of jumps. The first fire is regarded as 1 count as well.
+	// Initial counts of jump. The first fire is regarded as 1 count as well.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 4")
+	int32 initBombJumpCount;
+	// 현재 폭탄의 점프 횟수
 	int32 bombJumpCount;
 	// The time during bombs move to destination.
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 4")
 	float bombMoveTime;
 
 	UPROPERTY()
-	class UBoss_Stage2_Anim* animInstance;
+	UBoss_Stage2_Anim* animInstance;
 	UPROPERTY()
 	APlayerCharacter* playerCharacter;
 
+	// 보스 활성화 여부. 활성화되어야 패턴을 시작
+	bool activation;
+	// 타이머
+	float curTimer;
 	// 현재 패턴 함수를 가리키는 델리게이트
 	FPatternDelegate currentPattern;
 	// 보스 캐릭터의 현재 상태
 	EBossState state;
-	// 타이머
-	float curTimer;
 
 
 	UFUNCTION()
-	void AppearanceDirecting();
+	void Entrance();
 	UFUNCTION()
 	void Pattern_1();
 	UFUNCTION()
@@ -152,4 +165,8 @@ private:
 	void Pattern_4();
 
 	void Death();
+
+public:
+	void Initialize();
+	void Activate();
 };

@@ -47,3 +47,10 @@ void UBoss_Stage2_Anim::Attack(int32 PatternCode)
 		PatternNumber = PatternCode;
 	}
 }
+
+void UBoss_Stage2_Anim::Initialize()
+{
+	IsMoving = false;
+	IsDamaged = false;
+	PatternNumber = 0;
+}
