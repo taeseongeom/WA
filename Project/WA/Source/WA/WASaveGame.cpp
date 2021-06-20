@@ -27,6 +27,15 @@ void UWASaveGame::Load(int saveSlotIndex)
 {
 }
 
+void UWASaveGame::IsStageDatas(int stage)
+{
+	if (!stageDatas.Contains(stage))
+	{
+		FStageRoomData srData;
+		stageDatas.Add(stage, srData);
+	}
+}
+
 //void UWASaveGame::SaveRoomData(int saveSlotIndex, FRoomData data, int Stage, int RoomNum)
 //{
 //	FRoomData rData;
