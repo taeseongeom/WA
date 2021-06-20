@@ -4,28 +4,28 @@
 
 #include "EngineMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DefaultPuzzle.h"
-#include "Switchable.h"
-#include "Laser.generated.h"
+#include "LaserBarrel.generated.h"
 
 UCLASS()
-class WA_API ALaser : public ADefaultPuzzle, public ISwitchable
+class WA_API ALaserBarrel : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	ALaser();
+	ALaserBarrel();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnSwitch() override;
-
 private:
-	// The lasers damage per hit.
 	UPROPERTY(EditAnywhere, Category = "Laser")
 	int damage;
-	// The length of laser.
 	UPROPERTY(EditAnywhere, Category = "Laser")
 	float distance;
+
+	// 레이저 활성화 여부
+	bool active;
+
+public:
+	void SwitchActive(bool IsActive);
 };
