@@ -8,6 +8,7 @@
 
 class APlayerCamera;
 class UInGameUI;
+class UPlayerCharacter_AnimInstance;
 
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
@@ -96,7 +97,10 @@ private:
 	UPROPERTY()
 	class AWAGameModeBase* WaGMB;
 
-	// ĳ������ ���� ����. ��� ī��Ʈ ȸ�� ���θ� �Ǵ��� �� ���˴ϴ�.
+	UPROPERTY()
+	UPlayerCharacter_AnimInstance* animInstance;
+
+	// 현재 연결된 MovableBox
 	class AMovableBox* holdingBox;
 
 	// 착지 여부. 착지 후에 대시 쿨타임을 진행합니다.
