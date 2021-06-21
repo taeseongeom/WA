@@ -33,7 +33,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	ARoomActor* parentRoom;
 	UPROPERTY(VisibleAnywhere)
 	bool puzzleActive;

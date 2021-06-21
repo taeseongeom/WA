@@ -35,7 +35,6 @@ void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
 				waInstance->GetSaveSlotIndex(),
 				waInstance->GetCurrentStage() +1);
 		}
-
 		if (GetWorld())
 		{
 			UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
@@ -44,19 +43,9 @@ void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
 				waVP->Fade(1, true);
 			}
 		}
-		UWorld* world = GetWorld();
-		if (world)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Make VP"));
-			UWAViewportClient* waVP = Cast<UWAViewportClient>(world->GetGameViewport());
-			if (Cast<UWAViewportClient>(world->GetGameViewport()))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("fade"));
-				Cast<UWAViewportClient>(world->GetGameViewport())->Fade(1, true);
-			}
-		}
+		waInstance->SetCurrentStage(waInstance->GetCurrentStage() + 1);
 		GetWorldTimerManager().SetTimer(CountdownTimerHandle,
-			this, &ATeleporter::TransferLevel, 1.5f, true);
+			this, &ATeleporter::TransferLevel, 1.0f, true);
 	}
 }
 

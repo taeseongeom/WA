@@ -168,7 +168,7 @@ void AMovableBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (inAir)
+	if (inAir && !IsHidden())
 	{
 		fallSpeed += gravitySpeed * DeltaTime;
 		SetActorLocation(GetActorLocation() - FVector(0, 0, fallSpeed));

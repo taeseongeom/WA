@@ -6,6 +6,7 @@
 #include "WAGameModeBase.h"
 #include "PlayerCamera.h"
 #include "InGameUI.h"
+#include "WAGameInstance.h"
 #include "MovableBox.h"
 
 #include "Blueprint/UserWidget.h"
@@ -74,21 +75,7 @@ void APlayerCharacter::BeginPlay()
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->JumpZVelocity = jump_power;
 
-	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
-	if (WaGMB)
-	{
-		WaGMB->SetRespawnPoint(GetActorLocation());
-	}
-
-	// �ΰ��� ���� ��������Ʈ�� ã�� ������ �����ϰ� ���
-	FStringClassReference tempInGameWidgetClassRef(TEXT("/Game/BluePrints/BP_InGameUI.BP_InGameUI_C"));
-	if (UClass* tempInGameWidgetClass = tempInGameWidgetClassRef.TryLoadClass<UUserWidget>())
-	{
-		UUserWidget* tempInGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempInGameWidgetClass);
-		inGameUI = Cast<UInGameUI>(tempInGameWidget);
-		inGameUI->AddToViewport();
-		inGameUI->DisplayText("");
-	}
+	WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -214,7 +201,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	UE_LOG(LogTemp, Warning, TEXT("Input Key"));
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::InputForwardBackward);
 	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::InputLeftRight);
 	PlayerInputComponent->BindAction(TEXT("MoveJump"), IE_Pressed, this, &APlayerCharacter::MoveJump);
@@ -303,13 +290,31 @@ void APlayerCharacter::MoveDashEnd()
 }
 void APlayerCharacter::Interaction()
 {
-	InteractionWithPuzzle.Broadcast();
+	if(!(WaGMB->GetGameState() == EGameState::CutScene))
+		InteractionWithPuzzle.Broadcast();
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NextCutScene"));
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			UWAGameInstance* waInstance = Cast<UWAGameInstance>(world->GetGameInstance());
+			if (waInstance)
+			{
+				if (inGameUI->NextCutScene(waInstance->GetCurrentStage()))
+				{
+					inGameUI->DisableCutScene();
+					WaGMB->SetGameState(EGameState::Load);
+				}
+			}
+		}
+	}
 }
 
 void APlayerCharacter::Death()
 {
-	// 리셋
-	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+	// �ʱ�ȭ
+	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
 	WaGMB->RoomReset();
 	SetActorLocation(WaGMB->GetRespawnPoint());
 
@@ -384,7 +389,20 @@ float APlayerCharacter::GetHealthPoint() const
 {
 	return health_point;
 }
-
+void APlayerCharacter::InitInGameUI()
+{
+	if (!inGameUI)
+	{
+		FStringClassReference tempInGameWidgetClassRef(TEXT("/Game/BluePrints/BP_InGameUI.BP_InGameUI_C"));
+		if (UClass* tempInGameWidgetClass = tempInGameWidgetClassRef.TryLoadClass<UUserWidget>())
+		{
+			UUserWidget* tempInGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempInGameWidgetClass);
+			inGameUI = Cast<UInGameUI>(tempInGameWidget);
+			inGameUI->AddToViewport();
+			inGameUI->DisplayText("");
+		}
+	}
+}
 void APlayerCharacter::ActivateInGameUI()
 {
 	if (inGameUI)
@@ -406,6 +424,31 @@ void APlayerCharacter::DeactivateInGameUI()
 	}
 }
 
+void APlayerCharacter::StartCutScene()
+{
+	if (inGameUI)
+	{
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			UWAGameInstance* waInstance = Cast<UWAGameInstance>(world->GetGameInstance());
+			if (waInstance)
+			{
+				inGameUI->EnableCutScene(waInstance->GetCurrentStage());
+				UE_LOG(LogTemp, Warning, TEXT("Enable"));
+			}
+			UE_LOG(LogTemp, Warning, TEXT("No Instance"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No World"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No InGameUI"));
+	}
+}
 void APlayerCharacter::ConnectWithCharacter(AMovableBox* HoldingMovableBox)
 {
 	holdingBox = HoldingMovableBox;

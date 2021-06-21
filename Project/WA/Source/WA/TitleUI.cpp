@@ -12,6 +12,13 @@
 #include "WAViewportClient.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
 
+void UTitleUI::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+	alpha = 1.0f;
+	isIncreaseAlpha = -1.0f;
+}
+
 void UTitleUI::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -37,7 +44,18 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 			secondSaveDataBtn->SetVisibility(ESlateVisibility::Visible);
 			thirdSaveDataBtn->SetVisibility(ESlateVisibility::Visible);
 			quitBtn->SetVisibility(ESlateVisibility::Visible);
+			backGround->SetColorAndOpacity(FLinearColor::White * 0.35f);
 			ChangeSlotImage(slotIndex);
+		}
+		else
+		{
+			alpha += 0.01f * isIncreaseAlpha * InDeltaTime;
+			if ((alpha <= 0 && isIncreaseAlpha == -1.0f) || 
+				(alpha >= 1 && isIncreaseAlpha == 1.0f))
+			{
+				isIncreaseAlpha *= -1.0f;
+			}
+			pressAnyKeyText->SetOpacity(alpha);
 		}
 	}
 	else
@@ -143,6 +161,10 @@ void UTitleUI::StartGameFromSaveData()
 			))
 		{
 			SaveGame->CreateFile(slotIndex);
+			UWAGameInstance* instance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+			instance->SetCurrentStage(1);
+			instance->SetSaveSlotIndex(slotIndex);
+			instance->SetCurrentRoomNum(1);
 			UGameplayStatics::OpenLevel(GetWorld(), FName("Stage1"));
 			UE_LOG(LogTemp, Warning, TEXT("NEW"));
 		}
