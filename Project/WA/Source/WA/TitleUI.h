@@ -50,6 +50,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Init")
 		class UTexture2D* hoveredQuitTexture;
 
+	UPROPERTY(EditAnywhere, Category = "Init")
+		class USoundBase* changeBtnEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Init")
+		class USoundBase* quitBtnEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Init")
+		class USoundBase* startBtnEffect;
+
+	UPROPERTY()
+	class ATitleSoundEffect* effectComp;
+
 	bool isPressed;
 	bool isSelectingData;
 	bool isGameStart;

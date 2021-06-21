@@ -5,6 +5,7 @@
 #include "Components/BillboardComponent.h"
 #include "Door.h"
 #include "WAViewportClient.h"
+#include "WAAmbientSound.h"
 #include "WA.h"
 
 AWAGameModeBase::AWAGameModeBase()
@@ -32,9 +33,18 @@ void AWAGameModeBase::Init()
 			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 		waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
 		CurrentRoomNum = WASaveGameInstance->loadRoomNum;
+		waInstance->SetCurrentRoomNum(CurrentRoomNum);
 		if (DebugRoomNum != 0)
 			CurrentRoomNum = DebugRoomNum;
 
+		for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+		{
+			bgm = *iter;
+			bgm->SetStage(waInstance->GetCurrentStage());
+			bgm->SwapRoomBGM(waInstance->GetCurrentRoomNum());
+			break;
+		}
+		
 		for (int i = 0; i < rooms.Num(); i++)
 		{
 			for (int j = 0; j < rooms.Num(); j++)
@@ -104,11 +114,56 @@ void AWAGameModeBase::BeginPlay()
 	{
 		if (WASaveGameInstance->loadRoomNum == 1)
 		{
+			UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+			waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
+			waInstance->SetCurrentRoomNum(1);
+			waInstance->SetSaveSlotIndex(WASaveGameInstance->slotIndex);
 			ShowCutScene();
+			if (GetWorld())
+			{
+				for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+				{
+					bgm = *iter;
+					bgm->SetStage(waInstance->GetCurrentStage());
+					bgm->SwapRoomBGM(waInstance->GetCurrentRoomNum());
+					break;
+				}
+			}
 		}
 		else
 		{
 			state = EGameState::Load;
+		}
+	}
+	else
+	{
+		UWASaveGame* newSaveGameInstance =
+			Cast<UWASaveGame>(UGameplayStatics::CreateSaveGameObject(UWASaveGame::StaticClass()));
+		newSaveGameInstance->CreateFile(0);
+		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		int i = 0;
+		while (true)
+		{
+			if (UGameplayStatics::GetCurrentLevelName(GetWorld())
+				== FString("Stage") + FString::FromInt(i))
+				break;
+			else
+				i++;
+		}
+		waInstance->SetCurrentStage(i);
+		waInstance->SetCurrentRoomNum(1);
+		waInstance->SetSaveSlotIndex(0);
+		newSaveGameInstance->Save(FVector::ZeroVector, 3, 1, 0, waInstance->GetCurrentStage());
+		ShowCutScene();
+		if (GetWorld())
+		{
+			for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+			{
+				bgm = *iter;
+				bgm->SetStage(waInstance->GetCurrentStage());
+				bgm->SwapRoomBGM(waInstance->GetCurrentRoomNum());
+				break;
+			}
 		}
 	}
 }
@@ -149,6 +204,7 @@ void AWAGameModeBase::ChangeRoom(int8 roomNum, FVector resPoint)
 		DisableActor(rooms[CurrentRoomNum - 1]);
 	}
 	CurrentRoomNum = roomNum;
+	bgm->SwapRoomBGM(CurrentRoomNum);
 	respawnPoint = resPoint;
 }
 

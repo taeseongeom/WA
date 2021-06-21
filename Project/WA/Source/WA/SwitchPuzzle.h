@@ -39,6 +39,7 @@ protected:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PlayEffect();
 public:
 	virtual void InitializePuzzle() override;
 	virtual void OnSwitchTarget();
