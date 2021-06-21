@@ -16,6 +16,7 @@ UWASaveGame::UWASaveGame()
 void UWASaveGame::Save(FVector respawnPoint, int _health_point, int _loadRoomNum, int saveSlotIndex, int currentStage)
 {
 	SlotName = FString("WASave" + FString::FromInt(saveSlotIndex));
+	slotIndex = saveSlotIndex;
 	saveRespawnPoint = respawnPoint;
 	health_point = _health_point;
 	loadRoomNum = _loadRoomNum;

@@ -37,6 +37,10 @@ protected:
 	ARoomActor* parentRoom;
 	UPROPERTY(VisibleAnywhere)
 	bool puzzleActive;
+	UPROPERTY()
+	class UAudioComponent* audioComp;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TArray<class USoundBase*> effects;
 private: // Reset Property
 	FVector initPos;
 	FRotator initRot;
