@@ -6,6 +6,7 @@
 #include "MovableBox.h"
 #include "SwitchPuzzle.h"
 #include "DefaultPuzzle.h"
+#include "Door.h"
 #include "WA.h"
 
 // Sets default values
@@ -173,4 +174,15 @@ void ARoomActor::SetClear(bool value)
 bool ARoomActor::GetClear() const
 {
 	return isClear;
+}
+
+FVector ARoomActor::GetRoomSpawnPoint() const
+{
+	return spawnPoint;
+}
+
+void ARoomActor::SetRoomSpawnPoint(FVector location)
+{
+	spawnPoint = location;
+	UE_LOG(LogTemp, Warning, TEXT("%f %f %f"), spawnPoint.X, spawnPoint.Y, spawnPoint.Z);
 }

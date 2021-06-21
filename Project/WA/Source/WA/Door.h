@@ -20,13 +20,13 @@ public:
 	ADoor();
 protected:
 	virtual void BeginPlay() override;
-
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 protected:
 	virtual void BeginSetup(FVector pos, FRotator rot) override;
 public:
 	virtual void InitializePuzzle() override;
 	virtual void OnSwitch() override;
+	virtual FVector GetSpawnPoint() const;
 private:
 	UPROPERTY(EditAnywhere)
 	int8 TransferRoomNumber;

@@ -32,6 +32,8 @@ public:
 	void LoadRoom();
 	void SetClear(bool value);
 	bool GetClear() const;
+	FVector GetRoomSpawnPoint() const;
+	void SetRoomSpawnPoint(FVector location);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -47,4 +49,6 @@ private:
 	TArray<AActor*> boxActors;
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*> switchActors;
+	UPROPERTY()
+	FVector spawnPoint;
 };

@@ -25,7 +25,6 @@ void ASwitchPuzzle::OnSwitchTarget()
 	isInteracted = !isInteracted;
 	if (TurnOnTargets.Num() != 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Target Size : %d"), TurnOnTargets.Num());
 		for (int8 i = 0; i < TurnOnTargets.Num(); i++)
 			Cast<ISwitchable>(TurnOnTargets[i])->OnSwitch();
 	}
@@ -38,7 +37,6 @@ void ASwitchPuzzle::OnSwitchTarget()
 			if (!parentRoom->GetClear())
 			{
 				parentRoom->SetClear(true);
-				UE_LOG(LogTemp, Warning, TEXT("Not saved"));
 				UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
 					UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 				APlayerCharacter* pc = NULL;
@@ -50,8 +48,7 @@ void ASwitchPuzzle::OnSwitchTarget()
 				}
 				if (pc && parentRoom && waInstance)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Save"));
-					WASaveGameInstance->Save(GetActorLocation(),
+					WASaveGameInstance->Save(parentRoom->GetRoomSpawnPoint(),
 						pc->GetHealthPoint(),
 						Cast<ARoomActor>(parentRoom)->GetRoomNumber(),
 						waInstance->GetSaveSlotIndex(),
