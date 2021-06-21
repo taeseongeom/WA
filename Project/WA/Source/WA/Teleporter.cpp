@@ -3,6 +3,7 @@
 
 #include "Teleporter.h"
 #include "WA.h"
+#include "WAViewportClient.h"
 
 // Sets default values
 ATeleporter::ATeleporter()
@@ -16,8 +17,6 @@ void ATeleporter::BeginPlay()
 {
 	Super::BeginPlay();
 	SetActorEnableCollision(false);
-	pController = GetWorld()->GetFirstPlayerController();
-	pController->ClientSetCameraFade(true, FColor::Black, FVector2D(1.0, 0.0), 0.7);
 }
 
 void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -36,9 +35,28 @@ void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
 				waInstance->GetSaveSlotIndex(),
 				waInstance->GetCurrentStage() +1);
 		}
-		pController->ClientSetCameraFade(true, FColor::Black, FVector2D(0.0, 1.0), 0.7);
+
+		if (GetWorld())
+		{
+			UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+			if (waVP)
+			{
+				waVP->Fade(1, true);
+			}
+		}
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Make VP"));
+			UWAViewportClient* waVP = Cast<UWAViewportClient>(world->GetGameViewport());
+			if (Cast<UWAViewportClient>(world->GetGameViewport()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("fade"));
+				Cast<UWAViewportClient>(world->GetGameViewport())->Fade(1, true);
+			}
+		}
 		GetWorldTimerManager().SetTimer(CountdownTimerHandle,
-			this, &ATeleporter::TransferLevel, 0.7, true);
+			this, &ATeleporter::TransferLevel, 1.5f, true);
 	}
 }
 
@@ -52,7 +70,6 @@ void ATeleporter::OnSwitch()
 	else
 	{
 		isTurnOn = true;
-		UE_LOG(LogTemp, Warning, TEXT("OpenTeleporter"));
 		SetActorEnableCollision(true);
 	}
 	puzzleActive = isTurnOn;

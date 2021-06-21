@@ -9,6 +9,7 @@
 #include "PlayerCharacter.h"
 #include "WASaveGame.h"
 #include "WAGameInstance.h"
+#include "WAViewportClient.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
 
 void UTitleUI::NativeConstruct()
@@ -41,7 +42,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 	}
 	else
 	{
-		if (isSelectingData)
+		if (isSelectingData && !isGameStart)
 		{
 			if (pc->WasInputKeyJustPressed(EKeys::Left) && slotIndex > 0)
 			{
@@ -61,32 +62,16 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 			{
 				if (GetWorld()->GetGameInstance())
 				{
-					if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
-						UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(slotIndex), 0)))
+					UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+					if (waVP)
 					{
-						UE_LOG(LogTemp, Warning, TEXT("Load"));
-						UWAGameInstance* instance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
-						instance->SetCurrentStage(LoadedGame->stageLevel);
-						instance->SetSaveSlotIndex(slotIndex);
-						instance->SetCurrentRoomNum(LoadedGame->loadRoomNum);
-						FString stageName = "Stage" + FString::FromInt(LoadedGame->stageLevel);
-						UGameplayStatics::OpenLevel(GetWorld(), FName(*stageName));
+						waVP->Fade(1, true);
 					}
-					else
-					{
-						if (UWASaveGame* SaveGame = Cast<UWASaveGame>(
-							UGameplayStatics::CreateSaveGameObject(UWASaveGame::StaticClass())
-							))
-						{
-							SaveGame->CreateFile(slotIndex);
-							UGameplayStatics::OpenLevel(GetWorld(), FName("Stage1"));
-							UE_LOG(LogTemp, Warning, TEXT("NEW"));
-						}
-					}
+					isGameStart = true;
 				}
 			}
 		}
-		else
+		else if(!isSelectingData && !isGameStart)
 		{
 			if (pc->WasInputKeyJustPressed(EKeys::Enter))
 			{
@@ -97,6 +82,15 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 				isSelectingData = true;
 				quitBtn->SetBrushFromTexture(normalQuitTexture);
 				ChangeSlotImage(slotIndex);
+			}
+		}
+		else if (isGameStart)
+		{
+			UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+			if (waVP->GetFadeAlpha() >= 1.0f)
+			{
+				waVP->ClearFade();
+				StartGameFromSaveData();
 			}
 		}
 	}
@@ -126,5 +120,31 @@ void UTitleUI::ChangeSlotImage(int _slotIndex)
 		secondSaveDataBtn->SetBrushFromTexture(normalSlotTexture);
 		thirdSaveDataBtn->SetBrushFromTexture(normalSlotTexture);
 		break;
+	}
+}
+
+void UTitleUI::StartGameFromSaveData()
+{
+	if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
+		UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(slotIndex), 0)))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Load"));
+		UWAGameInstance* instance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		instance->SetCurrentStage(LoadedGame->stageLevel);
+		instance->SetSaveSlotIndex(slotIndex);
+		instance->SetCurrentRoomNum(LoadedGame->loadRoomNum);
+		FString stageName = "Stage" + FString::FromInt(LoadedGame->stageLevel);
+		UGameplayStatics::OpenLevel(GetWorld(), FName(*stageName));
+	}
+	else
+	{
+		if (UWASaveGame* SaveGame = Cast<UWASaveGame>(
+			UGameplayStatics::CreateSaveGameObject(UWASaveGame::StaticClass())
+			))
+		{
+			SaveGame->CreateFile(slotIndex);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("Stage1"));
+			UE_LOG(LogTemp, Warning, TEXT("NEW"));
+		}
 	}
 }

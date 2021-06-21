@@ -335,6 +335,7 @@ void APlayerCharacter::IncreaseDashCount(int increase_num)
 }
 void APlayerCharacter::DecreaseDashCount(int decrease_num)
 {
+
 	if (dash_count >= 1)
 	{
 		dash_count -= decrease_num;
