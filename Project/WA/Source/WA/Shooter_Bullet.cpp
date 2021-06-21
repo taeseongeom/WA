@@ -19,7 +19,8 @@ void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	if (!OtherActor->ActorHasTag(FName("Direction_Changer")) &&
 		!OtherActor->ActorHasTag(FName("Shooter")) &&
-		!OtherActor->ActorHasTag(FName("Character")))
+		!OtherActor->ActorHasTag(FName("Character")) &&
+		!OtherActor->ActorHasTag(FName("Viewport_Changer")))
 	{
 		Destroy();
 	}

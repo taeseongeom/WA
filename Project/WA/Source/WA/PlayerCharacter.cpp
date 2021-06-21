@@ -340,11 +340,15 @@ void APlayerCharacter::IncreaseDashCount(int increase_num)
 }
 void APlayerCharacter::DecreaseDashCount(int decrease_num)
 {
-	dash_count -= decrease_num;
-	if (cur_dashCount > dash_count)
+
+	if (dash_count >= 1)
 	{
-		cur_dashCount = dash_count;
-		cur_dashCooltime = 0.0f;
+		dash_count -= decrease_num;
+		if (cur_dashCount > dash_count)
+		{
+			cur_dashCount = dash_count;
+			cur_dashCooltime = 0.0f;
+		}
 	}
 }
 
