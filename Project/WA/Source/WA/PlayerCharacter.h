@@ -87,6 +87,7 @@ private:
 
 	UPROPERTY()
 	APlayerCamera* playerCamera;
+	FVector viewportDirection;
 
 	UPROPERTY()
 	UInGameUI* inGameUI;
@@ -126,6 +127,7 @@ public:
 	void DecreaseDashCount(int decrease_num);
 
 	APlayerCamera* GetPlayerCamera() const;
+	void SetViewportDirection(const FVector& Dir);
 
 	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
 

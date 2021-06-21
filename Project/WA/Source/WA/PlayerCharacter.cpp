@@ -38,6 +38,7 @@ APlayerCharacter::APlayerCharacter()
 	knockBack_decrease = 0.01f;
 
 	camera_init = false;
+	viewportDirection = FVector::ForwardVector;
 
 	has_landed = false;
 	cur_dashCount = dash_count;
@@ -214,7 +215,7 @@ void APlayerCharacter::InputForwardBackward(float value)
 		if (!isblockForwardBackwardMove)
 		{
 			velocity.X = value;
-			AddMovementInput(velocity.GetSafeNormal());
+			AddMovementInput(velocity.GetSafeNormal().RotateAngleAxis(viewportDirection.Rotation().Yaw, GetActorUpVector()));
 		}
 		break;
 	case ECharacterState::Shooting:
@@ -229,7 +230,7 @@ void APlayerCharacter::InputLeftRight(float value)
 		if (!isblockLeftRightMove)
 		{
 			velocity.Y = value;
-			AddMovementInput(velocity.GetSafeNormal());
+			AddMovementInput(velocity.GetSafeNormal().RotateAngleAxis(viewportDirection.Rotation().Yaw, GetActorUpVector()));
 		}
 		break;
 	case ECharacterState::Shooting:
@@ -340,17 +341,25 @@ void APlayerCharacter::IncreaseDashCount(int increase_num)
 }
 void APlayerCharacter::DecreaseDashCount(int decrease_num)
 {
-	dash_count -= decrease_num;
-	if (cur_dashCount > dash_count)
+	if (dash_count >= 1)
 	{
-		cur_dashCount = dash_count;
-		cur_dashCooltime = 0.0f;
+		dash_count -= decrease_num;
+		if (cur_dashCount > dash_count)
+		{
+			cur_dashCount = dash_count;
+			cur_dashCooltime = 0.0f;
+		}
 	}
 }
 
 APlayerCamera* APlayerCharacter::GetPlayerCamera() const
 {
 	return playerCamera;
+}
+void APlayerCharacter::SetViewportDirection(const FVector& Dir)
+{
+	viewportDirection = Dir.GetSafeNormal();
+	viewportDirection.Z = 0;
 }
 
 void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)

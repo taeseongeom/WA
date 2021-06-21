@@ -3,6 +3,8 @@
 
 #include "PlayerCamera.h"
 
+#include "PlayerCharacter.h"
+
 
 APlayerCamera::APlayerCamera()
 {
@@ -89,6 +91,8 @@ void APlayerCamera::ChangeViewport(const FVector& Position, const FRotator& Rota
 	relativeLocation = Position;
 	relativeRotation = Rotation;
 
+	Cast<APlayerCharacter>(playerCharacter)->SetViewportDirection(-relativeLocation);
+
 	overlapCount++;
 }
 void APlayerCamera::RevertViewport(const FVector& Position, const FRotator& Rotation)
@@ -105,6 +109,8 @@ void APlayerCamera::RevertViewport(const FVector& Position, const FRotator& Rota
 			relativeLocation = prevRelativeLocation;
 			relativeRotation = prevRelativeRotation;
 		}
+
+		Cast<APlayerCharacter>(playerCharacter)->SetViewportDirection(-relativeLocation);
 	}
 
 	overlapCount--;
