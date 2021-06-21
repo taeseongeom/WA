@@ -16,6 +16,7 @@ void ASwitchTarget::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	if (OtherActor->ActorHasTag(FName("Bullet")))
 	{
+		PlayEffect();
 		OnSwitchTarget();
 	}
 }

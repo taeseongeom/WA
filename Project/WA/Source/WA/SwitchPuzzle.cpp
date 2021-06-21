@@ -20,6 +20,19 @@ void ASwitchPuzzle::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ASwitchPuzzle::PlayEffect()
+{
+	if (isInteracted)
+	{
+		audioComp->SetSound(effects[0]);
+	}
+	else
+	{
+		audioComp->SetSound(effects[1]);
+	}
+	audioComp->Play();
+}
+
 void ASwitchPuzzle::OnSwitchTarget()
 {
 	isInteracted = !isInteracted;

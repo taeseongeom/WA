@@ -10,6 +10,7 @@
 #include "WASaveGame.h"
 #include "WAGameInstance.h"
 #include "WAViewportClient.h"
+#include "TitleSoundEffect.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
 
 void UTitleUI::NativeOnInitialized()
@@ -27,6 +28,11 @@ void UTitleUI::NativeConstruct()
 	if (world)
 	{
 		pc = world->GetFirstPlayerController();
+	}
+	for (TActorIterator<ATitleSoundEffect> iter(GetWorld()); iter; ++iter)
+	{
+		effectComp = *iter;
+		break;
 	}
 }
 
@@ -49,7 +55,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 		}
 		else
 		{
-			alpha += 0.01f * isIncreaseAlpha * InDeltaTime;
+			alpha += isIncreaseAlpha * InDeltaTime;
 			if ((alpha <= 0 && isIncreaseAlpha == -1.0f) || 
 				(alpha >= 1 && isIncreaseAlpha == 1.0f))
 			{
@@ -64,14 +70,17 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 		{
 			if (pc->WasInputKeyJustPressed(EKeys::Left) && slotIndex > 0)
 			{
+				effectComp->PlayBtnEffect(changeBtnEffect);
 				ChangeSlotImage(--slotIndex);
 			}
 			else if (pc->WasInputKeyJustPressed(EKeys::Right) && slotIndex < 2)
 			{
+				effectComp->PlayBtnEffect(changeBtnEffect);
 				ChangeSlotImage(++slotIndex);
 			}
 			else if (pc->WasInputKeyJustPressed(EKeys::Down))
 			{
+				effectComp->PlayBtnEffect(changeBtnEffect);
 				isSelectingData = false;
 				quitBtn->SetBrushFromTexture(hoveredQuitTexture);
 				ChangeSlotImage(-1);
@@ -85,6 +94,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 					{
 						waVP->Fade(1, true);
 					}
+					effectComp->PlayBtnEffect(startBtnEffect);
 					isGameStart = true;
 				}
 			}
@@ -97,6 +107,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 			}
 			else if (pc->WasInputKeyJustPressed(EKeys::Up))
 			{
+				effectComp->PlayBtnEffect(changeBtnEffect);
 				isSelectingData = true;
 				quitBtn->SetBrushFromTexture(normalQuitTexture);
 				ChangeSlotImage(slotIndex);
