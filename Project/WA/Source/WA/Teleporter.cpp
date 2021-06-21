@@ -24,6 +24,18 @@ void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	if (puzzleActive && OtherActor->ActorHasTag(FName("Character")))
 	{
+		UWASaveGame* waSave = Cast<UWASaveGame>(
+			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
+		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		if (waInstance)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Save"));
+			waSave->Save(FVector(0, 0, 0),
+				3,
+				1,
+				waInstance->GetSaveSlotIndex(),
+				waInstance->GetCurrentStage() +1);
+		}
 		pController->ClientSetCameraFade(true, FColor::Black, FVector2D(0.0, 1.0), 0.7);
 		GetWorldTimerManager().SetTimer(CountdownTimerHandle,
 			this, &ATeleporter::TransferLevel, 1.0, true);

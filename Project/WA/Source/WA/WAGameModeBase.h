@@ -47,10 +47,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EGameState state;
 public:
-	UPROPERTY(EditAnywhere)
-	int8 MaxRoomCount;
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool DebugMode;
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	int8 DebugRoomNum;
+	UPROPERTY()
 	int8 CurrentRoomNum;
 
 	int8 maxRoomNumber;

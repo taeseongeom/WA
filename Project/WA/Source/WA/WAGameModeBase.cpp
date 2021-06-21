@@ -25,7 +25,11 @@ void AWAGameModeBase::Init()
 		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
 			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
+		waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
 		CurrentRoomNum = WASaveGameInstance->loadRoomNum;
+		if (DebugRoomNum != 0)
+			CurrentRoomNum = DebugRoomNum;
+
 		for (int i = 0; i < rooms.Num(); i++)
 		{
 			for (int j = 0; j < rooms.Num(); j++)
@@ -36,7 +40,7 @@ void AWAGameModeBase::Init()
 					break;
 				}
 			}
-			if (rooms[i]->GetRoomNumber() != CurrentRoomNum)
+			if (rooms[i]->GetRoomNumber() != CurrentRoomNum && !DebugMode)
 			{
 				DisableActor(rooms[i]);
 			}
@@ -57,9 +61,9 @@ void AWAGameModeBase::Init()
 		for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Init SpawnPoint"), WASaveGameInstance->loadRoomNum);
-			if (WASaveGameInstance->loadRoomNum == 1)
+			if (WASaveGameInstance->loadRoomNum == 1 || DebugRoomNum != 0)
 				respawnPoint = iter->GetActorLocation();
-			else
+			else if(!DebugMode)
 				respawnPoint = WASaveGameInstance->saveRespawnPoint;
 			iter->SetHealthPoint(WASaveGameInstance->health_point);
 			iter->SetActorLocation(respawnPoint);
@@ -103,8 +107,8 @@ void AWAGameModeBase::SetRespawnPoint(FVector point)
 
 void AWAGameModeBase::ChangeRoom(int8 roomNum, FVector resPoint)
 {
-	if ((roomNum > 0 || roomNum < maxRoomNumber)
-		|| (CurrentRoomNum > 0 || CurrentRoomNum < maxRoomNumber))
+	if ((roomNum > 0 || roomNum < maxRoomNumber
+		|| CurrentRoomNum > 0) && !DebugMode)
 	{
 		EnableActor(rooms[roomNum - 1]);
 		DisableActor(rooms[CurrentRoomNum - 1]);
