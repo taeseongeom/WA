@@ -13,6 +13,8 @@ ASpike::ASpike()
 	activePeriod = 1.0f;
 	deactivePeriod = 1.0f;
 
+	activation = false;
+
 	isBegin = true;
 	currentTime = 0.0f;
 
@@ -39,7 +41,7 @@ void ASpike::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	if (puzzleActive)
+	if (activation)
 	{
 		if (OtherActor->ActorHasTag(FName("Character")))
 		{
@@ -67,7 +69,7 @@ void ASpike::Tick(float DeltaTime)
 		}
 		else
 		{
-			if (puzzleActive)
+			if (activation)
 			{
 				if (currentTime >= activePeriod)
 				{
@@ -89,7 +91,7 @@ void ASpike::Tick(float DeltaTime)
 	// 가시 상태변화 애니메이션
 	if (playAnimation)
 	{
-		if (puzzleActive)
+		if (activation)
 		{
 			spikeMesh->SetRelativeLocation(FMath::Lerp(spikeMesh->GetRelativeLocation(), FVector(0.0f, 0.0f, 0.0f), DeltaTime * 10.0f));
 
@@ -122,5 +124,6 @@ void ASpike::OnSwitch()
 void ASpike::SwitchActive(bool Active)
 {
 	puzzleActive = Active;
+	activation = Active;
 	playAnimation = true;
 }
