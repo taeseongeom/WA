@@ -47,8 +47,7 @@ void AAbilityGainVolume::NotifyActorBeginOverlap(AActor* OtherActor)
 
 				
 				// 캐릭터 이동 제한
-				playerCharacter->SetBlockPlayerMoveDirection(true, true);
-				playerCharacter->SetBlockPlayerMoveDirection(false, true);
+				playerCharacter->SetBlockPlayerMoveDirection(true, true, true, true);
 				playerCharacter->GetCharacterMovement()->StopMovementImmediately();
 				playerCharacter->DecreaseDashCount(1);
 				// 캐릭터를 해당 객체의 위치로 강제 이동
@@ -148,8 +147,7 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 		isDirectingWork = false;
 
 		// 캐릭터 이동과 UI 원상 복귀
-		playerCharacter->SetBlockPlayerMoveDirection(true, false);
-		playerCharacter->SetBlockPlayerMoveDirection(false, false);
+		playerCharacter->SetBlockPlayerMoveDirection(false, false, false, false);
 		playerCharacter->ActivateInGameUI();
 
 		playerCharacter->IncreaseDashCount(1);

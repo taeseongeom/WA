@@ -29,6 +29,8 @@ protected:
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
+	virtual void InitializePuzzle() override;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
