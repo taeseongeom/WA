@@ -34,8 +34,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Bullet")
 	int Crash_count;
 
+	int32 UsageLimit;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 	virtual void NotifyActorEndOverlap(AActor* OtherActor);
@@ -49,4 +52,7 @@ public:
 private:
 	void ShootBullet();
 	void RotateShooter();
+
+public:
+	void SetUsageLimit(int32 LimitCount);
 };
