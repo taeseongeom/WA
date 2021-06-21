@@ -94,6 +94,9 @@ private:
 	UInGameUI* inGameUI;
 
 	UPROPERTY()
+	class AWAGameModeBase* WaGMB;
+
+	// ĳ������ ���� ����. ��� ī��Ʈ ȸ�� ���θ� �Ǵ��� �� ���˴ϴ�.
 	class AMovableBox* holdingBox;
 
 	// 착지 여부. 착지 후에 대시 쿨타임을 진행합니다.
@@ -139,9 +142,10 @@ public:
 
 	void SetHealthPoint(float value);
 	float GetHealthPoint() const;
-
+	void InitInGameUI();
 	void ActivateInGameUI();
 	void DeactivateInGameUI();
+	void StartCutScene();
 
 	// 해당 캐릭터와 Movable Box를 연결합니다. nullptr인 경우 연결을 해제합니다.
 	void ConnectWithCharacter(AMovableBox* HoldingMovableBox);

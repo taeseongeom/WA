@@ -38,6 +38,8 @@ public:
 	void DisableActor(AActor* target);
 	void EnableActor(AActor* target);
 	FVector GetRespawnPoint() const;
+	EGameState GetGameState() const;
+	void SetGameState(EGameState value);
 private:
 	void Init();
 	void ShowCutScene();
@@ -48,6 +50,9 @@ private:
 	FVector respawnPoint;
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EGameState state;
+	UPROPERTY()
+	class APlayerCharacter* pc;
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool DebugMode;
