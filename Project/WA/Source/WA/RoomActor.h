@@ -45,9 +45,9 @@ private:
 	bool isClear;
 	UPROPERTY(EditAnywhere, Category = "Property")
 	int roomNumber;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<AActor*> boxActors;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<AActor*> switchActors;
 	UPROPERTY()
 	FVector spawnPoint;
