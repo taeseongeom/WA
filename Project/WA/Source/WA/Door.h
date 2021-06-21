@@ -26,7 +26,7 @@ protected:
 public:
 	virtual void InitializePuzzle() override;
 	virtual void OnSwitch() override;
-	virtual FVector GetSpawnPoint() const;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	int8 TransferRoomNumber;
