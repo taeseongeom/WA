@@ -92,6 +92,9 @@ private:
 	UPROPERTY()
 	UInGameUI* inGameUI;
 
+	UPROPERTY()
+	class AWAGameModeBase* WaGMB;
+
 	// ĳ������ ���� ����. ��� ī��Ʈ ȸ�� ���θ� �Ǵ��� �� ���˴ϴ�.
 	bool has_landed;
 	// ���� ���� ��� ��밡�� Ƚ��
@@ -133,6 +136,8 @@ public:
 
 	void SetHealthPoint(float value);
 	float GetHealthPoint() const;
+	void InitInGameUI();
 	void ActivateInGameUI();
 	void DeactivateInGameUI();
+	void StartCutScene();
 };

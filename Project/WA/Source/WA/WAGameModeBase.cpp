@@ -18,6 +18,11 @@ void AWAGameModeBase::Init()
 	UWorld* world = GetWorld();
 	if (world)
 	{
+		UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+		if (waVP)
+		{
+			waVP->Fade(0, true);
+		}
 		for(const auto & entity : TActorRange<ARoomActor>(world))
 		{
 			rooms.Add(entity);
@@ -58,44 +63,48 @@ void AWAGameModeBase::Init()
 			}
 		}
 		maxRoomNumber = rooms.Num();
-		for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+		if (!pc)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Init SpawnPoint"), WASaveGameInstance->loadRoomNum);
-			if (WASaveGameInstance->loadRoomNum == 1 || DebugRoomNum != 0)
-				respawnPoint = iter->GetActorLocation();
-			else if(!DebugMode)
-				respawnPoint = WASaveGameInstance->saveRespawnPoint;
-			iter->SetHealthPoint(WASaveGameInstance->health_point);
-			iter->SetActorLocation(respawnPoint);
-			break;
+			for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+			{
+				pc = *iter;
+				if (WASaveGameInstance->loadRoomNum == 1 || DebugRoomNum != 0)
+					respawnPoint = iter->GetActorLocation();
+				else if (!DebugMode)
+					respawnPoint = WASaveGameInstance->saveRespawnPoint;
+				pc->InitInGameUI();
+				pc->SetHealthPoint(WASaveGameInstance->health_point);
+				pc->SetActorLocation(respawnPoint);
+				break;
+			}
 		}
+		waVP->ClearFade();
 	}
 	state = EGameState::Play;
 }
 
 void AWAGameModeBase::ShowCutScene()
 {
-	UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
-	if (waVP)
+	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
-		waVP->ClearFade();
+		pc = *iter;
+	}
+	if (pc)
+	{
+		pc->InitInGameUI();
+		pc->StartCutScene();
 	}
 }
 
 void AWAGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
-	if (waVP)
-	{
-		waVP->Fade(0, true);
-	}
 	if (UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
 		UGameplayStatics::LoadGameFromSlot("WASave0", 0)))
 	{
 		if (WASaveGameInstance->loadRoomNum == 1)
 		{
-			state = EGameState::CutScene;
+			ShowCutScene();
 		}
 		else
 		{
@@ -109,7 +118,7 @@ void AWAGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	switch (state)
 	{
-	case EGameState::CutScene: ShowCutScene(); break;
+	case EGameState::CutScene:  break;
 	case EGameState::Load: Init(); break;
 	case EGameState::Play: break;
 	case EGameState::End: break;
@@ -187,6 +196,16 @@ void AWAGameModeBase::EnableActor(AActor * target)
 FVector AWAGameModeBase::GetRespawnPoint() const
 {
 	return respawnPoint;
+}
+
+EGameState AWAGameModeBase::GetGameState() const
+{
+	return state;
+}
+
+void AWAGameModeBase::SetGameState(EGameState value)
+{
+	state = value;
 }
 
 void AWAGameModeBase::SetRoomSpawnPoint(int roomNum, FVector location)
