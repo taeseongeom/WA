@@ -38,7 +38,7 @@ void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
 		}
 		pController->ClientSetCameraFade(true, FColor::Black, FVector2D(0.0, 1.0), 0.7);
 		GetWorldTimerManager().SetTimer(CountdownTimerHandle,
-			this, &ATeleporter::TransferLevel, 1.0, true);
+			this, &ATeleporter::TransferLevel, 0.7, true);
 	}
 }
 
