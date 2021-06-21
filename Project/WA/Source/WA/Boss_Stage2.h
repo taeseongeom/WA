@@ -138,6 +138,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Pattern|Pattern 4")
 	float bombMoveTime;
 
+	// This user widget blueprint will be shown when boss dead. It is temporary.
+	UPROPERTY(EditAnywhere, Category = "Temp")
+	TSubclassOf<UUserWidget> gameClearUIBlueprint;
+
 	UPROPERTY()
 	UBoss_Stage2_Anim* animInstance;
 	UPROPERTY()

@@ -13,6 +13,7 @@
 
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
+#include "Blueprint/UserWidget.h"
 
 
 ABoss_Stage2::ABoss_Stage2()
@@ -455,6 +456,10 @@ void ABoss_Stage2::Death()
 	// 애니메이션 초기화
 	animInstance->Initialize();
 	animInstance->Die();
+
+	// 게임 클리어 연출
+	UUserWidget* temp_gameClear_widget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), gameClearUIBlueprint);
+	temp_gameClear_widget->AddToViewport(0);
 	
 	// 사망 처리
 	SetActorEnableCollision(false);
