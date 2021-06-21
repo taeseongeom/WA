@@ -32,6 +32,7 @@ public:
 	void RoomReset();
 	void SetRespawnPoint(FVector point);
 	void ChangeRoom(int8 roomNum, FVector resPoint);
+	void SetRoomSpawnPoint(int roomNum, FVector location);
 	void SetCurrentRoomNum(int8 value);
 	void DisableActor(AActor* target);
 	void EnableActor(AActor* target);
@@ -46,9 +47,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EGameState state;
 public:
-	UPROPERTY(EditAnywhere)
-	int8 MaxRoomCount;
-
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool DebugMode;
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	int8 DebugRoomNum;
 	UPROPERTY()
 	int8 CurrentRoomNum;
 
