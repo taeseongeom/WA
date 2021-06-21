@@ -31,7 +31,6 @@ protected:
 	UPROPERTY(Meta = (BindWidget))
 	class UTextBlock* pressAnyKeyText;
 
-
 private:
 	UPROPERTY()
 	class APlayerController* pc;
@@ -50,6 +49,7 @@ private:
 
 	bool isPressed;
 	bool isSelectingData;
+	bool isGameStart;
 	int slotIndex;
 protected:
 	virtual void NativeConstruct() override;
@@ -57,4 +57,5 @@ protected:
 
 private:
 	void ChangeSlotImage(int slotIndex);
+	void StartGameFromSaveData();
 };

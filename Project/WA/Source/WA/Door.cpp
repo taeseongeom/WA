@@ -45,7 +45,7 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 					UE_LOG(LogTemp, Warning, TEXT("Save"));
 					waSave->Save(spawnPoint->GetComponentLocation(),
 						pc->GetHealthPoint(),
-						Cast<ARoomActor>(parentRoom)->GetRoomNumber(),
+						TransferRoomNumber,
 						waInstance->GetSaveSlotIndex(),
 						waInstance->GetCurrentStage());
 					Cast<ARoomActor>(parentRoom)->SaveRoom();
