@@ -4,11 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "RoomActor.h"
 #include "WASaveGame.generated.h"
 
 /**
  * 
  */
+USTRUCT()
+struct FStageRoomData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+		TMap<FString, FVector> boxLocations;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+		TMap<FString, bool> isOnSwitchs;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+		TMap<int, bool> isRoomClears;
+};
+
 UCLASS()
 class WA_API UWASaveGame : public USaveGame
 {
@@ -16,23 +30,25 @@ class WA_API UWASaveGame : public USaveGame
 	
 public:
 	UWASaveGame();
-
-	UPROPERTY()
-	FString SaveSlotName;
-	
-	UPROPERTY()
-	int32 SaveIndex;
-
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+	FString SlotName;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+	int8 playerIndex;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+	FVector saveRespawnPoint;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
 	int stageLevel;
-
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = Basic)
 	int health_point;
-
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = Basic)
 	int loadRoomNum;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+	TMap<int, FStageRoomData> stageDatas;
 
 public:
-	void Save(int slotIndex, int stageLevel, int health_point, int loadRoomNum);
-	void Load(int slotIndex);
+	void CreateFile(int saveSlotIndex);
+	void Save(FVector respawnPoint, int health_point, int loadRoomNum, int saveSlotIndex, int currentStage);
+	void Load(int saveSlotIndex);
+	void IsStageDatas(int stage);
+	//void SaveRoomData(int saveSlotIndex, FRoomData data, int Stage, int RoomNum);
 };

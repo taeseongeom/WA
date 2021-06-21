@@ -1,4 +1,5 @@
 #include "Shooter_Bullet.h"
+#include "WA.h"
 
 // Sets default values
 AShooter_Bullet::AShooter_Bullet()
@@ -20,7 +21,7 @@ void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
 		!OtherActor->ActorHasTag(FName("Shooter")) &&
 		!OtherActor->ActorHasTag(FName("Character")))
 	{
-		SetActorHiddenInGame(true);
+		Destroy();
 	}
 
 	if (OtherActor->ActorHasTag(FName("Boss")))

@@ -4,6 +4,7 @@
 #include "DefaultPuzzle.h"
 #include "WA.h"
 #include "BreakableBox.h"
+#include "RoomActor.h"
 #include "UObject/ConstructorHelpers.h"
 #include "WAGameModeBase.h"
 
@@ -45,7 +46,17 @@ void ADefaultPuzzle::BeginPlay()
 				UE_LOG(LogTemp, Warning, TEXT("Not Init"));
 		}
 	}
-	puzzleActive = initpuzzleActive;
+	BeginSetup(GetActorLocation(), GetActorRotation());
+	UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+	if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
+		UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(waInstance->GetSaveSlotIndex()), 0)))
+	{
+		LoadedGame->IsStageDatas(waInstance->GetCurrentStage());
+		if (!LoadedGame->stageDatas[waInstance->GetCurrentStage()].isOnSwitchs.Contains(GetName()))
+		{
+			puzzleActive = initpuzzleActive;
+		}
+	}
 	BeginSetup(GetActorLocation(), GetActorRotation());
 	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->AddInitPuzzle(this, roomNum);
 }
@@ -73,4 +84,14 @@ void ADefaultPuzzle::InitializePuzzle()
 		SetActorEnableCollision(true);
 		SetHide(true);
 	}
+}
+
+bool ADefaultPuzzle::GetPuzzleActive()
+{
+	return puzzleActive;
+}
+
+void ADefaultPuzzle::SetParentRoom(ARoomActor * value)
+{
+	parentRoom = value;
 }

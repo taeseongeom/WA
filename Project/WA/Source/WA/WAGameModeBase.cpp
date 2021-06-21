@@ -1,15 +1,14 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "WAGameModeBase.h"
-#include "WASaveGame.h"
-#include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.h"
 #include "Components/BillboardComponent.h"
 #include "Door.h"
-#include "Runtime/Engine//Public/EngineUtils.h"
+#include "WA.h"
 
 AWAGameModeBase::AWAGameModeBase()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	CurrentRoomNum = 1;
 }
 
@@ -19,33 +18,29 @@ void AWAGameModeBase::Init()
 
 	if (world)
 	{
-		//GameLoad
-		auto WASaveGame = Cast<UWASaveGame>(UGameplayStatics::LoadGameFromSlot(saveSlotName, 0));
-		if (WASaveGame)
+		for(const auto & entity : TActorRange<ARoomActor>(world))
 		{
-			// 타이틀 화면에서 데이터 가져오기
+			rooms.Add(entity);
 		}
-		//Init room data and Disable not current room
-		for (const auto& entity : FActorRange(world))
-		{
-			if (entity->GetName().Contains(TEXT("Room")))
-			{
-				rooms.Add(entity);
-			}
-		}
+		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
+			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
+		CurrentRoomNum = WASaveGameInstance->loadRoomNum;
 		for (int i = 0; i < rooms.Num(); i++)
 		{
 			for (int j = 0; j < rooms.Num(); j++)
 			{
-				if (rooms[j]->GetName() ==
-					FString("Room" + FString::FromInt(i + 1)))
+				if (i + 1 == rooms[j]->GetRoomNumber())
 				{
 					rooms.Swap(i, j);
 					break;
 				}
 			}
-			if (i != CurrentRoomNum - 1)
+			if (rooms[i]->GetRoomNumber() != CurrentRoomNum)
+			{
 				DisableActor(rooms[i]);
+			}
+			rooms[i]->InitRoom();
 		}
 		for (TActorIterator<ADoor> iter(GetWorld()); iter; ++iter)
 		{
@@ -59,13 +54,36 @@ void AWAGameModeBase::Init()
 			}
 		}
 		maxRoomNumber = rooms.Num();
+		for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Init SpawnPoint"), WASaveGameInstance->loadRoomNum);
+			if (WASaveGameInstance->loadRoomNum == 1)
+				respawnPoint = iter->GetActorLocation();
+			else
+				respawnPoint = WASaveGameInstance->saveRespawnPoint;
+			iter->SetHealthPoint(WASaveGameInstance->health_point);
+			iter->SetActorLocation(respawnPoint);
+			break;
+		}
 	}
+	state = EGameState::Play;
 }
 
 void AWAGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	Init();
+	state = EGameState::Load;
+}
+
+void AWAGameModeBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	switch (state)
+	{
+	case EGameState::Load: Init(); break;
+	case EGameState::Play: break;
+	case EGameState::End: break;
+	}
 }
 
 void AWAGameModeBase::AddInitPuzzle(ADefaultPuzzle* value, int roomNum){
@@ -104,6 +122,7 @@ void AWAGameModeBase::DisableActor(AActor * target)
 {
 	TArray<AActor*> children;
 	target->GetAttachedActors(children);
+
 	if (children.Num() > 0)
 	{
 		for (int i = 0; i < children.Num(); i++)
@@ -119,10 +138,9 @@ void AWAGameModeBase::DisableActor(AActor * target)
 
 void AWAGameModeBase::EnableActor(AActor * target)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), *(target)->GetName());
 	TArray<AActor*> children;
 	target->GetAttachedActors(children);
-	//UE_LOG(LogTemp, Warning, TEXT("%d"), children.Num());
+
 	if (children.Num() > 0)
 	{
 		for (int i = 0; i < children.Num(); i++)
@@ -134,10 +152,15 @@ void AWAGameModeBase::EnableActor(AActor * target)
 		target->SetActorHiddenInGame(false);
 	if (!target->GetActorEnableCollision())
 		target->SetActorEnableCollision(true);
-
 }
 
 FVector AWAGameModeBase::GetRespawnPoint() const
 {
 	return respawnPoint;
 }
+
+void AWAGameModeBase::SetRoomSpawnPoint(int roomNum, FVector location)
+{
+	rooms[roomNum - 1]->SetRoomSpawnPoint(location);
+}
+
