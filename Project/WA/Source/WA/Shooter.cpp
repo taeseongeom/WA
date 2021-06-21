@@ -13,6 +13,8 @@ AShooter::AShooter()
  	PrimaryActorTick.bCanEverTick = true;
 
 	SetInteractability(false);
+
+	UsageLimit = 0;
 }
 
 void AShooter::BeginPlay()
@@ -28,17 +30,30 @@ void AShooter::BeginPlay()
 	}
 	pController = GetWorld()->GetFirstPlayerController();
 }
+void AShooter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (puzzleActive)
+	{
+		puzzleActive = false;
+		pc->SetCharacterState(ECharacterState::Idle);
+	}
+}
 
 void AShooter::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+	Super::NotifyActorBeginOverlap(OtherActor);
+	
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(true);
 	}
 }
-
 void AShooter::NotifyActorEndOverlap(AActor* OtherActor)
 {
+	Super::NotifyActorEndOverlap(OtherActor);
+	
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(false);
@@ -77,6 +92,14 @@ void AShooter::ShootBullet()
 	pc->SetCharacterState(ECharacterState::Idle);
 	AShooter_Bullet* bullet = (AShooter_Bullet*)GetWorld()->SpawnActor<AActor>(BulletBlueprint, GetActorLocation(), GetActorRotation());
 	bullet->SetStack(BulletSpeed, Crash_count);
+
+	if (UsageLimit > 0)
+	{
+		UsageLimit--;
+
+		if (UsageLimit <= 0)
+			Destroy();
+	}
 }
 
 void AShooter::RotateShooter()
@@ -102,4 +125,9 @@ void AShooter::RotateShooter()
 	SetActorRotation(FRotator(0, FMath::RadiansToDegrees(FMath::Atan2(direction.Y, direction.X)), 0));
 	pc->SetActorRotation(GetActorRotation());
 	pc->SetActorLocation(GetActorLocation() + -GetActorForwardVector() * 40);
+}
+
+void AShooter::SetUsageLimit(int32 LimitCount)
+{
+	UsageLimit = LimitCount;
 }

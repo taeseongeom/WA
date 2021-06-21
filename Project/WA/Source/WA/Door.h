@@ -26,6 +26,7 @@ protected:
 public:
 	virtual void InitializePuzzle() override;
 	virtual void OnSwitch() override;
+
 private:
 	UPROPERTY(EditAnywhere)
 	int8 TransferRoomNumber;
