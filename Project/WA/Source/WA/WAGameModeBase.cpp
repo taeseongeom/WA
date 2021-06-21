@@ -4,6 +4,7 @@
 #include "PlayerCharacter.h"
 #include "Components/BillboardComponent.h"
 #include "Door.h"
+#include "WAViewportClient.h"
 #include "WA.h"
 
 AWAGameModeBase::AWAGameModeBase()
@@ -15,7 +16,6 @@ AWAGameModeBase::AWAGameModeBase()
 void AWAGameModeBase::Init()
 {
 	UWorld* world = GetWorld();
-
 	if (world)
 	{
 		for(const auto & entity : TActorRange<ARoomActor>(world))
@@ -73,10 +73,35 @@ void AWAGameModeBase::Init()
 	state = EGameState::Play;
 }
 
+void AWAGameModeBase::ShowCutScene()
+{
+	UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+	if (waVP)
+	{
+		waVP->ClearFade();
+	}
+}
+
 void AWAGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	state = EGameState::Load;
+	UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+	if (waVP)
+	{
+		waVP->Fade(0, true);
+	}
+	if (UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
+		UGameplayStatics::LoadGameFromSlot("WASave0", 0)))
+	{
+		if (WASaveGameInstance->loadRoomNum == 1)
+		{
+			state = EGameState::CutScene;
+		}
+		else
+		{
+			state = EGameState::Load;
+		}
+	}
 }
 
 void AWAGameModeBase::Tick(float DeltaTime)
@@ -84,6 +109,7 @@ void AWAGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	switch (state)
 	{
+	case EGameState::CutScene: ShowCutScene(); break;
 	case EGameState::Load: Init(); break;
 	case EGameState::Play: break;
 	case EGameState::End: break;

@@ -28,7 +28,5 @@ private:
 private:
 	UPROPERTY(EditAnywhere)
 	FName TransferLevelName;
-	UPROPERTY()
-	class APlayerController* pController;
 	FTimerHandle CountdownTimerHandle;
 };
