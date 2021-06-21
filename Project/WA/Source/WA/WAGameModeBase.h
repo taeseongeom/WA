@@ -52,6 +52,8 @@ private:
 	EGameState state;
 	UPROPERTY()
 	class APlayerCharacter* pc;
+	UPROPERTY()
+	class AWAAmbientSound* bgm;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Debug")
