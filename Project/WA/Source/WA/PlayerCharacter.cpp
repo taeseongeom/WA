@@ -7,6 +7,7 @@
 #include "PlayerCamera.h"
 #include "InGameUI.h"
 #include "WAGameInstance.h"
+#include "PlayerCharacter_AnimInstance.h"
 #include "MovableBox.h"
 
 #include "Blueprint/UserWidget.h"
@@ -76,6 +77,8 @@ void APlayerCharacter::BeginPlay()
 	GetCharacterMovement()->JumpZVelocity = jump_power;
 
 	WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
+
+	animInstance = Cast<UPlayerCharacter_AnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -269,6 +272,8 @@ void APlayerCharacter::MoveDashBegin()
 		GetCharacterMovement()->Velocity.Z = 0.0f;
 
 		state = ECharacterState::Dash;
+
+		animInstance->SetDash(true);
 	}
 }
 void APlayerCharacter::MoveDashEnd()
@@ -286,6 +291,8 @@ void APlayerCharacter::MoveDashEnd()
 		GetCharacterMovement()->GravityScale = 1.0f;
 
 		state = ECharacterState::Idle;
+
+		animInstance->SetDash(false);
 	}
 }
 void APlayerCharacter::Interaction()
