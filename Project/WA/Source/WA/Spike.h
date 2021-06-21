@@ -46,6 +46,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Spike|Timelapse")
 	float deactivePeriod;
 
+	// 가시 활성화 여부. true일 때 가시가 올라온 상태
+	bool activation;
+
 	// beginDelay 변수를 이용한 초기 작동 딜레이를 걸 것인지 여부
 	bool isBegin;
 	// 현재 작동 시간

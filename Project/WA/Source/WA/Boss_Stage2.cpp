@@ -3,6 +3,7 @@
 
 #include "Boss_Stage2.h"
 
+#include "Boss_Stage2_Anim.h"
 #include "PlayerCharacter.h"
 #include "LaserBarrel.h"
 #include "Shooter.h"
@@ -12,6 +13,7 @@
 
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
+#include "Blueprint/UserWidget.h"
 
 
 ABoss_Stage2::ABoss_Stage2()
@@ -20,7 +22,12 @@ ABoss_Stage2::ABoss_Stage2()
 
 	Tags.Add(FName("Boss"));
 
-	healthPoint = 5;
+	maxHealthPoint = 5;
+	healthPoint = 0;
+
+	bossStartPosition = FVector::ZeroVector;
+	bossStandPosition = FVector::ZeroVector;
+
 	patternInterval = 1.0f;
 
 	laserPlaceRegion = nullptr;
@@ -31,7 +38,8 @@ ABoss_Stage2::ABoss_Stage2()
 
 	bulletSpreadRegion = nullptr;
 	bossBulletBlueprint = nullptr;
-	bulletCount = 6;
+	initBulletCount = 6;
+	bulletCount = 0;
 	bulletCountIncrease = 2;
 	bulletPlacementTime = 1.5f;
 	bulletWarningColor = FColor::Red;
@@ -48,20 +56,30 @@ ABoss_Stage2::ABoss_Stage2()
 	rightSpikeWall = nullptr;
 
 	jumpingBombBlueprint = nullptr;
-	bombJumpCount = 1;
+	initBombJumpCount = 1;
+	bombJumpCount = 0;
 	bombMoveTime = 2.0f;
 
 	playerCharacter = nullptr;
 
-	currentPattern.BindUFunction(this, FName("Pattern_1"));
+	activation = false;
+	curTimer = 0.0f;
+	currentPattern.BindUFunction(this, FName("Entrance"));
 	state = EBossState::STEP1;
-	curTimer = 2.0f;
 }
 
 void ABoss_Stage2::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	healthPoint = maxHealthPoint;
+	bossStartPosition = GetActorLocation();
+
+	bulletCount = initBulletCount;
+	bombJumpCount = initBombJumpCount;
+
+	animInstance = Cast<UBoss_Stage2_Anim>(GetMesh()->GetAnimInstance());
+
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
 		playerCharacter = *iter;
@@ -73,10 +91,13 @@ float ABoss_Stage2::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	healthPoint -= (int32)Damage;
+	if (activation)
+		healthPoint -= (int32)Damage;
 
 	if (healthPoint <= 0)
 		Death();
+	else
+		animInstance->GetHit();
 
 	return (float)healthPoint;
 }
@@ -85,33 +106,71 @@ void ABoss_Stage2::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (curTimer > 0)
-		curTimer -= DeltaTime;
-	else
-		currentPattern.ExecuteIfBound();
+	if (activation)
+	{
+		if (curTimer > 0)
+			curTimer -= DeltaTime;
+		else
+			currentPattern.ExecuteIfBound();
+	}
 }
 
-void ABoss_Stage2::AppearanceDirecting()
+void ABoss_Stage2::Entrance()
 {
 	// 등장연출
-}
+	switch (state)
+	{
+	case EBossState::STEP1:
+		animInstance->StartMoving();
 
+		if (!bossStandPosition.IsZero())
+		{
+			state = EBossState::STEP2;
+		}
+		break;
+
+	case EBossState::STEP2:
+		SetActorLocation(FMath::Lerp<FVector>(GetActorLocation(), bossStandPosition, 0.005f));
+
+		if (FVector::DistSquared(GetActorLocation(), bossStandPosition) < 50.0f * 50.0f)
+		{
+			animInstance->StopMoving();
+			state = EBossState::STEP3;
+		}
+		break;
+
+	case EBossState::STEP3:
+		SetActorLocation(FMath::Lerp<FVector>(GetActorLocation(), bossStandPosition, 0.05f));
+
+		if (FVector::DistSquared(GetActorLocation(), bossStandPosition) < 1.0f)
+		{
+			SetActorLocation(bossStandPosition);
+			state = EBossState::STEP4;
+		}
+		break;
+
+	case EBossState::STEP4:
+		curTimer = patternInterval;
+		state = EBossState::STEP1;
+		currentPattern.Unbind();
+		currentPattern.BindUFunction(this, FName("Pattern_1"));
+		break;
+	}
+}
 void ABoss_Stage2::Pattern_1()
 {
 	/*
 	* 1. 존재하는 모든 LaserBarrel을 비활성화
 	* 2. 무작위 위치에 Shooter와 LaserBarrel을 각각 1개 설치
 	* 3. 일정 시간 이후 Shooter를 제거하고, 모든 LaserBarrel을 활성화
-	* @ LaserBarrel은 4방향으로 레이저를 발사하는 원통형 오브젝트이다.
-	*	리스트로 관리해야 하므로, 별도의 블루프린트나 클래스로 만들어야 할 것 같다.
-	* @ 해당 보스가 Shooter의 Bullet에 피격되면 피해를 입는다.
 	* @ 무작위 위치에 생성되는 Shooter와 LaserBarrel은 이미 생성된 구조물의 일정 범위 내에 위치해서는 안 된다.
-	*	바닥에 태그를 등록하고, SingleTrace로 판별하여 바닥에 닿았을 때에만 생성하게끔 하면 될 것 같다.
 	*/
 
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(1);
+
 		if (laserPlaceRegion && laserBarrelBlueprint && shooterBlueprint)
 		{
 			for (int32 i = 0; i < lasers.Num(); i++)
@@ -137,7 +196,9 @@ void ABoss_Stage2::Pattern_1()
 
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
+			{
 				lasers.Add(GetWorld()->SpawnActor<ALaserBarrel>(laserBarrelBlueprint, spawn_pos, FRotator::ZeroRotator));
+			}
 
 			limit_try = 0;
 			do
@@ -153,7 +214,11 @@ void ABoss_Stage2::Pattern_1()
 
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
+			{
 				tempShooter = GetWorld()->SpawnActor<AShooter>(shooterBlueprint, spawn_pos + FVector(0, 0, 88.0f), FRotator::ZeroRotator);
+				tempShooter->SetUsageLimit(1);
+			}
+				
 		}
 		else
 		{
@@ -170,8 +235,8 @@ void ABoss_Stage2::Pattern_1()
 			lasers[i]->SwitchActive(true);
 		}
 
-		// 슈터 파괴. 플레이어가 탑승 중이었을 경우 별도의 대처 필요
-		tempShooter->Destroy();
+		if (tempShooter)
+			tempShooter->Destroy();
 
 		// 다음 패턴으로 전환
 		curTimer = patternInterval;
@@ -192,6 +257,8 @@ void ABoss_Stage2::Pattern_2()
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(2);
+
 		if (bulletSpreadRegion && bossBulletBlueprint)
 		{
 			bullets.Empty(bulletCount);
@@ -206,7 +273,10 @@ void ABoss_Stage2::Pattern_2()
 					FMath::FRandRange(region_pos.Y - region_box.Y, region_pos.Y + region_box.Y),
 					88.0f);
 
-				ABossBullet* bullet = GetWorld()->SpawnActor<ABossBullet>(bossBulletBlueprint, GetActorLocation() + FVector(0, 0, 88.0f), FRotator::ZeroRotator);
+				ABossBullet* bullet = GetWorld()->SpawnActor<ABossBullet>(
+					bossBulletBlueprint, 
+					GetMesh()->GetSocketLocation(FName("hand_r_railSocket")), 
+					FRotator::ZeroRotator);
 				if (bullet)
 				{
 					bullet->MoveToLocation(target_pos, bulletPlacementTime);
@@ -269,12 +339,14 @@ void ABoss_Stage2::Pattern_3()
 {
 	/*
 	* 1. 지형 전체를 덮을 가시 장벽을 양쪽에 생성. 단, 가시 장벽은 무작위 위치에 가시가 없다.
-	* 2. 가시 장벽은 지형을 가로질러 반대편 장벽이 생성된 위치로 이동하여 소멸
+	* 2. 일정 시간 후 가시 장벽은 지형을 가로질러 반대편 장벽이 생성된 위치로 이동하여 소멸
 	*/
 
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(3);
+
 		if (spikeWallBlueprint && !spikeWallLeftSpawnPos.IsZero() && !spikeWallRightSpawnPos.IsZero())
 		{
 			leftSpikeWall = GetWorld()->SpawnActor<ASpikeWall>(spikeWallBlueprint, spikeWallLeftSpawnPos, FRotator(0, 90.0f, 0));
@@ -318,9 +390,19 @@ void ABoss_Stage2::Pattern_4()
 	switch (state)
 	{
 	case EBossState::STEP1:
+		animInstance->Attack(4);
+
+		curTimer = 0.5f;
+		state = EBossState::STEP2;
+		break;
+
+	case EBossState::STEP2:
 		if (jumpingBombBlueprint)
 		{
-			AJumpingBomb* bomb = GetWorld()->SpawnActor<AJumpingBomb>(jumpingBombBlueprint, GetActorLocation(), FRotator::ZeroRotator);
+			AJumpingBomb* bomb = GetWorld()->SpawnActor<AJumpingBomb>(
+				jumpingBombBlueprint,
+				GetMesh()->GetSocketLocation(FName("hand_r_railSocket")),
+				FRotator::ZeroRotator);
 			bomb->FireBomb(playerCharacter, bombMoveTime, bombJumpCount);
 		}
 		else
@@ -329,10 +411,10 @@ void ABoss_Stage2::Pattern_4()
 		}
 
 		curTimer = bombMoveTime * bombJumpCount;
-		state = EBossState::STEP2;
+		state = EBossState::STEP3;
 		break;
 
-	case EBossState::STEP2:
+	case EBossState::STEP3:
 		bombJumpCount++;
 
 		curTimer = patternInterval;
@@ -345,18 +427,81 @@ void ABoss_Stage2::Pattern_4()
 
 void ABoss_Stage2::Death()
 {
+	// 패턴 초기화
+	activation = false;
+	curTimer = 0;
 	currentPattern.Unbind();
+	currentPattern.BindUFunction(this, FName("Entrance"));
+	state = EBossState::STEP1;
 
+	// 패턴 내용 초기화
 	for (int32 i = 0; i < lasers.Num(); i++)
 		lasers[i]->Destroy();
 	lasers.Empty();
-
 	if (tempShooter)
-		tempShooter->Destroy();	// 플레이어가 탑승 중이었을 경우 별도의 대처 필요
+		tempShooter->Destroy();
 
+	bulletCount = initBulletCount;
 	for (int32 i = 0; i < bullets.Num(); i++)
 		bullets[i]->Destroy();
 	bullets.Empty();
+
+	if (leftSpikeWall)
+		leftSpikeWall->Destroy();
+	if (rightSpikeWall)
+		rightSpikeWall->Destroy();
+
+	bombJumpCount = initBombJumpCount;
+
+	// 애니메이션 초기화
+	animInstance->Initialize();
+	animInstance->Die();
+
+	// 게임 클리어 연출
+	UUserWidget* temp_gameClear_widget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), gameClearUIBlueprint);
+	temp_gameClear_widget->AddToViewport(0);
 	
-	Destroy();
+	// 사망 처리
+	SetActorEnableCollision(false);
+	SetLifeSpan(3.0f);
+}
+
+void ABoss_Stage2::Initialize()
+{
+	// 상태 초기화
+	healthPoint = maxHealthPoint;
+	SetActorLocation(bossStartPosition);
+
+	// 패턴 초기화
+	activation = false;
+	curTimer = 0;
+	currentPattern.Unbind();
+	currentPattern.BindUFunction(this, FName("Entrance"));
+	state = EBossState::STEP1;
+
+	// 패턴 내용 초기화
+	for (int32 i = 0; i < lasers.Num(); i++)
+		lasers[i]->Destroy();
+	lasers.Empty();
+	if (tempShooter)
+		tempShooter->Destroy();
+
+	bulletCount = initBulletCount;
+	for (int32 i = 0; i < bullets.Num(); i++)
+		bullets[i]->Destroy();
+	bullets.Empty();
+
+	if (leftSpikeWall)
+		leftSpikeWall->Destroy();
+	if (rightSpikeWall)
+		rightSpikeWall->Destroy();
+
+	bombJumpCount = initBombJumpCount;
+
+	// 애니메이션 초기화
+	animInstance->Initialize();
+}
+void ABoss_Stage2::Activate()
+{
+	activation = true;
 }
