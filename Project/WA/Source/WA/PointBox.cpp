@@ -33,7 +33,7 @@ void APointBox::OnSwitch()
 
 void APointBox::InitializePuzzle()
 {
-	Super::InitializePuzzle();
 	if (teleportPoint->GetComponentLocation() != initTeleportPos)
 		Teleport();
+	Super::InitializePuzzle();
 }
