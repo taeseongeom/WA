@@ -3,6 +3,7 @@
 
 #include "Spike.h"
 
+
 ASpike::ASpike()
 {
  	PrimaryActorTick.bCanEverTick = true;
@@ -15,7 +16,7 @@ ASpike::ASpike()
 
 	activation = false;
 
-	isBegin = true;
+	isBegin = false;
 	currentTime = 0.0f;
 
 	playAnimation = false;
@@ -30,10 +31,12 @@ void ASpike::BeginPlay()
 	
 	spikeMesh = Cast<USceneComponent>(GetComponentsByTag(USceneComponent::StaticClass(), FName("SpikeMesh"))[0]);
 
+	if (beginDelay > 0)
+		isBegin = true;
+
 	if (ESpikeType::FIXED == spikeType)
-	{
 		puzzleActive = true;
-	}
+
 	SwitchActive(puzzleActive);
 }
 
@@ -48,6 +51,25 @@ void ASpike::NotifyActorBeginOverlap(AActor* OtherActor)
 			OtherActor->TakeDamage((float)damage, FDamageEvent(), GetWorld()->GetFirstPlayerController(), this);
 		}
 	}
+}
+
+void ASpike::InitializePuzzle()
+{
+	Super::InitializePuzzle();
+
+	activation = false;
+
+	if (beginDelay > 0)
+		isBegin = true;
+	currentTime = 0;
+
+	playAnimation = false;
+	animationTime = 0;
+
+	if (ESpikeType::FIXED == spikeType)
+		puzzleActive = true;
+
+	SwitchActive(puzzleActive);
 }
 
 void ASpike::Tick(float DeltaTime)
