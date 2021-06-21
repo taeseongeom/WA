@@ -2,7 +2,9 @@
 
 
 #include "MovableBox.h"
+
 #include "PlayerCharacter.h"
+
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 
@@ -13,23 +15,24 @@ AMovableBox::AMovableBox()
 
 	SetInteractability(false);
 
-	gravitySpeed = 0.1f;
-	overlapedObjectNum = 0;
-	velocity = FVector::ZeroVector;
+	isInAirOnStart = false;
+	gravitySpeed = 9.81f;
+	inAir = false;
+	fallSpeed = 0;
+
 	distance = FVector::ZeroVector;
+
+	pc = nullptr;
 }
 
 void AMovableBox::BeginPlay()
 {
 	Super::BeginPlay();
-	SetTickGroup(TG_PostUpdateWork);
-	BeginSetup(GetActorLocation(), GetActorRotation());
 
-	boxBody = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass()));
-	if (boxBody != nullptr)
-	{
-		boxBody->SetSimulatePhysics(false);
-	}
+	SetTickGroup(TG_PostUpdateWork);
+
+	inAir = isInAirOnStart;
+
 	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 	{
 		pc = *iter;
@@ -46,7 +49,84 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 	else
 	{
-		boxBody->SetSimulatePhysics(false);
+		bool res = false;
+		FHitResult hit;
+
+		if (puzzleActive)
+		{
+			if (FMath::Abs(distance.X) > FMath::Abs(distance.Y))
+			{
+				// Ban forward
+				if (distance.X > 0)
+				{
+					res = GetWorld()->SweepSingleByChannel(
+						hit,
+						GetActorLocation(),
+						GetActorLocation() + FVector(50, 0, 0) * GetActorScale().X + FVector(1, 0, 0),
+						FQuat::Identity,
+						ECollisionChannel::ECC_GameTraceChannel4,
+						FCollisionShape::MakeBox(FVector(1, 50 * GetActorScale().Y, 50 * GetActorScale().Z)));
+
+					pc->SetBlockPlayerMoveDirection(res, false, true, true);
+				}
+				// Ban backward
+				else
+				{
+					res = GetWorld()->SweepSingleByChannel(
+						hit,
+						GetActorLocation(),
+						GetActorLocation() + FVector(-50, 0, 0) * GetActorScale().X + FVector(-1, 0, 0),
+						FQuat::Identity,
+						ECollisionChannel::ECC_GameTraceChannel4,
+						FCollisionShape::MakeBox(FVector(1, 50 * GetActorScale().Y, 50 * GetActorScale().Z)));
+
+					pc->SetBlockPlayerMoveDirection(false, res, true, true);
+				}
+			}
+			else
+			{
+				// Ban right
+				if (distance.Y > 0)
+				{
+					res = GetWorld()->SweepSingleByChannel(
+						hit,
+						GetActorLocation(),
+						GetActorLocation() + FVector(0, 50, 0) * GetActorScale().Y + FVector(0, 1, 0),
+						FQuat::Identity,
+						ECollisionChannel::ECC_GameTraceChannel4,
+						FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 1, 50 * GetActorScale().Z)));
+
+					pc->SetBlockPlayerMoveDirection(true, true, res, false);
+				}
+				// Ban left
+				else
+				{
+					res = GetWorld()->SweepSingleByChannel(
+						hit,
+						GetActorLocation(),
+						GetActorLocation() + FVector(0, -50, 0) * GetActorScale().Y + FVector(0, -1, 0),
+						FQuat::Identity,
+						ECollisionChannel::ECC_GameTraceChannel4,
+						FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 1, 50 * GetActorScale().Z)));
+
+					pc->SetBlockPlayerMoveDirection(true, true, false, res);
+				}
+			}
+		}
+		else
+		{
+			// Check landing
+			res = GetWorld()->SweepSingleByChannel(
+				hit,
+				GetActorLocation(),
+				GetActorLocation() + FVector(0, 0, -50) * GetActorScale().Z + FVector(0, 0, -1),
+				FQuat::Identity,
+				ECollisionChannel::ECC_GameTraceChannel4,
+				FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 50 * GetActorScale().Y, 1)));
+			
+			inAir = !res;
+			fallSpeed = 0;
+		}
 	}
 }
 void AMovableBox::NotifyActorEndOverlap(AActor* OtherActor)
@@ -54,18 +134,46 @@ void AMovableBox::NotifyActorEndOverlap(AActor* OtherActor)
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(false);
-		//puzzleActive = false;
-		OutOfInteractionRange();
+
+		puzzleActive = false;
 	}
 	else
 	{
-		boxBody->SetSimulatePhysics(true);
+		if (puzzleActive)
+		{
+			if (FMath::Abs(distance.X) > FMath::Abs(distance.Y))
+				pc->SetBlockPlayerMoveDirection(false, false, true, true);
+			else
+				pc->SetBlockPlayerMoveDirection(true, true, false, false);
+		}
+		else
+		{
+			// Check landing
+			FHitResult hit;
+			bool res = GetWorld()->SweepSingleByChannel(
+				hit,
+				GetActorLocation(),
+				GetActorLocation() + FVector(0, 0, -50) * GetActorScale().Z + FVector(0, 0, -1),
+				FQuat::Identity,
+				ECollisionChannel::ECC_GameTraceChannel4,
+				FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 50 * GetActorScale().Y, 1)));
+			
+			inAir = !res;
+			fallSpeed = 0;
+		}
 	}
 }
 
 void AMovableBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (inAir)
+	{
+		fallSpeed += gravitySpeed * DeltaTime;
+		SetActorLocation(GetActorLocation() - FVector(0, 0, fallSpeed));
+	}
+
 	if (puzzleActive)
 	{
 		SetActorLocation(pc->GetActorLocation() + distance);
@@ -75,8 +183,12 @@ void AMovableBox::Tick(float DeltaTime)
 void AMovableBox::InitializePuzzle()
 {
 	Super::InitializePuzzle();
+
 	SetInteractability(false);
-	velocity = FVector::ZeroVector;
+	
+	inAir = isInAirOnStart;
+	fallSpeed = 0;
+
 	distance = FVector::ZeroVector;
 }
 
@@ -86,61 +198,76 @@ void AMovableBox::Interact()
 	{
 		puzzleActive = !puzzleActive;
 
+		// 캐릭터와 연결
 		if (puzzleActive)
 		{
-			//boxBody->SetCollisionObjectType(ECC_GameTraceChannel3);		// object type을 moving_box로 변경
-
-			SetActorLocation(GetActorLocation() + FVector(0.0f, 0.0f, 10.0f));
-			FVector temp_dist = GetActorLocation() - pc->GetActorLocation();
-			if ((temp_dist.X > -50.0f && temp_dist.X < 50.0f) ||
-				(temp_dist.Y > -50.0f && temp_dist.Y < 50.0f))
+			// 유효한 범위 내에 있을 경우
+			FVector temp_dist = pc->GetActorLocation() - GetActorLocation();
+			if ((-50.0f < temp_dist.Y && temp_dist.Y < 50.0f) ||
+				(-50.0f < temp_dist.X && temp_dist.X < 50.0f))
 			{
-				if (temp_dist.X > 50.0f)
+				float gap = 34.0f + 50.0f * GetActorScale().X + 20.0f * GetActorScale().X;
+				FVector player_pos = pc->GetActorLocation();
+				
+				// Forward available
+				if (temp_dist.X < -50.0f)
 				{
-					// forward
-					pc->HoldMovableBox(0, GetActorLocation());
-					pc->SetBlockPlayerMoveDirection(true, true);
+					pc->SetActorLocation(FVector(GetActorLocation().X - gap, player_pos.Y, player_pos.Z));
+					pc->SetBlockPlayerMoveDirection(false, false, true, true);
 				}
-				else if (temp_dist.X < -50.0f)
+				// Backward available
+				else if (temp_dist.X > 50.0f)
 				{
-					// backward
-					pc->HoldMovableBox(1, GetActorLocation());
-					pc->SetBlockPlayerMoveDirection(true, true);
+					pc->SetActorLocation(FVector(GetActorLocation().X + gap, player_pos.Y, player_pos.Z));
+					pc->SetBlockPlayerMoveDirection(false, false, true, true);
 				}
-				else if (temp_dist.Y > 50.0f)
-				{
-					// right
-					pc->HoldMovableBox(2, GetActorLocation());
-					pc->SetBlockPlayerMoveDirection(false, true);
-				}
+				// Right available
 				else if (temp_dist.Y < -50.0f)
 				{
-					// left
-					pc->HoldMovableBox(3, GetActorLocation());
-					pc->SetBlockPlayerMoveDirection(false, true);
+					pc->SetActorLocation(FVector(player_pos.X, GetActorLocation().Y - gap, player_pos.Z));
+					pc->SetBlockPlayerMoveDirection(true, true, false, false);
 				}
+				// Left available
+				else if (temp_dist.Y > 50.0f)
+				{
+					pc->SetActorLocation(FVector(player_pos.X, GetActorLocation().Y + gap, player_pos.Z));
+					pc->SetBlockPlayerMoveDirection(true, true, false, false);
+				}
+
+				pc->ConnectWithCharacter(this);
+				distance = GetActorLocation() - pc->GetActorLocation();
 			}
-
-			distance = GetActorLocation() - pc->GetActorLocation();
-
-			boxBody->SetSimulatePhysics(false);
-			
-			UE_LOG(LogTemp, Warning, TEXT("Interact"));
+			else
+			{
+				puzzleActive = false;
+			}
 		}
+		// 캐릭터와 연결 해제
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Interact End"));
+			// Disconnect with character
+			pc->SetBlockPlayerMoveDirection(false, false, false, false);
+			pc->ConnectWithCharacter(nullptr);
 			distance = FVector::ZeroVector;
-			OutOfInteractionRange();
-			pc->SetBlockPlayerMoveDirection(true, false);
-			pc->SetBlockPlayerMoveDirection(false, false);
 
-			boxBody->SetSimulatePhysics(true);
+			// Check landing
+			FHitResult hit;
+			bool res = GetWorld()->SweepSingleByChannel(
+				hit,
+				GetActorLocation(),
+				GetActorLocation() + FVector(0, 0, -50) * GetActorScale().Z + FVector(0, 0, -1),
+				FQuat::Identity,
+				ECollisionChannel::ECC_GameTraceChannel4,
+				FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 50 * GetActorScale().Y, 1)));
+
+			inAir = !res;
+			fallSpeed = 0;
 		}
 	}
 }
 
-void AMovableBox::OutOfInteractionRange()
+void AMovableBox::ForceDisconnect()
 {
-	//boxBody->SetCollisionObjectType(ECC_WorldDynamic);
+	puzzleActive = false;
+	distance = FVector::ZeroVector;
 }

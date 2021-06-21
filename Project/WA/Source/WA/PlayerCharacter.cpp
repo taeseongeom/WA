@@ -6,6 +6,7 @@
 #include "WAGameModeBase.h"
 #include "PlayerCamera.h"
 #include "InGameUI.h"
+#include "MovableBox.h"
 
 #include "Blueprint/UserWidget.h"
 
@@ -47,7 +48,14 @@ APlayerCharacter::APlayerCharacter()
 
 	cur_invincibleTime = 0.0f;
 
-	// ĳ���� �̵� ���� �ʱⰪ�� CharacterMovementComponent�� �ݿ�
+	blockDir_forward = false;
+	blockDir_backward = false;
+	blockDir_right = false;
+	blockDir_left = false;
+
+	holdingBox = nullptr;
+
+	// 입력된 정보를 CharacterMovementComponent와 연결
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 900.0f, 0.0f);
@@ -121,21 +129,18 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	{
 		health_point -= Damage;
 
-		// �˹�
+		// 피격
 		GetCharacterMovement()->StopMovementImmediately();
 		MoveDashEnd();	// state�� IDLE�� ����Ƿ�, KnockBack���� ����� ���� ����Ǿ�� ��
 		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
 
-		// ü�� �������̽� ������Ʈ
 		inGameUI->UpdateHealthBar(health_point);
 	}
 
-	// ���
+	// 사망
 	if (health_point <= 0)
-	{
 		Death();
-	}
 
 	return health_point;
 }
@@ -144,18 +149,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Dash ����
+	// Dash 발동
 	if (ECharacterState::Dash == state)
 	{
 		AddMovementInput(GetActorForwardVector(), dash_multiplier);
 
 		cur_dashTime += DeltaTime;
-		if (cur_dashTime >= dash_time)	// Dash ����
+		if (cur_dashTime >= dash_time)	// Dash 종료
 		{
 			MoveDashEnd();
 		}
 	}
-	// Dash ��ٿ� ����
+	// Dash 쿨타임 진행
 	if (cur_dashCount < dash_count)
 	{
 		cur_dashCooltime += DeltaTime;
@@ -174,7 +179,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	// �˹�
+	// 넉백
 	if (ECharacterState::KnockBack == state)
 	{
 		cur_invincibleTime += DeltaTime;
@@ -188,10 +193,21 @@ void APlayerCharacter::Tick(float DeltaTime)
 		GetCharacterMovement()->AddImpulse(velocity * DeltaTime * 500.0f);
 	}
 
-	// �Ʒ��� �������� ���
+	// 추락사
 	if (GetActorLocation().Z < -300)
 	{
 		Death();
+	}
+
+	// Movable Box와 상호작용 중 추락 체크
+	if (ECharacterState::BoxMoving == state && GetCharacterMovement()->IsFalling())
+	{
+		if (holdingBox)
+			holdingBox->ForceDisconnect();
+
+		SetBlockPlayerMoveDirection(false, false, false, false);
+
+		ConnectWithCharacter(nullptr);
 	}
 }
 
@@ -212,12 +228,15 @@ void APlayerCharacter::InputForwardBackward(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		if (!isblockForwardBackwardMove)
+	case ECharacterState::BoxMoving:
+		if ((!blockDir_forward && value >= 0) ||
+			(!blockDir_backward && value <= 0))
 		{
 			velocity.X = value;
-			AddMovementInput(velocity.GetSafeNormal().RotateAngleAxis(viewportDirection.Rotation().Yaw, GetActorUpVector()));
 		}
+		AddMovementInput(velocity.GetSafeNormal().RotateAngleAxis(viewportDirection.Rotation().Yaw, GetActorUpVector()));
 		break;
+
 	case ECharacterState::Shooting:
 		break;
 	}
@@ -227,23 +246,27 @@ void APlayerCharacter::InputLeftRight(float value)
 	switch (state)
 	{
 	case ECharacterState::Idle:
-		if (!isblockLeftRightMove)
+	case ECharacterState::BoxMoving:
+		if ((!blockDir_right && value >= 0) ||
+			(!blockDir_left && value <= 0))
 		{
 			velocity.Y = value;
-			AddMovementInput(velocity.GetSafeNormal().RotateAngleAxis(viewportDirection.Rotation().Yaw, GetActorUpVector()));
 		}
+		AddMovementInput(velocity.GetSafeNormal().RotateAngleAxis(viewportDirection.Rotation().Yaw, GetActorUpVector()));
 		break;
+
 	case ECharacterState::Shooting:
 		break;
 	}
 }
 void APlayerCharacter::MoveJump()
 {
-	if (!isblockForwardBackwardMove &&
-		!isblockLeftRightMove)
-	{
+	// 이동이 금지된 방향이 없을 때 점프 가능
+	if (!blockDir_forward &&
+		!blockDir_backward &&
+		!blockDir_right &&
+		!blockDir_left)
 		Jump();
-	}
 }
 void APlayerCharacter::MoveDashBegin()
 {
@@ -251,10 +274,10 @@ void APlayerCharacter::MoveDashBegin()
 	{
 		cur_dashTime = 0.0f;
 
-		// �ִ� �̵� �ӵ��� �ӽ÷� �ø�
+		// 속도 증폭
 		GetCharacterMovement()->MaxWalkSpeed = move_speed * dash_multiplier;
 		GetCharacterMovement()->MaxAcceleration = move_accel * dash_multiplier;
-		// �ӽ÷� �߷� ����
+		// 중력 제거
 		GetCharacterMovement()->GravityScale = 0.0f;
 		GetCharacterMovement()->Velocity.Z = 0.0f;
 
@@ -269,10 +292,10 @@ void APlayerCharacter::MoveDashEnd()
 		cur_dashTime = 0.0f;
 		cur_dashCooltime = 0.0f;
 
-		// �ִ� �̵� �ӵ� ���� ����
+		// 속도 원상복귀
 		GetCharacterMovement()->MaxWalkSpeed = move_speed;
 		GetCharacterMovement()->MaxAcceleration = move_accel;
-		// �߷� �ٽ� Ȱ��ȭ
+		// 중력 원상복귀
 		GetCharacterMovement()->GravityScale = 1.0f;
 
 		state = ECharacterState::Idle;
@@ -285,8 +308,7 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::Death()
 {
-	// �ʱ�ȭ
-	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
+	// 리셋
 	AWAGameModeBase* WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 	WaGMB->RoomReset();
 	SetActorLocation(WaGMB->GetRespawnPoint());
@@ -299,34 +321,6 @@ void APlayerCharacter::Death()
 	state = ECharacterState::Idle;
 
 	cur_invincibleTime = 0.0f;
-}
-
-void APlayerCharacter::HoldMovableBox(int dir_code, FVector box_pos)
-{
-	FVector dist = GetActorLocation() - box_pos;
-	float value = 184.0f;
-	switch (dir_code)
-	{
-	case 0:
-		//SetActorLocation(GetActorLocation() + FVector(-10.0f, 0.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(-value, dist.Y, dist.Z));
-		break;
-
-	case 1:
-		//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(value, dist.Y, dist.Z));
-		break;
-
-	case 2:
-		//SetActorLocation(GetActorLocation() + FVector(0.0f, -10.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(dist.X, -value, dist.Z));
-		break;
-
-	case 3:
-		//SetActorLocation(GetActorLocation() + FVector(0.0f, 10.0f, 0.0f));
-		SetActorLocation(box_pos + FVector(dist.X, value, dist.Z));
-		break;
-	}
 }
 
 void APlayerCharacter::SetCharacterState(ECharacterState cs)
@@ -362,12 +356,23 @@ void APlayerCharacter::SetViewportDirection(const FVector& Dir)
 	viewportDirection.Z = 0;
 }
 
-void APlayerCharacter::SetBlockPlayerMoveDirection(bool isHorizon, bool value)
+void APlayerCharacter::SetBlockPlayerMoveDirection(bool Forward, bool Backward, bool Right, bool Left)
 {
-	if (isHorizon)
-		isblockLeftRightMove = value;
-	else
-		isblockForwardBackwardMove = value;
+	blockDir_forward = Forward;
+	blockDir_backward = Backward;
+	blockDir_right = Right;
+	blockDir_left = Left;
+
+	if (Forward || Backward)
+	{
+		velocity.X = 0;
+		GetCharacterMovement()->StopMovementImmediately();
+	}
+	if (Right || Left)
+	{
+		velocity.Y = 0;
+		GetCharacterMovement()->StopMovementImmediately();
+	}
 }
 
 void APlayerCharacter::SetHealthPoint(float value)
@@ -378,6 +383,7 @@ float APlayerCharacter::GetHealthPoint() const
 {
 	return health_point;
 }
+
 void APlayerCharacter::ActivateInGameUI()
 {
 	if (inGameUI)
@@ -396,5 +402,19 @@ void APlayerCharacter::DeactivateInGameUI()
 		{
 			inGameUI->RemoveFromViewport();
 		}
+	}
+}
+
+void APlayerCharacter::ConnectWithCharacter(AMovableBox* HoldingMovableBox)
+{
+	holdingBox = HoldingMovableBox;
+	
+	if (HoldingMovableBox)
+	{
+		state = ECharacterState::BoxMoving;
+	}
+	else
+	{
+		state = ECharacterState::Idle;
 	}
 }
