@@ -89,9 +89,9 @@ void ARoomActor::SaveRoom()
 	if (GetWorld())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Room Save : %d"), roomNumber);
-		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
-			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
+			UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(waInstance->GetSaveSlotIndex()), 0));
 		WASaveGameInstance->IsStageDatas(waInstance->GetCurrentStage());
 		for (AActor* actor : boxActors)
 		{

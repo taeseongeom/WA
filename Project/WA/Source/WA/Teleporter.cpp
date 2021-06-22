@@ -24,13 +24,13 @@ void ATeleporter::NotifyActorBeginOverlap(AActor * OtherActor)
 	if (puzzleActive && OtherActor->ActorHasTag(FName("Character")))
 	{
 		audioComp->Play();
-		UWASaveGame* waSave = Cast<UWASaveGame>(
-			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
+			UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(waInstance->GetSaveSlotIndex()), 0));
 		if (waInstance)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Save"));
-			waSave->Save(FVector(0, 0, 0),
+			WASaveGameInstance->Save(FVector(0, 0, 0),
 				3,
 				1,
 				waInstance->GetSaveSlotIndex(),
