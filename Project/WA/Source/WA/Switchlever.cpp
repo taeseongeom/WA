@@ -41,6 +41,7 @@ void ASwitchlever::Interact()
 {
 	if (IsInteractable()) // Interact Begin
 	{
+		PlayEffect();
 		OnSwitchTarget();
 	}
 }

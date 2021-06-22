@@ -31,6 +31,8 @@ protected:
 	UPROPERTY(Meta = (BindWidget))
 	class UTextBlock* pressAnyKeyText;
 
+	UPROPERTY(Meta = (BindWidget))
+	class UImage* backGround;
 
 private:
 	UPROPERTY()
@@ -48,13 +50,31 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Init")
 		class UTexture2D* hoveredQuitTexture;
 
+	UPROPERTY(EditAnywhere, Category = "Init")
+		class USoundBase* changeBtnEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Init")
+		class USoundBase* quitBtnEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Init")
+		class USoundBase* startBtnEffect;
+
+	UPROPERTY()
+	class ATitleSoundEffect* effectComp;
+
 	bool isPressed;
 	bool isSelectingData;
+	bool isGameStart;
+	int8 isIncreaseAlpha;
 	int slotIndex;
+	UPROPERTY()
+	float alpha;
 protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry & MyGeometry, float InDeltaTime) override;
 
 private:
 	void ChangeSlotImage(int slotIndex);
+	void StartGameFromSaveData();
 };

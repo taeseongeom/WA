@@ -15,6 +15,7 @@
 UENUM(BlueprintType)
 enum class EGameState : uint8
 {
+	CutScene UMETA(DisplayName = "CutScene"),
 	Load UMETA(DisplayName = "Load"),
 	Play UMETA(DisplayName = "Play"),
 	End UMETA(DisplayName = "End"),
@@ -37,8 +38,11 @@ public:
 	void DisableActor(AActor* target);
 	void EnableActor(AActor* target);
 	FVector GetRespawnPoint() const;
+	EGameState GetGameState() const;
+	void SetGameState(EGameState value);
 private:
 	void Init();
+	void ShowCutScene();
 private:
 	//UPROPERTY 사용 불가능한데 추후 수정필요
 	TMultiMap<int8, ADefaultPuzzle*> InitPuzzles;
@@ -46,6 +50,11 @@ private:
 	FVector respawnPoint;
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EGameState state;
+	UPROPERTY()
+	class APlayerCharacter* pc;
+	UPROPERTY()
+	class AWAAmbientSound* bgm;
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool DebugMode;

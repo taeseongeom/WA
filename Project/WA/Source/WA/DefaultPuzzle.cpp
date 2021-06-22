@@ -5,6 +5,7 @@
 #include "WA.h"
 #include "BreakableBox.h"
 #include "RoomActor.h"
+#include "Components/AudioComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "WAGameModeBase.h"
 
@@ -56,6 +57,13 @@ void ADefaultPuzzle::BeginPlay()
 		{
 			puzzleActive = initpuzzleActive;
 		}
+	}
+	audioComp = FindComponentByClass<UAudioComponent>();
+	if (audioComp)
+	{
+		audioComp->bAutoActivate = false;
+		if (effects.Num() > 0)
+			audioComp->SetSound(effects[0]);
 	}
 	BeginSetup(GetActorLocation(), GetActorRotation());
 	((AWAGameModeBase*)(GetWorld()->GetAuthGameMode()))->AddInitPuzzle(this, roomNum);

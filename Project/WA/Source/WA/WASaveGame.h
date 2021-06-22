@@ -35,6 +35,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	int8 playerIndex;
 	UPROPERTY(VisibleAnywhere, Category = Basic)
+	int8 slotIndex;
+	UPROPERTY(VisibleAnywhere, Category = Basic)
 	FVector saveRespawnPoint;
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	int stageLevel;

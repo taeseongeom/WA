@@ -19,6 +19,7 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	if (puzzleActive && OtherActor->ActorHasTag(FName("Character")))
 	{
+		audioComp->Play();
 		UWASaveGame* waSave = Cast<UWASaveGame>(
 			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 		waSave->SlotName = "WASave0";
@@ -45,7 +46,7 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 					UE_LOG(LogTemp, Warning, TEXT("Save"));
 					waSave->Save(spawnPoint->GetComponentLocation(),
 						pc->GetHealthPoint(),
-						Cast<ARoomActor>(parentRoom)->GetRoomNumber(),
+						TransferRoomNumber,
 						waInstance->GetSaveSlotIndex(),
 						waInstance->GetCurrentStage());
 					Cast<ARoomActor>(parentRoom)->SaveRoom();

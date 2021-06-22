@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interactable.h"
 #include "DefaultPuzzle.h"
@@ -17,22 +17,19 @@ public:
 	AMovableBox();
 
 private:
-	UPROPERTY()
-	UStaticMeshComponent* boxBody;
+	// Weather this object is in the air when game start.
+	UPROPERTY(EditAnywhere, Category = "Gravity")
+	bool isInAirOnStart;
+	// Speed of gravity.
+	UPROPERTY(EditAnywhere, Category = "Gravity")
+	float gravitySpeed;
+	bool inAir;
+	float fallSpeed;
+
+	FVector distance;
 
 	UPROPERTY()
 	class APlayerCharacter* pc;
-
-	UPROPERTY(EditAnywhere, Category = "Gravity")
-	float gravitySpeed;
-
-	int overlapedObjectNum;
-
-	FVector velocity;
-	FVector distance;
-
-
-	void OutOfInteractionRange();
 
 protected:
 	virtual void BeginPlay() override;
@@ -44,5 +41,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void InitializePuzzle() override;
+
 	virtual void Interact() override;
+
+	// 캐릭터와의 연결을 강제로 해제합니다.
+	void ForceDisconnect();
 };

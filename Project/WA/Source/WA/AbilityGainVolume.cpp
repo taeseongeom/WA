@@ -47,8 +47,7 @@ void AAbilityGainVolume::NotifyActorBeginOverlap(AActor* OtherActor)
 
 				
 				// 캐릭터 이동 제한
-				playerCharacter->SetBlockPlayerMoveDirection(true, true);
-				playerCharacter->SetBlockPlayerMoveDirection(false, true);
+				playerCharacter->SetBlockPlayerMoveDirection(true, true, true, true);
 				playerCharacter->GetCharacterMovement()->StopMovementImmediately();
 				playerCharacter->DecreaseDashCount(1);
 				// 캐릭터를 해당 객체의 위치로 강제 이동
@@ -133,7 +132,7 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 	// 클로즈 업, 윙크
 	else if (timeline >= 4.2f && timeline < 5.0f)
 	{
-		FVector dist = FMath::Lerp<FVector>(playerCam->GetActorLocation(), characterPosition + FVector(-50.0f, 0.0f, 40.0f), DeltaTime * 10.0f);
+		FVector dist = FMath::Lerp<FVector>(playerCam->GetActorLocation(), characterPosition + FVector(-50.0f, 0.0f, 80.0f), DeltaTime * 10.0f);
 		playerCam->SetActorLocation(dist);
 	}
 	// 부들부들 떨기 (휘파람)
@@ -148,8 +147,7 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 		isDirectingWork = false;
 
 		// 캐릭터 이동과 UI 원상 복귀
-		playerCharacter->SetBlockPlayerMoveDirection(true, false);
-		playerCharacter->SetBlockPlayerMoveDirection(false, false);
+		playerCharacter->SetBlockPlayerMoveDirection(false, false, false, false);
 		playerCharacter->ActivateInGameUI();
 
 		playerCharacter->IncreaseDashCount(1);

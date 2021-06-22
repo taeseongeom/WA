@@ -20,6 +20,19 @@ void ASwitchPuzzle::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ASwitchPuzzle::PlayEffect()
+{
+	if (isInteracted)
+	{
+		audioComp->SetSound(effects[0]);
+	}
+	else
+	{
+		audioComp->SetSound(effects[1]);
+	}
+	audioComp->Play();
+}
+
 void ASwitchPuzzle::OnSwitchTarget()
 {
 	isInteracted = !isInteracted;
@@ -86,7 +99,7 @@ void ASwitchPuzzle::SetInteractedFlag(bool value)
 void ASwitchPuzzle::InitializePuzzle()
 {
 	ADefaultPuzzle::InitializePuzzle();
-	if (initIsTurnOn.Num() != 0)
+	if (initIsTurnOn.Num() != 0 && !isAutoReturnOff)
 	{
 		for (int8 i = 0; i < TurnOnTargets.Num(); i++)
 			Cast<ISwitchable>(TurnOnTargets[i])->SetIsTurnOn(initIsTurnOn[i]);

@@ -8,6 +8,7 @@
 
 class APlayerCamera;
 class UInGameUI;
+class UPlayerCharacter_AnimInstance;
 
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
@@ -15,6 +16,7 @@ UENUM(BlueprintType)
 enum class ECharacterState : uint8
 {
 	Idle UMETA(DisplayName = "Idle"),
+	BoxMoving UMETA(DisplayName = "Moving MovableBox"),
 	Shooting UMETA(DisplayName = "Shooting"),
 	Dash UMETA(DisplayName = "Dash"),
 	KnockBack UMETA(DisplayName = "Knock-Back")
@@ -76,36 +78,47 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
 	float knockBack_decrease;
 
-	// ī�޶� ���� ����. ù ���� �ÿ� ī�޶� �����˴ϴ�.
-	bool camera_init;
-	
-	// ĳ���� �̵� �ӵ�
+	// 이동 속도
 	FVector velocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	ECharacterState state;
 
+	// 카메라 생성 여부. 첫 착지 이후에 생성됩니다.
+	bool camera_init;
 	UPROPERTY()
 	APlayerCamera* playerCamera;
+	// 카메라 시점에 따른 캐릭터의 방향
 	FVector viewportDirection;
 
 	UPROPERTY()
 	UInGameUI* inGameUI;
 
-	// ĳ������ ���� ����. ��� ī��Ʈ ȸ�� ���θ� �Ǵ��� �� ���˴ϴ�.
+	UPROPERTY()
+	class AWAGameModeBase* WaGMB;
+
+	UPROPERTY()
+	UPlayerCharacter_AnimInstance* animInstance;
+
+	// 현재 연결된 MovableBox
+	class AMovableBox* holdingBox;
+
+	// 착지 여부. 착지 후에 대시 쿨타임을 진행합니다.
 	bool has_landed;
-	// ���� ���� ��� ��밡�� Ƚ��
+	// 현재 대시 가능 횟수
 	int cur_dashCount;
-	// ���� ����� ��� ���� �ð�
+	// 현재 대시 지속시간
 	float cur_dashTime;
-	// ���� ����� ��� ��Ÿ��
+	// 현재 대시 재사용 대기시간
 	float cur_dashCooltime;
 
-	// ���� ����� ���� �ð�(�ǰ� ���� �ð�)
+	// 현재 무적 시간(피격되지 않으며, 이동도 불가)
 	float cur_invincibleTime;
 
-	bool isblockLeftRightMove;
-	bool isblockForwardBackwardMove;
+	bool blockDir_forward;
+	bool blockDir_backward;
+	bool blockDir_right;
+	bool blockDir_left;
 
 
 	void InputForwardBackward(float value);
@@ -120,7 +133,6 @@ private:
 public:
 	FInteractDelegate InteractionWithPuzzle;
 
-	void HoldMovableBox(int dir_code, FVector box_pos);
 	void SetCharacterState(ECharacterState cs);
 
 	void IncreaseDashCount(int increase_num);
@@ -129,10 +141,16 @@ public:
 	APlayerCamera* GetPlayerCamera() const;
 	void SetViewportDirection(const FVector& Dir);
 
-	void SetBlockPlayerMoveDirection(bool isHorizon, bool value);
+	// 플레이어의 이동을 제한합니다. 각 매개변수가 true면 해당 이동을 막습니다.
+	void SetBlockPlayerMoveDirection(bool Forward, bool Backward, bool Right, bool Left);
 
 	void SetHealthPoint(float value);
 	float GetHealthPoint() const;
+	void InitInGameUI();
 	void ActivateInGameUI();
 	void DeactivateInGameUI();
+	void StartCutScene();
+
+	// 해당 캐릭터와 Movable Box를 연결합니다. nullptr인 경우 연결을 해제합니다.
+	void ConnectWithCharacter(AMovableBox* HoldingMovableBox);
 };

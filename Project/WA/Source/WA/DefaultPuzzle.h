@@ -33,10 +33,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	ARoomActor* parentRoom;
 	UPROPERTY(VisibleAnywhere)
 	bool puzzleActive;
+	UPROPERTY()
+	class UAudioComponent* audioComp;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TArray<class USoundBase*> effects;
 private: // Reset Property
 	FVector initPos;
 	FRotator initRot;

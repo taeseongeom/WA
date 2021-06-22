@@ -36,9 +36,21 @@ public:
 	UPROPERTY(Meta = (BindWidget))
 	UTextBlock* txt_dialog;
 
+	UPROPERTY(Meta = (BindWidget))
+	UImage* img_cutscene;
+
 
 	void UpdateHealthBar(int HealthPoint);
 	void UpdateStamina(bool IsActive);
 
 	void DisplayText(const FString& String);
+	bool NextCutScene(int stage);
+
+	void EnableCutScene(int stage);
+	void DisableCutScene();
+private:
+	UPROPERTY(EditAnywhere, Category = "CutScene")
+	TMap<FString, UTexture2D*> cutScenes;
+
+	int cutSceneNum;
 };

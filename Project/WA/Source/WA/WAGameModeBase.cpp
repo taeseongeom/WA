@@ -4,6 +4,8 @@
 #include "PlayerCharacter.h"
 #include "Components/BillboardComponent.h"
 #include "Door.h"
+#include "WAViewportClient.h"
+#include "WAAmbientSound.h"
 #include "WA.h"
 
 AWAGameModeBase::AWAGameModeBase()
@@ -15,9 +17,13 @@ AWAGameModeBase::AWAGameModeBase()
 void AWAGameModeBase::Init()
 {
 	UWorld* world = GetWorld();
-
 	if (world)
 	{
+		UWAViewportClient* waVP = Cast<UWAViewportClient>(GetWorld()->GetGameViewport());
+		if (waVP)
+		{
+			waVP->Fade(0, true);
+		}
 		for(const auto & entity : TActorRange<ARoomActor>(world))
 		{
 			rooms.Add(entity);
@@ -27,9 +33,18 @@ void AWAGameModeBase::Init()
 			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 		waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
 		CurrentRoomNum = WASaveGameInstance->loadRoomNum;
+		waInstance->SetCurrentRoomNum(CurrentRoomNum);
 		if (DebugRoomNum != 0)
 			CurrentRoomNum = DebugRoomNum;
 
+		for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+		{
+			bgm = *iter;
+			bgm->SetStage(waInstance->GetCurrentStage());
+			bgm->SwapRoomBGM(waInstance->GetCurrentRoomNum());
+			break;
+		}
+		
 		for (int i = 0; i < rooms.Num(); i++)
 		{
 			for (int j = 0; j < rooms.Num(); j++)
@@ -58,25 +73,99 @@ void AWAGameModeBase::Init()
 			}
 		}
 		maxRoomNumber = rooms.Num();
-		for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+		if (!pc)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Init SpawnPoint"), WASaveGameInstance->loadRoomNum);
-			if (WASaveGameInstance->loadRoomNum == 1 || DebugRoomNum != 0)
-				respawnPoint = iter->GetActorLocation();
-			else if(!DebugMode)
-				respawnPoint = WASaveGameInstance->saveRespawnPoint;
-			iter->SetHealthPoint(WASaveGameInstance->health_point);
-			iter->SetActorLocation(respawnPoint);
-			break;
+			for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+			{
+				pc = *iter;
+				if (WASaveGameInstance->loadRoomNum == 1 || DebugRoomNum != 0)
+					respawnPoint = iter->GetActorLocation();
+				else if (!DebugMode)
+					respawnPoint = WASaveGameInstance->saveRespawnPoint;
+				pc->InitInGameUI();
+				pc->SetHealthPoint(WASaveGameInstance->health_point);
+				pc->SetActorLocation(respawnPoint);
+				break;
+			}
 		}
+		waVP->ClearFade();
 	}
 	state = EGameState::Play;
+}
+
+void AWAGameModeBase::ShowCutScene()
+{
+	for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
+	{
+		pc = *iter;
+	}
+	if (pc)
+	{
+		pc->InitInGameUI();
+		pc->StartCutScene();
+	}
 }
 
 void AWAGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	state = EGameState::Load;
+	if (UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
+		UGameplayStatics::LoadGameFromSlot("WASave0", 0)))
+	{
+		if (WASaveGameInstance->loadRoomNum == 1)
+		{
+			UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+			waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
+			waInstance->SetCurrentRoomNum(1);
+			waInstance->SetSaveSlotIndex(WASaveGameInstance->slotIndex);
+			ShowCutScene();
+			if (GetWorld())
+			{
+				for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+				{
+					bgm = *iter;
+					bgm->SetStage(waInstance->GetCurrentStage());
+					bgm->SwapRoomBGM(waInstance->GetCurrentRoomNum());
+					break;
+				}
+			}
+		}
+		else
+		{
+			state = EGameState::Load;
+		}
+	}
+	else
+	{
+		UWASaveGame* newSaveGameInstance =
+			Cast<UWASaveGame>(UGameplayStatics::CreateSaveGameObject(UWASaveGame::StaticClass()));
+		newSaveGameInstance->CreateFile(0);
+		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+		int i = 0;
+		while (true)
+		{
+			if (UGameplayStatics::GetCurrentLevelName(GetWorld())
+				== FString("Stage") + FString::FromInt(i))
+				break;
+			else
+				i++;
+		}
+		waInstance->SetCurrentStage(i);
+		waInstance->SetCurrentRoomNum(1);
+		waInstance->SetSaveSlotIndex(0);
+		newSaveGameInstance->Save(FVector::ZeroVector, 3, 1, 0, waInstance->GetCurrentStage());
+		ShowCutScene();
+		if (GetWorld())
+		{
+			for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+			{
+				bgm = *iter;
+				bgm->SetStage(waInstance->GetCurrentStage());
+				bgm->SwapRoomBGM(waInstance->GetCurrentRoomNum());
+				break;
+			}
+		}
+	}
 }
 
 void AWAGameModeBase::Tick(float DeltaTime)
@@ -84,6 +173,7 @@ void AWAGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	switch (state)
 	{
+	case EGameState::CutScene:  break;
 	case EGameState::Load: Init(); break;
 	case EGameState::Play: break;
 	case EGameState::End: break;
@@ -114,6 +204,7 @@ void AWAGameModeBase::ChangeRoom(int8 roomNum, FVector resPoint)
 		DisableActor(rooms[CurrentRoomNum - 1]);
 	}
 	CurrentRoomNum = roomNum;
+	bgm->SwapRoomBGM(CurrentRoomNum);
 	respawnPoint = resPoint;
 }
 
@@ -161,6 +252,16 @@ void AWAGameModeBase::EnableActor(AActor * target)
 FVector AWAGameModeBase::GetRespawnPoint() const
 {
 	return respawnPoint;
+}
+
+EGameState AWAGameModeBase::GetGameState() const
+{
+	return state;
+}
+
+void AWAGameModeBase::SetGameState(EGameState value)
+{
+	state = value;
 }
 
 void AWAGameModeBase::SetRoomSpawnPoint(int roomNum, FVector location)

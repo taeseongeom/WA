@@ -89,6 +89,7 @@ void AShooter::Interact()
 void AShooter::ShootBullet()
 {
 	puzzleActive = false;
+	audioComp->Play();
 	pc->SetCharacterState(ECharacterState::Idle);
 	AShooter_Bullet* bullet = (AShooter_Bullet*)GetWorld()->SpawnActor<AActor>(BulletBlueprint, GetActorLocation(), GetActorRotation());
 	bullet->SetStack(BulletSpeed, Crash_count);
