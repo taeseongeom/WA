@@ -32,6 +32,18 @@ protected:
 	class UTextBlock* pressAnyKeyText;
 
 	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* firstSaveDataText;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* secondSaveDataText;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* thirdSaveDataText;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* quitText;
+
+	UPROPERTY(Meta = (BindWidget))
 	class UImage* backGround;
 
 private:
