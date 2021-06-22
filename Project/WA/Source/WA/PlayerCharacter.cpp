@@ -311,6 +311,7 @@ void APlayerCharacter::Interaction()
 				if (inGameUI->NextCutScene(waInstance->GetCurrentStage()))
 				{
 					inGameUI->DisableCutScene();
+					SetBlockPlayerMoveDirection(false, false, false, false);
 					WaGMB->SetGameState(EGameState::Load);
 				}
 			}
@@ -442,6 +443,7 @@ void APlayerCharacter::StartCutScene()
 			if (waInstance)
 			{
 				inGameUI->EnableCutScene(waInstance->GetCurrentStage());
+				SetBlockPlayerMoveDirection(true, true, true, true);
 				UE_LOG(LogTemp, Warning, TEXT("Enable"));
 			}
 			UE_LOG(LogTemp, Warning, TEXT("No Instance"));
