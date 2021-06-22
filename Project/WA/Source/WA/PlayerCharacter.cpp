@@ -11,6 +11,7 @@
 #include "MovableBox.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetComponent.h"
 
 
 APlayerCharacter::APlayerCharacter()
@@ -55,6 +56,8 @@ APlayerCharacter::APlayerCharacter()
 	blockDir_right = false;
 	blockDir_left = false;
 
+	interactionRegionOverlap = 0;
+
 	holdingBox = nullptr;
 
 	// 입력된 정보를 CharacterMovementComponent와 연결
@@ -79,6 +82,8 @@ void APlayerCharacter::BeginPlay()
 	WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 
 	animInstance = Cast<UPlayerCharacter_AnimInstance>(GetMesh()->GetAnimInstance());
+
+	Cast<UWidgetComponent>(GetComponentByClass(UWidgetComponent::StaticClass()))->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void APlayerCharacter::Landed(const FHitResult& Hit)
@@ -311,6 +316,7 @@ void APlayerCharacter::Interaction()
 				if (inGameUI->NextCutScene(waInstance->GetCurrentStage()))
 				{
 					inGameUI->DisableCutScene();
+					SetBlockPlayerMoveDirection(false, false, false, false);
 					WaGMB->SetGameState(EGameState::Load);
 				}
 			}
@@ -431,6 +437,24 @@ void APlayerCharacter::DeactivateInGameUI()
 	}
 }
 
+void APlayerCharacter::DisplayInteractionUI(bool IsShown)
+{
+	if (IsShown)
+	{
+		interactionRegionOverlap++;
+	}
+	else
+	{
+		if (interactionRegionOverlap > 0)
+			interactionRegionOverlap--;
+	}
+
+	if (interactionRegionOverlap > 0)
+		Cast<UWidgetComponent>(GetComponentByClass(UWidgetComponent::StaticClass()))->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+	else
+		Cast<UWidgetComponent>(GetComponentByClass(UWidgetComponent::StaticClass()))->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void APlayerCharacter::StartCutScene()
 {
 	if (inGameUI)
@@ -442,6 +466,7 @@ void APlayerCharacter::StartCutScene()
 			if (waInstance)
 			{
 				inGameUI->EnableCutScene(waInstance->GetCurrentStage());
+				SetBlockPlayerMoveDirection(true, true, true, true);
 				UE_LOG(LogTemp, Warning, TEXT("Enable"));
 			}
 			UE_LOG(LogTemp, Warning, TEXT("No Instance"));

@@ -46,6 +46,7 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(true);
+		Cast<APlayerCharacter>(OtherActor)->DisplayInteractionUI(true);
 	}
 	else
 	{
@@ -134,6 +135,7 @@ void AMovableBox::NotifyActorEndOverlap(AActor* OtherActor)
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(false);
+		Cast<APlayerCharacter>(OtherActor)->DisplayInteractionUI(false);
 
 		puzzleActive = false;
 	}
