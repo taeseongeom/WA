@@ -63,10 +63,9 @@ void AAbilityGainVolume::NotifyActorBeginOverlap(AActor* OtherActor)
 				playerCam->SetActorRotation((characterPosition - playerCam->GetActorLocation()).ToOrientationQuat());
 				// 카메라 시점 초기화
 				playerCam->SetActorRotation(FQuat::Identity);
-				// 카메라 빛 추가
-				//playerCam->AddLight();
 
 				isDirectingWork = true;
+				UGameplayStatics::PlaySound2D(GetWorld(), gatchaEffect);
 			}
 		}
 	}

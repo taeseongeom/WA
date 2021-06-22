@@ -158,7 +158,10 @@ private:
 	class USoundBase* spikeEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-		class USoundBase* throwEffect;
+	class USoundBase* throwEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* gameEndEffect;
 
 	UPROPERTY()
 	UBoss_Stage2_Anim* animInstance;

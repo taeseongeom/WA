@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
 #include "GameFramework/Actor.h"
 #include "AbilityGainVolume.generated.h"
 
@@ -36,6 +36,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Directing")
 	float rotationSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* gatchaEffect;
 
 	UPROPERTY()
 	class APlayerCharacter* playerCharacter;

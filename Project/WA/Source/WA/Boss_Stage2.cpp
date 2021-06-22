@@ -467,6 +467,8 @@ void ABoss_Stage2::Death()
 	// 게임 클리어 연출
 	UUserWidget* temp_gameClear_widget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), gameClearUIBlueprint);
 	temp_gameClear_widget->AddToViewport(0);
+	UGameplayStatics::PlaySound2D(GetWorld(), gameEndEffect);
+	playerCharacter->SetBlockPlayerMoveDirection(true, true, true, true);
 	
 	// 사망 처리
 	SetActorEnableCollision(false);

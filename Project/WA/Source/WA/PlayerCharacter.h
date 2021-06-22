@@ -9,6 +9,7 @@
 class APlayerCamera;
 class UInGameUI;
 class UPlayerCharacter_AnimInstance;
+class USoundBase;
 
 DECLARE_MULTICAST_DELEGATE(FInteractDelegate);
 
@@ -77,6 +78,21 @@ private:
 	float knockBack_speed;
 	UPROPERTY(EditAnywhere, Category = "Movement|Knock-Back")
 	float knockBack_decrease;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* moveStepEffect1;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* moveStepEffect2;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* jumpEffect;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* landEffect;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* dashEffect;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* hitEffect;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* dieEffect;
 
 	// 이동 속도
 	FVector velocity;
