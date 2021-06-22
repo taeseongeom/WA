@@ -26,6 +26,7 @@ void ASwitchlever::NotifyActorBeginOverlap(AActor * OtherActor)
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(true);
+		Cast<APlayerCharacter>(OtherActor)->DisplayInteractionUI(true);
 	}
 }
 
@@ -34,6 +35,7 @@ void ASwitchlever::NotifyActorEndOverlap(AActor * OtherActor)
 	if (OtherActor->ActorHasTag(FName("Character")))
 	{
 		SetInteractability(false);
+		Cast<APlayerCharacter>(OtherActor)->DisplayInteractionUI(false);
 	}
 }
 
