@@ -50,10 +50,10 @@ void ASwitchPuzzle::OnSwitchTarget()
 			if (!parentRoom->GetClear())
 			{
 				parentRoom->SetClear(true);
-				UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
-					UGameplayStatics::LoadGameFromSlot("WASave0", 0));
 				APlayerCharacter* pc = NULL;
 				UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
+				UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
+					UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(waInstance->GetSaveSlotIndex()), 0));
 				for (TActorIterator<APlayerCharacter> iter(GetWorld()); iter; ++iter)
 				{
 					pc = *iter;

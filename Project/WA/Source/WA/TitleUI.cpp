@@ -28,6 +28,34 @@ void UTitleUI::NativeConstruct()
 	if (world)
 	{
 		pc = world->GetFirstPlayerController();
+		for (int i = 0; i < 3; i++)
+		{
+			if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
+				UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(i), 0)))
+			{
+				switch (i)
+				{
+				case 0:
+					firstSaveDataText->SetText(
+						FText::FromString("Stage " +
+							FString::FromInt(LoadedGame->stageLevel)
+							+ "\nRoom " + FString::FromInt(LoadedGame->loadRoomNum)));
+					break;
+				case 1:
+					secondSaveDataText->SetText(
+						FText::FromString("Stage " +
+							FString::FromInt(LoadedGame->stageLevel)
+							+ "\nRoom " + FString::FromInt(LoadedGame->loadRoomNum)));
+					break;
+				case 2:
+					thirdSaveDataText->SetText(
+						FText::FromString("Stage " +
+							FString::FromInt(LoadedGame->stageLevel)
+							+ "Room " + FString::FromInt(LoadedGame->loadRoomNum)));
+					break;
+				}
+			}
+		}
 	}
 	for (TActorIterator<ATitleSoundEffect> iter(GetWorld()); iter; ++iter)
 	{
@@ -47,9 +75,13 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 			isSelectingData = true;
 			pressAnyKeyText->SetVisibility(ESlateVisibility::Collapsed);
 			firstSaveDataBtn->SetVisibility(ESlateVisibility::Visible);
+			firstSaveDataText->SetVisibility(ESlateVisibility::Visible);
 			secondSaveDataBtn->SetVisibility(ESlateVisibility::Visible);
+			secondSaveDataText->SetVisibility(ESlateVisibility::Visible);
 			thirdSaveDataBtn->SetVisibility(ESlateVisibility::Visible);
+			thirdSaveDataText->SetVisibility(ESlateVisibility::Visible);
 			quitBtn->SetVisibility(ESlateVisibility::Visible);
+			quitText->SetVisibility(ESlateVisibility::Visible);
 			backGround->SetColorAndOpacity(FLinearColor::White * 0.35f);
 			ChangeSlotImage(slotIndex);
 		}
@@ -157,11 +189,13 @@ void UTitleUI::StartGameFromSaveData()
 	if (UWASaveGame* LoadedGame = Cast<UWASaveGame>(
 		UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(slotIndex), 0)))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Load"));
+		UE_LOG(LogTemp, Warning, TEXT("Load %d"), slotIndex);
 		UWAGameInstance* instance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 		instance->SetCurrentStage(LoadedGame->stageLevel);
 		instance->SetSaveSlotIndex(slotIndex);
 		instance->SetCurrentRoomNum(LoadedGame->loadRoomNum);
+		LoadedGame->Save(LoadedGame->saveRespawnPoint, LoadedGame->health_point,
+			LoadedGame->loadRoomNum, slotIndex, LoadedGame->stageLevel);
 		FString stageName = "Stage" + FString::FromInt(LoadedGame->stageLevel);
 		UGameplayStatics::OpenLevel(GetWorld(), FName(*stageName));
 	}

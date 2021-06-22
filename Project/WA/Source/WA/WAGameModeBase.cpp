@@ -30,7 +30,7 @@ void AWAGameModeBase::Init()
 		}
 		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 		UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
-			UGameplayStatics::LoadGameFromSlot("WASave0", 0));
+			UGameplayStatics::LoadGameFromSlot("WASave" + FString::FromInt(waInstance->GetSaveSlotIndex()), 0));
 		waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
 		CurrentRoomNum = WASaveGameInstance->loadRoomNum;
 		waInstance->SetCurrentRoomNum(CurrentRoomNum);
@@ -65,7 +65,7 @@ void AWAGameModeBase::Init()
 		{
 			if (iter->GetName() ==
 				FString("Gate" + FString::FromInt(CurrentRoomNum) +
-					"_1"))
+					"_1") && CurrentRoomNum != 1)
 			{
 				respawnPoint = iter->FindComponentByClass<UBillboardComponent>()
 					->GetComponentLocation();
@@ -109,12 +109,13 @@ void AWAGameModeBase::ShowCutScene()
 void AWAGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+	UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 	if (UWASaveGame* WASaveGameInstance = Cast<UWASaveGame>(
-		UGameplayStatics::LoadGameFromSlot("WASave0", 0)))
+			UGameplayStatics::LoadGameFromSlot("WASave" + 
+				FString::FromInt(waInstance->GetSaveSlotIndex()), 0)))
 	{
 		if (WASaveGameInstance->loadRoomNum == 1)
 		{
-			UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 			waInstance->SetCurrentStage(WASaveGameInstance->stageLevel);
 			waInstance->SetCurrentRoomNum(1);
 			waInstance->SetSaveSlotIndex(WASaveGameInstance->slotIndex);
@@ -129,6 +130,14 @@ void AWAGameModeBase::BeginPlay()
 					break;
 				}
 			}
+			if (pc)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("NIGGA"));
+				respawnPoint = pc->GetActorLocation();
+				WASaveGameInstance->Save(respawnPoint,
+					pc->GetHealthPoint(), 1,
+					waInstance->GetSaveSlotIndex(), waInstance->GetCurrentStage());
+			}
 		}
 		else
 		{
@@ -140,7 +149,6 @@ void AWAGameModeBase::BeginPlay()
 		UWASaveGame* newSaveGameInstance =
 			Cast<UWASaveGame>(UGameplayStatics::CreateSaveGameObject(UWASaveGame::StaticClass()));
 		newSaveGameInstance->CreateFile(0);
-		UWAGameInstance* waInstance = Cast<UWAGameInstance>(GetWorld()->GetGameInstance());
 		int i = 0;
 		while (true)
 		{

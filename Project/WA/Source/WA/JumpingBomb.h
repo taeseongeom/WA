@@ -24,6 +24,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float jumpHeight;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+		class USoundBase* bombSound;
+
 	UPROPERTY()
 	class APlayerCharacter* playerCharacter;
 	FVector startPos;
