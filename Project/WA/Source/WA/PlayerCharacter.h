@@ -120,6 +120,8 @@ private:
 	bool blockDir_right;
 	bool blockDir_left;
 
+	int8 interactionRegionOverlap;
+
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
@@ -150,6 +152,8 @@ public:
 	void ActivateInGameUI();
 	void DeactivateInGameUI();
 	void StartCutScene();
+
+	void DisplayInteractionUI(bool IsShown);
 
 	// 해당 캐릭터와 Movable Box를 연결합니다. nullptr인 경우 연결을 해제합니다.
 	void ConnectWithCharacter(AMovableBox* HoldingMovableBox);
