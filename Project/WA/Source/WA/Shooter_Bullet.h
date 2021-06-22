@@ -17,6 +17,8 @@ public:
 
 private:
 	float Speed;
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* explosion;
 	UPROPERTY(VisibleAnywhere)
 	int Crash_count;
 protected:

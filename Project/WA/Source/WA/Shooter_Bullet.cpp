@@ -22,6 +22,8 @@ void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
 		!OtherActor->ActorHasTag(FName("Character")) &&
 		!OtherActor->ActorHasTag(FName("Viewport_Changer")))
 	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosion,
+			GetActorLocation(), GetActorRotation());
 		Destroy();
 	}
 
