@@ -13,6 +13,7 @@
 
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
+#include "Components/AudioComponent.h"
 #include "Blueprint/UserWidget.h"
 
 
@@ -122,6 +123,7 @@ void ABoss_Stage2::Entrance()
 	{
 	case EBossState::STEP1:
 		animInstance->StartMoving();
+		UGameplayStatics::PlaySound2D(GetWorld(), appearEffect);
 
 		if (!bossStandPosition.IsZero())
 		{
@@ -197,6 +199,7 @@ void ABoss_Stage2::Pattern_1()
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
 			{
+				UGameplayStatics::PlaySound2D(GetWorld(), laserLandEffect);
 				lasers.Add(GetWorld()->SpawnActor<ALaserBarrel>(laserBarrelBlueprint, spawn_pos, FRotator::ZeroRotator));
 			}
 
@@ -266,6 +269,7 @@ void ABoss_Stage2::Pattern_2()
 			FVector region_pos = Cast<UBoxComponent>(bulletSpreadRegion->GetComponentByClass(UBoxComponent::StaticClass()))->GetComponentLocation();
 			FVector region_box = Cast<UBoxComponent>(bulletSpreadRegion->GetComponentByClass(UBoxComponent::StaticClass()))->GetScaledBoxExtent();
 			FVector target_pos;
+			UGameplayStatics::PlaySound2D(GetWorld(), bulletFirstEffect);
 			for (int32 i = 0; i < bulletCount; i++)
 			{
 				target_pos = FVector(
@@ -300,6 +304,7 @@ void ABoss_Stage2::Pattern_2()
 	case EBossState::STEP2:
 		if (bulletIndex >= 0)
 			bullets[bulletIndex]->ChangeColor(bulletWarningColor);
+		UGameplayStatics::PlaySound2D(GetWorld(), bulletSecondEffect);
 
 		curTimer = bulletShotDelay;
 		state = EBossState::STEP3;
@@ -364,6 +369,7 @@ void ABoss_Stage2::Pattern_3()
 	case EBossState::STEP2:
 		if (leftSpikeWall && rightSpikeWall)
 		{
+			UGameplayStatics::PlaySound2D(GetWorld(), spikeEffect);
 			leftSpikeWall->MoveTo(spikeWallRightSpawnPos, spikeWallMoveTime);
 			rightSpikeWall->MoveTo(spikeWallLeftSpawnPos, spikeWallMoveTime);
 		}
@@ -399,6 +405,7 @@ void ABoss_Stage2::Pattern_4()
 	case EBossState::STEP2:
 		if (jumpingBombBlueprint)
 		{
+			UGameplayStatics::PlaySound2D(GetWorld(), throwEffect);
 			AJumpingBomb* bomb = GetWorld()->SpawnActor<AJumpingBomb>(
 				jumpingBombBlueprint,
 				GetMesh()->GetSocketLocation(FName("hand_r_railSocket")),

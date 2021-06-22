@@ -34,6 +34,7 @@ void AJumpingBomb::Tick(float DeltaTime)
 		float rate = curTime / travelTime;
 		if (rate >= 1)
 		{
+			UGameplayStatics::PlaySound2D(GetWorld(), bombSound);
 			GetWorld()->SpawnActor<AActor>(bombEffect, targetPos, FRotator::ZeroRotator);
 			startPos = targetPos;
 			targetPos = playerCharacter->GetActorLocation();

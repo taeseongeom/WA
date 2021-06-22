@@ -141,6 +141,24 @@ private:
 	// This user widget blueprint will be shown when boss dead. It is temporary.
 	UPROPERTY(EditAnywhere, Category = "Temp")
 	TSubclassOf<UUserWidget> gameClearUIBlueprint;
+	
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* appearEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* laserLandEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* bulletFirstEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* bulletSecondEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundBase* spikeEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+		class USoundBase* throwEffect;
 
 	UPROPERTY()
 	UBoss_Stage2_Anim* animInstance;
