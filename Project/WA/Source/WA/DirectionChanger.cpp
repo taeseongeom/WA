@@ -2,9 +2,10 @@
 
 
 #include "DirectionChanger.h"
-#include "PlayerCharacter.h"
+
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
+#include "Components/ArrowComponent.h"
 
 
 ADirectionChanger::ADirectionChanger()
@@ -16,6 +17,11 @@ ADirectionChanger::ADirectionChanger()
 	revealTime = 3.0f;
 	isCounterclockwise = false;
 
+	activeColor = FColor::Green;
+	deactiveColor = FColor::Red;
+
+	arrowMesh = nullptr;
+
 	currentTick = 0.0f;
 }
 
@@ -24,6 +30,8 @@ void ADirectionChanger::BeginPlay()
 	Super::BeginPlay();
 
 	BeginSetup(GetActorLocation(), GetActorRotation());
+
+	arrowMesh = Cast<UArrowComponent>(GetComponentByClass(UArrowComponent::StaticClass()));
 }
 
 void ADirectionChanger::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -39,6 +47,7 @@ void ADirectionChanger::NotifyActorBeginOverlap(AActor* OtherActor)
 				OtherActor->GetActorLocation().Z));
 
 			changeActive = false;
+			arrowMesh->SetArrowColor(FLinearColor(deactiveColor));
 		}
 	}
 }
@@ -55,6 +64,7 @@ void ADirectionChanger::Tick(float DeltaTime)
 		{
 			currentTick = 0.0f;
 			changeActive = true;
+			arrowMesh->SetArrowColor(FLinearColor(activeColor));
 		}
 	}
 }
@@ -62,6 +72,7 @@ void ADirectionChanger::Tick(float DeltaTime)
 void ADirectionChanger::InitializePuzzle()
 {
 	Super::InitializePuzzle();
+
 	currentTick = 0.0f;
 }
 

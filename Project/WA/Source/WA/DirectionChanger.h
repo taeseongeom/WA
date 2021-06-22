@@ -21,9 +21,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Rotation")
 	bool isCounterclockwise;
 
+	UPROPERTY(EditAnywhere, Category = "Color")
+	FLinearColor activeColor;
+	UPROPERTY(EditAnywhere, Category = "Color")
+	FLinearColor deactiveColor;
+
+	UPROPERTY()
+	class UArrowComponent* arrowMesh;
+
 	float currentTick;
 
 	bool changeActive;
+
 protected:
 	virtual void BeginPlay() override;
 
