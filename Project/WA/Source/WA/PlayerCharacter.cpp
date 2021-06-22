@@ -56,6 +56,14 @@ APlayerCharacter::APlayerCharacter()
 	blockDir_right = false;
 	blockDir_left = false;
 
+	moveStepEffect1 = nullptr;
+	moveStepEffect2 = nullptr;
+	jumpEffect = nullptr;
+	landEffect = nullptr;
+	dashEffect = nullptr;
+	hitEffect = nullptr;
+	dieEffect = nullptr;
+
 	interactionRegionOverlap = 0;
 
 	holdingBox = nullptr;
@@ -82,6 +90,7 @@ void APlayerCharacter::BeginPlay()
 	WaGMB = (AWAGameModeBase*)(GetWorld()->GetAuthGameMode());
 
 	animInstance = Cast<UPlayerCharacter_AnimInstance>(GetMesh()->GetAnimInstance());
+	animInstance->RegisterMoveSound(moveStepEffect1, moveStepEffect2);
 
 	Cast<UWidgetComponent>(GetComponentByClass(UWidgetComponent::StaticClass()))->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 }
@@ -114,6 +123,8 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	{
 		has_landed = true;
 	}
+
+	UGameplayStatics::PlaySound2D(GetWorld(), landEffect);
 }
 
 float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -131,6 +142,8 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		velocity = GetActorForwardVector() * -knockBack_speed;
 
 		inGameUI->UpdateHealthBar(health_point);
+
+		UGameplayStatics::PlaySound2D(GetWorld(), hitEffect);
 	}
 
 	// 사망
@@ -261,11 +274,14 @@ void APlayerCharacter::MoveJump()
 		!blockDir_backward &&
 		!blockDir_right &&
 		!blockDir_left)
+	{
 		Jump();
+		UGameplayStatics::PlaySound2D(GetWorld(), jumpEffect);
+	}
 }
 void APlayerCharacter::MoveDashBegin()
 {
-	if (cur_dashCount > 0 && ECharacterState::Dash != state)
+	if (cur_dashCount > 0 && ECharacterState::Dash != state && (!blockDir_forward && !blockDir_backward && !blockDir_right && !blockDir_left))
 	{
 		cur_dashTime = 0.0f;
 
@@ -279,6 +295,7 @@ void APlayerCharacter::MoveDashBegin()
 		state = ECharacterState::Dash;
 
 		animInstance->SetDash(true);
+		UGameplayStatics::PlaySound2D(GetWorld(), dashEffect);
 	}
 }
 void APlayerCharacter::MoveDashEnd()
@@ -326,8 +343,7 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::Death()
 {
-	// �ʱ�ȭ
-	//UE_LOG(LogTemp, Warning, TEXT("Character has dead..."));
+	// 리셋
 	WaGMB->RoomReset();
 	SetActorLocation(WaGMB->GetRespawnPoint());
 
@@ -335,10 +351,13 @@ void APlayerCharacter::Death()
 	inGameUI->UpdateHealthBar(health_point);
 
 	velocity = FVector::ZeroVector;
+	SetBlockPlayerMoveDirection(false, false, false, false);
 
 	state = ECharacterState::Idle;
 
 	cur_invincibleTime = 0.0f;
+
+	UGameplayStatics::PlaySound2D(GetWorld(), dieEffect);
 }
 
 void APlayerCharacter::SetCharacterState(ECharacterState cs)

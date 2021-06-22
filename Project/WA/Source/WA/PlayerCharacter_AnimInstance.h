@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "PlayerCharacter_AnimInstance.generated.h"
 
@@ -24,6 +24,17 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action", Meta = (AllowPrivateAccess = true))
 	bool IsDash;
 
+	UPROPERTY()
+	class USoundBase* stepEffect1;
+	UPROPERTY()
+	class USoundBase* stepEffect2;
+
 public:
 	void SetDash(bool IsDashing);
+	void RegisterMoveSound(USoundBase* Step1, USoundBase* Step2);
+
+	UFUNCTION()
+	void AnimNotify_Step1();
+	UFUNCTION()
+	void AnimNotify_Step2();
 };
