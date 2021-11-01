@@ -66,7 +66,7 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 						GetActorLocation() + FVector(50, 0, 0) * GetActorScale().X + FVector(1, 0, 0),
 						FQuat::Identity,
 						ECollisionChannel::ECC_GameTraceChannel5,
-						FCollisionShape::MakeBox(FVector(1, 50 * GetActorScale().Y, 50 * GetActorScale().Z)));
+						FCollisionShape::MakeBox(FVector(1, 48 * GetActorScale().Y, 48 * GetActorScale().Z)));
 
 					pc->SetBlockPlayerMoveDirection(res, false, true, true);
 				}
@@ -79,7 +79,7 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 						GetActorLocation() + FVector(-50, 0, 0) * GetActorScale().X + FVector(-1, 0, 0),
 						FQuat::Identity,
 						ECollisionChannel::ECC_GameTraceChannel5,
-						FCollisionShape::MakeBox(FVector(1, 50 * GetActorScale().Y, 50 * GetActorScale().Z)));
+						FCollisionShape::MakeBox(FVector(1, 48 * GetActorScale().Y, 48 * GetActorScale().Z)));
 
 					pc->SetBlockPlayerMoveDirection(false, res, true, true);
 				}
@@ -95,7 +95,7 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 						GetActorLocation() + FVector(0, 50, 0) * GetActorScale().Y + FVector(0, 1, 0),
 						FQuat::Identity,
 						ECollisionChannel::ECC_GameTraceChannel5,
-						FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 1, 50 * GetActorScale().Z)));
+						FCollisionShape::MakeBox(FVector(48 * GetActorScale().X, 1, 48 * GetActorScale().Z)));
 
 					pc->SetBlockPlayerMoveDirection(true, true, res, false);
 				}
@@ -108,7 +108,7 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 						GetActorLocation() + FVector(0, -50, 0) * GetActorScale().Y + FVector(0, -1, 0),
 						FQuat::Identity,
 						ECollisionChannel::ECC_GameTraceChannel5,
-						FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 1, 50 * GetActorScale().Z)));
+						FCollisionShape::MakeBox(FVector(48 * GetActorScale().X, 1, 48 * GetActorScale().Z)));
 
 					pc->SetBlockPlayerMoveDirection(true, true, false, res);
 				}
@@ -123,7 +123,7 @@ void AMovableBox::NotifyActorBeginOverlap(AActor* OtherActor)
 				GetActorLocation() + FVector(0, 0, -50) * GetActorScale().Z + FVector(0, 0, -1),
 				FQuat::Identity,
 				ECollisionChannel::ECC_GameTraceChannel5,
-				FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 50 * GetActorScale().Y, 1)));
+				FCollisionShape::MakeBox(FVector(48 * GetActorScale().X, 48 * GetActorScale().Y, 1)));
 			
 			inAir = !res;
 			fallSpeed = 0;
@@ -158,7 +158,7 @@ void AMovableBox::NotifyActorEndOverlap(AActor* OtherActor)
 				GetActorLocation() + FVector(0, 0, -50) * GetActorScale().Z + FVector(0, 0, -1),
 				FQuat::Identity,
 				ECollisionChannel::ECC_GameTraceChannel5,
-				FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 50 * GetActorScale().Y, 1)));
+				FCollisionShape::MakeBox(FVector(48 * GetActorScale().X, 48 * GetActorScale().Y, 1)));
 			
 			inAir = !res;
 			fallSpeed = 0;
@@ -260,7 +260,7 @@ void AMovableBox::Interact()
 				GetActorLocation() + FVector(0, 0, -50) * GetActorScale().Z + FVector(0, 0, -1),
 				FQuat::Identity,
 				ECollisionChannel::ECC_GameTraceChannel5,
-				FCollisionShape::MakeBox(FVector(50 * GetActorScale().X, 50 * GetActorScale().Y, 1)));
+				FCollisionShape::MakeBox(FVector(48 * GetActorScale().X, 48 * GetActorScale().Y, 1)));
 
 			inAir = !res;
 			fallSpeed = 0;
