@@ -319,8 +319,10 @@ void APlayerCharacter::MoveDashEnd()
 }
 void APlayerCharacter::Interaction()
 {
-	if(!(WaGMB->GetGameState() == EGameState::CutScene))
+	if (!(WaGMB->GetGameState() == EGameState::CutScene))
+	{
 		InteractionWithPuzzle.Broadcast();
+	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NextCutScene"));
@@ -431,7 +433,7 @@ void APlayerCharacter::InitInGameUI()
 			UUserWidget* tempInGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempInGameWidgetClass);
 			inGameUI = Cast<UInGameUI>(tempInGameWidget);
 			inGameUI->AddToViewport();
-			inGameUI->DisplayText("");
+			DisplayMessage("");
 		}
 	}
 }
@@ -453,6 +455,13 @@ void APlayerCharacter::DeactivateInGameUI()
 		{
 			inGameUI->RemoveFromViewport();
 		}
+	}
+}
+void APlayerCharacter::DisplayMessage(const FString& Message, float Duration)
+{
+	if (inGameUI)
+	{
+		inGameUI->DisplayText(Message, Duration);
 	}
 }
 

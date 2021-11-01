@@ -37,6 +37,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Directing")
 	float rotationSpeed;
 
+	UPROPERTY(EditAnywhere, Category = "Message")
+	FString noticeMessage;
+
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* gatchaEffect;
 
