@@ -143,6 +143,7 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 
 		inGameUI->UpdateHealthBar(health_point);
 
+		animInstance->SetDamaged(true);
 		UGameplayStatics::PlaySound2D(GetWorld(), hitEffect);
 	}
 
@@ -195,6 +196,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			cur_invincibleTime = 0.0f;
 			state = ECharacterState::Idle;
+			animInstance->SetDamaged(false);
 		}
 
 		velocity *= (1.0f - (knockBack_decrease * DeltaTime * 500.0f));
@@ -359,6 +361,7 @@ void APlayerCharacter::Death()
 
 	cur_invincibleTime = 0.0f;
 
+	animInstance->SetDamaged(false);
 	UGameplayStatics::PlaySound2D(GetWorld(), dieEffect);
 }
 

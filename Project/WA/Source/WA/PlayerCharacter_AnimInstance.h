@@ -23,6 +23,8 @@ private:
 	bool IsInAir;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action", Meta = (AllowPrivateAccess = true))
 	bool IsDash;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action", Meta = (AllowPrivateAccess = true))
+	bool IsHit;
 
 	UPROPERTY()
 	class USoundBase* stepEffect1;
@@ -31,6 +33,7 @@ private:
 
 public:
 	void SetDash(bool IsDashing);
+	void SetDamaged(bool IsDamaged);
 	void RegisterMoveSound(USoundBase* Step1, USoundBase* Step2);
 
 	UFUNCTION()
