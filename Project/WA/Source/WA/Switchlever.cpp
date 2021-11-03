@@ -7,7 +7,10 @@
 #include "Runtime/Engine/Public/EngineUtils.h"
 
 // Sets default values
-ASwitchlever::ASwitchlever() : ASwitchPuzzle(){ }
+ASwitchlever::ASwitchlever() : ASwitchPuzzle()
+{
+	leverMesh = nullptr;
+}
 
 // Called when the game starts or when spawned
 void ASwitchlever::BeginPlay()
@@ -19,6 +22,7 @@ void ASwitchlever::BeginPlay()
 		iter->InteractionWithPuzzle.AddUFunction(this, FName("Interact"));
 		break;
 	}
+	leverMesh = Cast<USceneComponent>(GetComponentsByTag(USceneComponent::StaticClass(), FName("LeverMesh"))[0]);
 }
 
 void ASwitchlever::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -45,5 +49,10 @@ void ASwitchlever::Interact()
 	{
 		PlayEffect();
 		OnSwitchTarget();
+
+		if (IsInteracted())
+			leverMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, 45.0f));
+		else
+			leverMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, -45.0f));
 	}
 }
