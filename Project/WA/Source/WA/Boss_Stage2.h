@@ -146,7 +146,7 @@ private:
 	class USoundBase* appearEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	class USoundBase* laserLandEffect;
+	class USoundBase* hitEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundBase* bulletFirstEffect;

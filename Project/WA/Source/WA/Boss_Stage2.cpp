@@ -96,9 +96,14 @@ float ABoss_Stage2::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 		healthPoint -= (int32)Damage;
 
 	if (healthPoint <= 0)
+	{
 		Death();
+	}
 	else
+	{
 		animInstance->GetHit();
+		UGameplayStatics::PlaySound2D(GetWorld(), hitEffect);
+	}
 
 	return (float)healthPoint;
 }
@@ -199,7 +204,6 @@ void ABoss_Stage2::Pattern_1()
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
 			{
-				UGameplayStatics::PlaySound2D(GetWorld(), laserLandEffect);
 				lasers.Add(GetWorld()->SpawnActor<ALaserBarrel>(laserBarrelBlueprint, spawn_pos, FRotator::ZeroRotator));
 			}
 
