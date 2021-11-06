@@ -304,8 +304,7 @@ void ABoss_Stage2::Pattern_2()
 	case EBossState::STEP2:
 		if (bulletIndex >= 0)
 			bullets[bulletIndex]->ChangeColor(bulletWarningColor);
-		UGameplayStatics::PlaySound2D(GetWorld(), bulletSecondEffect);
-
+		
 		curTimer = bulletShotDelay;
 		state = EBossState::STEP3;
 		break;
@@ -317,6 +316,7 @@ void ABoss_Stage2::Pattern_2()
 				playerCharacter->GetActorLocation() - bullets[bulletIndex]->GetActorLocation(), 
 				bulletSpeed, 
 				5.0f);
+			UGameplayStatics::PlaySound2D(GetWorld(), bulletSecondEffect);
 
 			bulletIndex--;
 			state = EBossState::STEP2;
