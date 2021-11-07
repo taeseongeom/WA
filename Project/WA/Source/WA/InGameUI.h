@@ -53,6 +53,5 @@ private:
 
 	int cutSceneNum;
 
-	float waitTime;
 	float timer;
 };

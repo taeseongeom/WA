@@ -15,7 +15,6 @@ void UInGameUI::NativeOnInitialized()
 	DisplayText("");
 
 	cutSceneNum = 0;
-	waitTime = 0.0f;
 	timer = 0.0f;
 }
 
@@ -23,15 +22,11 @@ void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (waitTime > 0)
+	if (timer > 0)
 	{
-		if (timer < waitTime)
+		timer -= InDeltaTime;
+		if (timer <= 0)
 		{
-			timer += InDeltaTime;
-		}
-		else
-		{
-			waitTime = 0.0f;
 			timer = 0.0f;
 			DisplayText("");
 		}
@@ -76,7 +71,7 @@ void UInGameUI::DisplayText(const FString& String, float Duration)
 		img_dialog->SetOpacity((true));
 
 	txt_dialog->SetText(FText::FromString(String));
-	waitTime = Duration;
+	timer = Duration;
 }
 
 bool UInGameUI::NextCutScene(int stage)
