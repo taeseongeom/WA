@@ -167,6 +167,7 @@ public:
 	void InitInGameUI();
 	void ActivateInGameUI();
 	void DeactivateInGameUI();
+	void DisplayMessage(const FString& Message, float Duration = 0.0f);
 	void StartCutScene();
 
 	void DisplayInteractionUI(bool IsShown);

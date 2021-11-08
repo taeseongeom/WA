@@ -148,6 +148,7 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 		// 캐릭터 이동과 UI 원상 복귀
 		playerCharacter->SetBlockPlayerMoveDirection(false, false, false, false);
 		playerCharacter->ActivateInGameUI();
+		playerCharacter->DisplayMessage(noticeMessage, 5.0f);
 
 		playerCharacter->IncreaseDashCount(1);
 

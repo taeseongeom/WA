@@ -17,6 +17,8 @@ class WA_API UInGameUI : public UUserWidget
 protected:
 	virtual void NativeOnInitialized() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 public:
 	UPROPERTY(Meta = (BindWidget))
 	UImage* img_portrait;
@@ -28,8 +30,6 @@ public:
 	UImage* img_health_1;
 	UPROPERTY(Meta = (BindWidget))
 	UImage* img_health_2;
-	UPROPERTY(Meta = (BindWidget))
-	UImage* img_stamina;
 
 	UPROPERTY(Meta = (BindWidget))
 	UImage* img_dialog;
@@ -41,9 +41,8 @@ public:
 
 
 	void UpdateHealthBar(int HealthPoint);
-	void UpdateStamina(bool IsActive);
 
-	void DisplayText(const FString& String);
+	void DisplayText(const FString& String, float Duration = 0);
 	bool NextCutScene(int stage);
 
 	void EnableCutScene(int stage);
@@ -53,4 +52,6 @@ private:
 	TMap<FString, UTexture2D*> cutScenes;
 
 	int cutSceneNum;
+
+	float timer;
 };

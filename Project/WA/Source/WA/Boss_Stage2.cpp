@@ -11,6 +11,8 @@
 #include "SpikeWall.h"
 #include "JumpingBomb.h"
 
+#include "WAAmbientSound.h"
+
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "Components/AudioComponent.h"
@@ -96,9 +98,14 @@ float ABoss_Stage2::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 		healthPoint -= (int32)Damage;
 
 	if (healthPoint <= 0)
+	{
 		Death();
+	}
 	else
+	{
 		animInstance->GetHit();
+		UGameplayStatics::PlaySound2D(GetWorld(), hitEffect);
+	}
 
 	return (float)healthPoint;
 }
@@ -199,7 +206,6 @@ void ABoss_Stage2::Pattern_1()
 			} while (GetWorld()->LineTraceSingleByChannel(hit, spawn_pos + FVector(0, 0, 500.0f), spawn_pos, ECollisionChannel::ECC_GameTraceChannel4));
 			if (limit_try <= 10000)
 			{
-				UGameplayStatics::PlaySound2D(GetWorld(), laserLandEffect);
 				lasers.Add(GetWorld()->SpawnActor<ALaserBarrel>(laserBarrelBlueprint, spawn_pos, FRotator::ZeroRotator));
 			}
 
@@ -304,8 +310,7 @@ void ABoss_Stage2::Pattern_2()
 	case EBossState::STEP2:
 		if (bulletIndex >= 0)
 			bullets[bulletIndex]->ChangeColor(bulletWarningColor);
-		UGameplayStatics::PlaySound2D(GetWorld(), bulletSecondEffect);
-
+		
 		curTimer = bulletShotDelay;
 		state = EBossState::STEP3;
 		break;
@@ -317,6 +322,7 @@ void ABoss_Stage2::Pattern_2()
 				playerCharacter->GetActorLocation() - bullets[bulletIndex]->GetActorLocation(), 
 				bulletSpeed, 
 				5.0f);
+			UGameplayStatics::PlaySound2D(GetWorld(), bulletSecondEffect);
 
 			bulletIndex--;
 			state = EBossState::STEP2;
@@ -467,12 +473,22 @@ void ABoss_Stage2::Death()
 	// 게임 클리어 연출
 	UUserWidget* temp_gameClear_widget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), gameClearUIBlueprint);
 	temp_gameClear_widget->AddToViewport(0);
-	UGameplayStatics::PlaySound2D(GetWorld(), gameEndEffect);
 	playerCharacter->SetBlockPlayerMoveDirection(true, true, true, true);
+	for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+	{
+		AWAAmbientSound* bgm = *iter;
+		bgm->MuteBGM();
+		break;
+	}
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ABoss_Stage2::ReturnToTitle, 5.0f, true);
 	
 	// 사망 처리
 	SetActorEnableCollision(false);
-	SetLifeSpan(3.0f);
+	//SetLifeSpan(3.0f);
+}
+void ABoss_Stage2::ReturnToTitle()
+{
+	UGameplayStatics::OpenLevel(this, FName("Title"));
 }
 
 void ABoss_Stage2::Initialize()

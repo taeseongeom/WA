@@ -11,6 +11,7 @@ UPlayerCharacter_AnimInstance::UPlayerCharacter_AnimInstance()
 	CurrentSpeed = 0.0f;
 	IsInAir = false;
 	IsDash = false;
+	IsHit = false;
 
 	stepEffect1 = nullptr;
 	stepEffect2 = nullptr;
@@ -31,6 +32,10 @@ void UPlayerCharacter_AnimInstance::NativeUpdateAnimation(float DeltaTime)
 void UPlayerCharacter_AnimInstance::SetDash(bool IsDashing)
 {
 	IsDash = IsDashing;
+}
+void UPlayerCharacter_AnimInstance::SetDamaged(bool IsDamaged)
+{
+	IsHit = IsDamaged;
 }
 void UPlayerCharacter_AnimInstance::RegisterMoveSound(USoundBase* Step1, USoundBase* Step2)
 {

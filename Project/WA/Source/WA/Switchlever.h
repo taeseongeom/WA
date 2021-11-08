@@ -14,17 +14,21 @@ class WA_API ASwitchlever : public ASwitchPuzzle, public IInteractable
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ASwitchlever();
+
 private:
 	UPROPERTY()
 	class APlayerCharacter* pc;
+
+	UPROPERTY()
+	USceneComponent* leverMesh;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 	virtual void NotifyActorEndOverlap(AActor* OtherActor);
+
 public:	
-	// Called every frame
 	virtual void Interact() override;
 };

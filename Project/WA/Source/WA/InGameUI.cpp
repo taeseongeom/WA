@@ -12,7 +12,25 @@ void UInGameUI::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	DisplayText("");
+
 	cutSceneNum = 0;
+	timer = 0.0f;
+}
+
+void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (timer > 0)
+	{
+		timer -= InDeltaTime;
+		if (timer <= 0)
+		{
+			timer = 0.0f;
+			DisplayText("");
+		}
+	}
 }
 
 void UInGameUI::UpdateHealthBar(int HealthPoint)
@@ -44,14 +62,16 @@ void UInGameUI::UpdateHealthBar(int HealthPoint)
 		break;
 	}
 }
-void UInGameUI::UpdateStamina(bool IsActive)
-{
 
-}
-
-void UInGameUI::DisplayText(const FString& String)
+void UInGameUI::DisplayText(const FString& String, float Duration)
 {
+	if (String.IsEmpty())
+		img_dialog->SetOpacity((false));
+	else
+		img_dialog->SetOpacity((true));
+
 	txt_dialog->SetText(FText::FromString(String));
+	timer = Duration;
 }
 
 bool UInGameUI::NextCutScene(int stage)
@@ -65,7 +85,6 @@ bool UInGameUI::NextCutScene(int stage)
 	}
 	return true;
 }
-
 void UInGameUI::EnableCutScene(int stage)
 {
 	FString key = FString::FromInt(stage) + "_" + FString::FromInt(cutSceneNum);
@@ -75,7 +94,6 @@ void UInGameUI::EnableCutScene(int stage)
 	}
 	img_cutscene->SetOpacity(true);
 }
-
 void UInGameUI::DisableCutScene()
 {
 	img_cutscene->SetOpacity(false);

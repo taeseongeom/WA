@@ -113,6 +113,10 @@ void AWAAmbientSound::SwapRoomBGM(int roomNum)
 		}
 	}
 }
+void AWAAmbientSound::MuteBGM()
+{
+	GetAudioComponent()->Stop();
+}
 
 void AWAAmbientSound::SetStage(int value)
 {

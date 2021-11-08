@@ -143,6 +143,7 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 
 		inGameUI->UpdateHealthBar(health_point);
 
+		animInstance->SetDamaged(true);
 		UGameplayStatics::PlaySound2D(GetWorld(), hitEffect);
 	}
 
@@ -195,6 +196,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			cur_invincibleTime = 0.0f;
 			state = ECharacterState::Idle;
+			animInstance->SetDamaged(false);
 		}
 
 		velocity *= (1.0f - (knockBack_decrease * DeltaTime * 500.0f));
@@ -319,8 +321,10 @@ void APlayerCharacter::MoveDashEnd()
 }
 void APlayerCharacter::Interaction()
 {
-	if(!(WaGMB->GetGameState() == EGameState::CutScene))
+	if (!(WaGMB->GetGameState() == EGameState::CutScene))
+	{
 		InteractionWithPuzzle.Broadcast();
+	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NextCutScene"));
@@ -357,6 +361,7 @@ void APlayerCharacter::Death()
 
 	cur_invincibleTime = 0.0f;
 
+	animInstance->SetDamaged(false);
 	UGameplayStatics::PlaySound2D(GetWorld(), dieEffect);
 }
 
@@ -431,7 +436,7 @@ void APlayerCharacter::InitInGameUI()
 			UUserWidget* tempInGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempInGameWidgetClass);
 			inGameUI = Cast<UInGameUI>(tempInGameWidget);
 			inGameUI->AddToViewport();
-			inGameUI->DisplayText("");
+			DisplayMessage("");
 		}
 	}
 }
@@ -453,6 +458,13 @@ void APlayerCharacter::DeactivateInGameUI()
 		{
 			inGameUI->RemoveFromViewport();
 		}
+	}
+}
+void APlayerCharacter::DisplayMessage(const FString& Message, float Duration)
+{
+	if (inGameUI)
+	{
+		inGameUI->DisplayText(Message, Duration);
 	}
 }
 

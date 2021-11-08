@@ -100,24 +100,24 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 	{
 		if (isSelectingData && !isGameStart)
 		{
-			if (pc->WasInputKeyJustPressed(EKeys::Left) && slotIndex > 0)
+			if ((pc->WasInputKeyJustPressed(EKeys::Left) || pc->WasInputKeyJustPressed(EKeys::Gamepad_DPad_Left)) && slotIndex > 0)
 			{
 				effectComp->PlayBtnEffect(changeBtnEffect);
 				ChangeSlotImage(--slotIndex);
 			}
-			else if (pc->WasInputKeyJustPressed(EKeys::Right) && slotIndex < 2)
+			else if ((pc->WasInputKeyJustPressed(EKeys::Right) || pc->WasInputKeyJustPressed(EKeys::Gamepad_DPad_Right)) && slotIndex < 2)
 			{
 				effectComp->PlayBtnEffect(changeBtnEffect);
 				ChangeSlotImage(++slotIndex);
 			}
-			else if (pc->WasInputKeyJustPressed(EKeys::Down))
+			else if (pc->WasInputKeyJustPressed(EKeys::Down) || pc->WasInputKeyJustPressed(EKeys::Gamepad_DPad_Down))
 			{
 				effectComp->PlayBtnEffect(changeBtnEffect);
 				isSelectingData = false;
 				quitBtn->SetBrushFromTexture(hoveredQuitTexture);
 				ChangeSlotImage(-1);
 			}
-			else if (pc->WasInputKeyJustPressed(EKeys::Enter))
+			else if (pc->WasInputKeyJustPressed(EKeys::Enter) || pc->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
 			{
 				if (GetWorld()->GetGameInstance())
 				{
@@ -133,11 +133,11 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 		}
 		else if(!isSelectingData && !isGameStart)
 		{
-			if (pc->WasInputKeyJustPressed(EKeys::Enter))
+			if (pc->WasInputKeyJustPressed(EKeys::Enter) || pc->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
 			{
 				FGenericPlatformMisc::RequestExit(true);
 			}
-			else if (pc->WasInputKeyJustPressed(EKeys::Up))
+			else if (pc->WasInputKeyJustPressed(EKeys::Up) || pc->WasInputKeyJustPressed(EKeys::Gamepad_DPad_Up))
 			{
 				effectComp->PlayBtnEffect(changeBtnEffect);
 				isSelectingData = true;

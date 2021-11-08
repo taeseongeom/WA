@@ -34,5 +34,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Clear")
 	bool isClearCheckObject;
 
+	UPROPERTY(EditAnywhere, Category = "Lamp Color")
+	FColor activatedColor;
+	UPROPERTY(EditAnywhere, Category = "Lamp Color")
+	FColor deactivatedColor;
+
 	class UBillboardComponent* spawnPoint;
+	class UPointLightComponent* lampLight;
+
+
+	void SetLampLightColor(bool PuzzleActive);
 };

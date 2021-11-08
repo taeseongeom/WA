@@ -67,7 +67,8 @@ void AShooter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (puzzleActive)
 	{
-		if (pController->WasInputKeyJustReleased(EKeys::C))
+		if (pController->WasInputKeyJustReleased(EKeys::C) || 
+			pController->WasInputKeyJustReleased(EKeys::Gamepad_FaceButton_Right))
 			ShootBullet();
 		else
 			RotateShooter();

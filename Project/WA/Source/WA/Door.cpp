@@ -5,16 +5,28 @@
 #include "PlayerCharacter.h"
 #include "WAGameModeBase.h"
 
-ADoor::ADoor() : ADefaultPuzzle() {
+ADoor::ADoor() : ADefaultPuzzle()
+{
+	activatedColor = FColor::Green;
+	deactivatedColor = FColor::Red;
+
+	lampLight = nullptr;
 }
+
 void ADoor::BeginPlay()
 {
-	Super::BeginPlay();                                                    
+	Super::BeginPlay();
+
 	isClear = false;
 	if (!isClearCheckObject)
 		isClear = true;
+
 	spawnPoint = FindComponentByClass<UBillboardComponent>();
+
+	lampLight = FindComponentByClass<UPointLightComponent>();
+	SetLampLightColor(puzzleActive);
 }
+
 void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	if (puzzleActive && OtherActor->ActorHasTag(FName("Character")))
@@ -58,6 +70,7 @@ void ADoor::NotifyActorBeginOverlap(AActor * OtherActor)
 		WaGMB->ChangeRoom(TransferRoomNumber, spawnPoint->GetComponentLocation());
 	}
 }
+
 void ADoor::BeginSetup(FVector pos, FRotator rot)
 {
 	Super::BeginSetup(pos, rot);
@@ -65,16 +78,22 @@ void ADoor::BeginSetup(FVector pos, FRotator rot)
 void ADoor::InitializePuzzle()
 {
 	Super::InitializePuzzle();
+
+	SetLampLightColor(puzzleActive);
 }
+
 void ADoor::OnSwitch()
 {
-	if (isTurnOn)
-	{
-		isTurnOn = false;
-	}
+	SetIsTurnOn(!GetIsTurnOn());
+	puzzleActive = GetIsTurnOn();
+
+	SetLampLightColor(puzzleActive);
+}
+
+void ADoor::SetLampLightColor(bool PuzzleActive)
+{
+	if (PuzzleActive)
+		lampLight->SetLightColor(activatedColor);
 	else
-	{
-		isTurnOn = true;
-	}
-	puzzleActive = isTurnOn;
+		lampLight->SetLightColor(deactivatedColor);
 }
