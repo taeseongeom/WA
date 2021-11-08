@@ -177,6 +177,8 @@ private:
 	// 보스 캐릭터의 현재 상태
 	EBossState state;
 
+	FTimerHandle CountdownTimerHandle;
+
 
 	UFUNCTION()
 	void Entrance();
@@ -190,6 +192,7 @@ private:
 	void Pattern_4();
 
 	void Death();
+	void ReturnToTitle();
 
 public:
 	void Initialize();

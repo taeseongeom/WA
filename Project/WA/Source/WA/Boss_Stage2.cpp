@@ -11,6 +11,8 @@
 #include "SpikeWall.h"
 #include "JumpingBomb.h"
 
+#include "WAAmbientSound.h"
+
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "Components/AudioComponent.h"
@@ -471,12 +473,22 @@ void ABoss_Stage2::Death()
 	// 게임 클리어 연출
 	UUserWidget* temp_gameClear_widget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), gameClearUIBlueprint);
 	temp_gameClear_widget->AddToViewport(0);
-	UGameplayStatics::PlaySound2D(GetWorld(), gameEndEffect);
 	playerCharacter->SetBlockPlayerMoveDirection(true, true, true, true);
+	for (TActorIterator<AWAAmbientSound> iter(GetWorld()); iter; ++iter)
+	{
+		AWAAmbientSound* bgm = *iter;
+		bgm->MuteBGM();
+		break;
+	}
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ABoss_Stage2::ReturnToTitle, 5.0f, true);
 	
 	// 사망 처리
 	SetActorEnableCollision(false);
-	SetLifeSpan(3.0f);
+	//SetLifeSpan(3.0f);
+}
+void ABoss_Stage2::ReturnToTitle()
+{
+	UGameplayStatics::OpenLevel(this, FName("Title"));
 }
 
 void ABoss_Stage2::Initialize()
