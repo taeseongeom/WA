@@ -23,5 +23,6 @@ private:
 public:
 	virtual void BeginPlay() override;
 	void SwapRoomBGM(int roomNum);
+	void MuteBGM();
 	void SetStage(int value);
 };
