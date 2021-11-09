@@ -131,7 +131,7 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 	// 클로즈 업, 윙크
 	else if (timeline >= 4.2f && timeline < 5.0f)
 	{
-		FVector dist = FMath::Lerp<FVector>(playerCam->GetActorLocation(), characterPosition + FVector(-50.0f, 0.0f, 80.0f), DeltaTime * 10.0f);
+		FVector dist = FMath::Lerp<FVector>(playerCam->GetActorLocation(), characterPosition + FVector(-100.0f, 0.0f, 80.0f), DeltaTime * 10.0f);
 		playerCam->SetActorLocation(dist);
 	}
 	// 부들부들 떨기 (휘파람)
