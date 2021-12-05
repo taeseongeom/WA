@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Engine/Canvas.h"
 #include "WAViewportClient.h"
+#include "Engine/Canvas.h"
 #include "WA.h"
 
 void UWAViewportClient::PostRender(UCanvas * Canvas)
