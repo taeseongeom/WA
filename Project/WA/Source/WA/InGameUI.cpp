@@ -16,6 +16,9 @@ void UInGameUI::NativeOnInitialized()
 
 	cutSceneNum = 0;
 	timer = 0.0f;
+
+	txt_cutscene->SetText(FText::FromString("Press C key"));
+	txt_cutscene->SetOpacity(false);
 }
 
 void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -93,8 +96,10 @@ void UInGameUI::EnableCutScene(int stage)
 		img_cutscene->SetBrushFromTexture(cutScenes[key]);
 	}
 	img_cutscene->SetOpacity(true);
+	txt_cutscene->SetOpacity(true);
 }
 void UInGameUI::DisableCutScene()
 {
 	img_cutscene->SetOpacity(false);
+	txt_cutscene->SetOpacity(false);
 }

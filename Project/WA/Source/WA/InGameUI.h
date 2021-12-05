@@ -38,6 +38,8 @@ public:
 
 	UPROPERTY(Meta = (BindWidget))
 	UImage* img_cutscene;
+	UPROPERTY(Meta = (BindWidget))
+	UTextBlock* txt_cutscene;
 
 
 	void UpdateHealthBar(int HealthPoint);
