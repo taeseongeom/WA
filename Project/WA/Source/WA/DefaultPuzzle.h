@@ -15,14 +15,12 @@ class WA_API ADefaultPuzzle : public AActor, public IHideOnBox
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ADefaultPuzzle();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 protected:
-	//Reset Function
+	// Reset Function
 	virtual void BeginSetup(FVector pos, FRotator rot);
 public:
 	// Reset Function
@@ -30,7 +28,6 @@ public:
 	virtual bool GetPuzzleActive();
 	virtual void SetParentRoom(ARoomActor* value);
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -41,17 +38,11 @@ protected:
 	class UAudioComponent* audioComp;
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TArray<class USoundBase*> effects;
-private: // Reset Property
+private: // Reset Properties
 	FVector initPos;
 	FRotator initRot;
 	UPROPERTY(EditAnywhere, Category = "Init")
 	bool initpuzzleActive;
 	UPROPERTY(EditAnywhere, Category = "Init")
 	int32 roomNum;
-	UPROPERTY(EditAnywhere, Category = "Init")
-	bool isInitBreakableBox;
-	UPROPERTY()
-	TSubclassOf<class ABreakableBox> breakableBoxBlueprint;
-	UPROPERTY()
-	class ABreakableBox* breakableBox;
 };
