@@ -28,6 +28,7 @@ APlayerCharacter::APlayerCharacter()
 
 	health_point = 100.0f;
 	invincible_time = 1.0f;
+	rigorMortis_time = 1.0f;
 
 	move_speed = 800.0f;
 	move_accel = 6000.0f;
@@ -347,7 +348,11 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::Death()
 {
-	// 리셋
+	// Block all movement for a while(1 sec)
+	SetBlockPlayerMoveDirection(true, true, true, true);
+	GetWorldTimerManager().SetTimer(timerHandle, this, &APlayerCharacter::ResolutionOfRigorMortis, rigorMortis_time);
+
+	// Reset all status
 	WaGMB->RoomReset();
 	SetActorLocation(WaGMB->GetRespawnPoint());
 
@@ -355,7 +360,6 @@ void APlayerCharacter::Death()
 	inGameUI->UpdateHealthBar(health_point);
 
 	velocity = FVector::ZeroVector;
-	SetBlockPlayerMoveDirection(false, false, false, false);
 
 	state = ECharacterState::Idle;
 
@@ -363,6 +367,11 @@ void APlayerCharacter::Death()
 
 	animInstance->SetDamaged(false);
 	UGameplayStatics::PlaySound2D(GetWorld(), dieEffect);
+}
+void APlayerCharacter::ResolutionOfRigorMortis()
+{
+	SetBlockPlayerMoveDirection(false, false, false, false);
+	GetWorldTimerManager().ClearTimer(timerHandle);
 }
 
 void APlayerCharacter::SetCharacterState(ECharacterState cs)
