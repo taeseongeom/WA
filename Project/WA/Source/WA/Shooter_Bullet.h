@@ -12,7 +12,6 @@ class WA_API AShooter_Bullet : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AShooter_Bullet();
 
 private:
@@ -21,18 +20,17 @@ private:
 	class UParticleSystem* explosion;
 	UPROPERTY(VisibleAnywhere)
 	int Crash_count;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void SetStack(float Speed, int Crash_count);
 
-	//Get, Set
+	// Get, Set
 	int GetCrashCount() { return Crash_count; }
 	void SetCrashCount(int value) { Crash_count = value; }
 	float GetSpeed() { return Speed; }
