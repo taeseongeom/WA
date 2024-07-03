@@ -69,6 +69,8 @@ APlayerCharacter::APlayerCharacter()
 
 	holdingBox = nullptr;
 
+	isMenuOpen = false;
+
 	// 입력된 정보를 CharacterMovementComponent와 연결
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
 	GetCharacterMovement()->MaxAcceleration = move_accel;
@@ -225,13 +227,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	UE_LOG(LogTemp, Warning, TEXT("Input Key"));
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::InputForwardBackward);
 	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::InputLeftRight);
 	PlayerInputComponent->BindAction(TEXT("MoveJump"), IE_Pressed, this, &APlayerCharacter::MoveJump);
 	PlayerInputComponent->BindAction(TEXT("MoveDash"), IE_Pressed, this, &APlayerCharacter::MoveDashBegin);
 	PlayerInputComponent->BindAction(TEXT("MoveDash"), IE_Released, this, &APlayerCharacter::MoveDashEnd);
 	PlayerInputComponent->BindAction(TEXT("Interaction"), IE_Pressed, this, &APlayerCharacter::Interaction);
+	PlayerInputComponent->BindAction(TEXT("CallMenu"), IE_Pressed, this, &APlayerCharacter::CallMenu);
 }
 
 void APlayerCharacter::InputForwardBackward(float value)
@@ -322,13 +324,12 @@ void APlayerCharacter::MoveDashEnd()
 }
 void APlayerCharacter::Interaction()
 {
-	if (!(WaGMB->GetGameState() == EGameState::CutScene))
+	if (WaGMB->GetGameState() != EGameState::CutScene)
 	{
 		InteractionWithPuzzle.Broadcast();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NextCutScene"));
 		UWorld* world = GetWorld();
 		if (world)
 		{
@@ -344,6 +345,17 @@ void APlayerCharacter::Interaction()
 			}
 		}
 	}
+}
+void APlayerCharacter::CallMenu()
+{
+	isMenuOpen = true;
+	SetBlockPlayerMoveDirection(true, true, true, true);
+	WaGMB->DisplayMenu();
+}
+void APlayerCharacter::CloseMenu()
+{
+	isMenuOpen = false;
+	SetBlockPlayerMoveDirection(false, false, false, false);
 }
 
 void APlayerCharacter::Death()
@@ -370,7 +382,8 @@ void APlayerCharacter::Death()
 }
 void APlayerCharacter::ResolutionOfRigorMortis()
 {
-	SetBlockPlayerMoveDirection(false, false, false, false);
+	if (!isMenuOpen)
+		SetBlockPlayerMoveDirection(false, false, false, false);
 	GetWorldTimerManager().ClearTimer(timerHandle);
 }
 

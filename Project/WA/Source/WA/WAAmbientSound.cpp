@@ -117,6 +117,10 @@ void AWAAmbientSound::MuteBGM()
 {
 	GetAudioComponent()->Stop();
 }
+void AWAAmbientSound::SetBGMVolume(float value)
+{
+	GetAudioComponent()->SetVolumeMultiplier(value);
+}
 
 void AWAAmbientSound::SetStage(int value)
 {

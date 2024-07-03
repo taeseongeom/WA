@@ -18,7 +18,8 @@ enum class EGameState : uint8
 	CutScene UMETA(DisplayName = "CutScene"),
 	Load UMETA(DisplayName = "Load"),
 	Play UMETA(DisplayName = "Play"),
-	End UMETA(DisplayName = "End"),
+	Menu UMETA(DisplayName = "Menu"),
+	Clear UMETA(DisplayName = "Clear")
 };
 
 UCLASS()
@@ -40,9 +41,14 @@ public:
 	FVector GetRespawnPoint() const;
 	EGameState GetGameState() const;
 	void SetGameState(EGameState value);
+
+	void DisplayMenu();
+	void CloseMenu(int code);
+
 private:
 	void Init();
 	void ShowCutScene();
+
 private:
 	//UPROPERTY 사용 불가능한데 추후 수정필요
 	TMultiMap<int8, ADefaultPuzzle*> InitPuzzles;
@@ -54,6 +60,9 @@ private:
 	class APlayerCharacter* pc;
 	UPROPERTY()
 	class AWAAmbientSound* bgm;
+
+	UPROPERTY()
+	class UMenuUI* menuUI;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Debug")

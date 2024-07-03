@@ -144,6 +144,8 @@ private:
 	// 사후경직 타이머
 	FTimerHandle timerHandle;
 
+	bool isMenuOpen;
+
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
@@ -151,6 +153,7 @@ private:
 	void MoveDashBegin();
 	void MoveDashEnd();
 	void Interaction();
+	void CallMenu();
 
 	void Death();
 	// 사후경직 해제
@@ -179,6 +182,7 @@ public:
 	void StartCutScene();
 
 	void DisplayInteractionUI(bool IsShown);
+	void CloseMenu();
 
 	// 해당 캐릭터와 Movable Box를 연결합니다. nullptr인 경우 연결을 해제합니다.
 	void ConnectWithCharacter(AMovableBox* HoldingMovableBox);
