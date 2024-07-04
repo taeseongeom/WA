@@ -20,7 +20,8 @@ enum class ECharacterState : uint8
 	BoxMoving UMETA(DisplayName = "Moving MovableBox"),
 	Shooting UMETA(DisplayName = "Shooting"),
 	Dash UMETA(DisplayName = "Dash"),
-	KnockBack UMETA(DisplayName = "Knock-Back")
+	KnockBack UMETA(DisplayName = "Knock-Back"),
+	CutScene UMETA(DisplayName = "Displaying CutScene")
 };
 
 UCLASS()

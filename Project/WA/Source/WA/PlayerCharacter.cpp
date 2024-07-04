@@ -139,9 +139,10 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		health_point -= Damage;
 
 		// 피격
-		GetCharacterMovement()->StopMovementImmediately();
+		SetCharacterState(ECharacterState::KnockBack);
+		//GetCharacterMovement()->StopMovementImmediately();
+		SetBlockPlayerMoveDirection(true, true, true, true);
 		MoveDashEnd();	// state�� IDLE�� ����Ƿ�, KnockBack���� ����� ���� ����Ǿ�� ��
-		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
 
 		inGameUI->UpdateHealthBar(health_point);
@@ -198,7 +199,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (cur_invincibleTime > invincible_time)
 		{
 			cur_invincibleTime = 0.0f;
-			state = ECharacterState::Idle;
+			velocity = FVector::ZeroVector;
+			SetCharacterState(ECharacterState::Idle);
+			if (!isMenuOpen)
+				SetBlockPlayerMoveDirection(false, false, false, false);
+
 			animInstance->SetDamaged(false);
 		}
 
@@ -297,7 +302,7 @@ void APlayerCharacter::MoveDashBegin()
 		GetCharacterMovement()->GravityScale = 0.0f;
 		GetCharacterMovement()->Velocity.Z = 0.0f;
 
-		state = ECharacterState::Dash;
+		SetCharacterState(ECharacterState::Dash);
 
 		animInstance->SetDash(true);
 		UGameplayStatics::PlaySound2D(GetWorld(), dashEffect);
@@ -317,7 +322,7 @@ void APlayerCharacter::MoveDashEnd()
 		// 중력 원상복귀
 		GetCharacterMovement()->GravityScale = 1.0f;
 
-		state = ECharacterState::Idle;
+		SetCharacterState(ECharacterState::Idle);
 
 		animInstance->SetDash(false);
 	}
@@ -326,7 +331,8 @@ void APlayerCharacter::Interaction()
 {
 	if (WaGMB->GetGameState() != EGameState::CutScene)
 	{
-		InteractionWithPuzzle.Broadcast();
+		if (!isMenuOpen)
+			InteractionWithPuzzle.Broadcast();
 	}
 	else
 	{
@@ -341,6 +347,7 @@ void APlayerCharacter::Interaction()
 					inGameUI->DisableCutScene();
 					SetBlockPlayerMoveDirection(false, false, false, false);
 					WaGMB->SetGameState(EGameState::Load);
+					SetCharacterState(ECharacterState::Idle);
 				}
 			}
 		}
@@ -348,14 +355,18 @@ void APlayerCharacter::Interaction()
 }
 void APlayerCharacter::CallMenu()
 {
-	isMenuOpen = true;
-	SetBlockPlayerMoveDirection(true, true, true, true);
-	WaGMB->DisplayMenu();
+	if (ECharacterState::Idle == state)
+	{
+		isMenuOpen = true;
+		SetBlockPlayerMoveDirection(true, true, true, true);
+		WaGMB->DisplayMenu();
+	}
 }
 void APlayerCharacter::CloseMenu()
 {
 	isMenuOpen = false;
-	SetBlockPlayerMoveDirection(false, false, false, false);
+	if (ECharacterState::Idle == state)
+		SetBlockPlayerMoveDirection(false, false, false, false);
 }
 
 void APlayerCharacter::Death()
@@ -373,7 +384,7 @@ void APlayerCharacter::Death()
 
 	velocity = FVector::ZeroVector;
 
-	state = ECharacterState::Idle;
+	SetCharacterState(ECharacterState::Idle);
 
 	cur_invincibleTime = 0.0f;
 
@@ -512,6 +523,8 @@ void APlayerCharacter::StartCutScene()
 {
 	if (inGameUI)
 	{
+		SetCharacterState(ECharacterState::CutScene);
+		
 		UWorld* world = GetWorld();
 		if (world)
 		{
@@ -540,10 +553,10 @@ void APlayerCharacter::ConnectWithCharacter(AMovableBox* HoldingMovableBox)
 	
 	if (HoldingMovableBox)
 	{
-		state = ECharacterState::BoxMoving;
+		SetCharacterState(ECharacterState::BoxMoving);
 	}
 	else
 	{
-		state = ECharacterState::Idle;
+		SetCharacterState(ECharacterState::Idle);
 	}
 }
