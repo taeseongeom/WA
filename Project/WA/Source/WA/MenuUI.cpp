@@ -78,7 +78,6 @@ void UMenuUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}*/
 }
 
-
 void UMenuUI::Change(int8 current_index)
 {
 	switch (current_index)
