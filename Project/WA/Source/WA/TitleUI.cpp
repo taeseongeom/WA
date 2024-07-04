@@ -117,7 +117,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 				quitBtn->SetBrushFromTexture(hoveredQuitTexture);
 				ChangeSlotImage(-1);
 			}
-			else if (pc->WasInputKeyJustPressed(EKeys::Enter) || pc->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
+			else if (pc->WasInputKeyJustPressed(EKeys::Enter) || pc->WasInputKeyJustPressed(EKeys::C) || pc->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
 			{
 				if (GetWorld()->GetGameInstance())
 				{
@@ -133,7 +133,7 @@ void UTitleUI::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 		}
 		else if(!isSelectingData && !isGameStart)
 		{
-			if (pc->WasInputKeyJustPressed(EKeys::Enter) || pc->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
+			if (pc->WasInputKeyJustPressed(EKeys::Enter) || pc->WasInputKeyJustPressed(EKeys::C) || pc->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
 			{
 				FGenericPlatformMisc::RequestExit(true);
 			}
