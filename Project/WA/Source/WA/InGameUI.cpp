@@ -15,6 +15,7 @@ void UInGameUI::NativeOnInitialized()
 	DisplayText("");
 
 	cutSceneNum = 0;
+	isCutSceneDisplaying = false;
 	timer = 0.0f;
 
 	txt_cutscene->SetText(FText::FromString("Press C key"));
@@ -25,7 +26,7 @@ void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (timer > 0)
+	if (timer > 0 && !isCutSceneDisplaying)
 	{
 		timer -= InDeltaTime;
 		if (timer <= 0)
@@ -69,9 +70,9 @@ void UInGameUI::UpdateHealthBar(int HealthPoint)
 void UInGameUI::DisplayText(const FString& String, float Duration)
 {
 	if (String.IsEmpty())
-		img_dialog->SetOpacity((false));
+		img_dialog->SetOpacity(false);
 	else
-		img_dialog->SetOpacity((true));
+		img_dialog->SetOpacity(true);
 
 	txt_dialog->SetText(FText::FromString(String));
 	timer = Duration;
@@ -86,10 +87,12 @@ bool UInGameUI::NextCutScene(int stage)
 		img_cutscene->SetBrushFromTexture(cutScenes[key]);
 		return false;
 	}
+	isCutSceneDisplaying = false;
 	return true;
 }
 void UInGameUI::EnableCutScene(int stage)
 {
+	isCutSceneDisplaying = true;
 	FString key = FString::FromInt(stage) + "_" + FString::FromInt(cutSceneNum);
 	if (cutScenes.Contains(key))
 	{
@@ -100,6 +103,7 @@ void UInGameUI::EnableCutScene(int stage)
 }
 void UInGameUI::DisableCutScene()
 {
+	isCutSceneDisplaying = false;
 	img_cutscene->SetOpacity(false);
 	txt_cutscene->SetOpacity(false);
 }
