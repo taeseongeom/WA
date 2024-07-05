@@ -40,7 +40,8 @@ private:
 	FColor deactivatedColor;
 
 	class UBillboardComponent* spawnPoint;
-	class UPointLightComponent* lampLight;
+	class UPointLightComponent* frontLamp;
+	UPointLightComponent* rearLamp;
 
 
 	void SetLampLightColor(bool PuzzleActive);

@@ -116,6 +116,15 @@ void APlayerCamera::RevertViewport(const FVector& Position, const FRotator& Rota
 	overlapCount--;
 }
 
+void APlayerCamera::SetFOV(float field_of_view)
+{
+	GetCameraComponent()->SetFieldOfView(field_of_view);
+}
+float APlayerCamera::GetFOV() const
+{
+	return GetCameraComponent()->FieldOfView;
+}
+
 void APlayerCamera::AddLight()
 {
 	UPointLightComponent* light = CreateDefaultSubobject<UPointLightComponent>(FName("Light"));

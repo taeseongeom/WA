@@ -20,9 +20,13 @@ private:
 	int currentPlayIndex;
 	UPROPERTY(EditAnywhere, Category = "BGM")
 	TArray<class USoundBase*> bgms;
+
 public:
 	virtual void BeginPlay() override;
+
 	void SwapRoomBGM(int roomNum);
 	void MuteBGM();
+	void SetBGMVolume(float value);
+
 	void SetStage(int value);
 };

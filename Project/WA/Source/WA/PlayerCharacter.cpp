@@ -28,6 +28,7 @@ APlayerCharacter::APlayerCharacter()
 
 	health_point = 100.0f;
 	invincible_time = 1.0f;
+	rigorMortis_time = 1.0f;
 
 	move_speed = 800.0f;
 	move_accel = 6000.0f;
@@ -67,6 +68,8 @@ APlayerCharacter::APlayerCharacter()
 	interactionRegionOverlap = 0;
 
 	holdingBox = nullptr;
+
+	isMenuOpen = false;
 
 	// 입력된 정보를 CharacterMovementComponent와 연결
 	GetCharacterMovement()->MaxWalkSpeed = move_speed;
@@ -136,9 +139,10 @@ float APlayerCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		health_point -= Damage;
 
 		// 피격
-		GetCharacterMovement()->StopMovementImmediately();
+		SetCharacterState(ECharacterState::KnockBack);
+		//GetCharacterMovement()->StopMovementImmediately();
+		SetBlockPlayerMoveDirection(true, true, true, true);
 		MoveDashEnd();	// state�� IDLE�� ����Ƿ�, KnockBack���� ����� ���� ����Ǿ�� ��
-		state = ECharacterState::KnockBack;
 		velocity = GetActorForwardVector() * -knockBack_speed;
 
 		inGameUI->UpdateHealthBar(health_point);
@@ -195,7 +199,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (cur_invincibleTime > invincible_time)
 		{
 			cur_invincibleTime = 0.0f;
-			state = ECharacterState::Idle;
+			velocity = FVector::ZeroVector;
+			SetCharacterState(ECharacterState::Idle);
+			if (!isMenuOpen)
+				SetBlockPlayerMoveDirection(false, false, false, false);
+
 			animInstance->SetDamaged(false);
 		}
 
@@ -224,13 +232,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	UE_LOG(LogTemp, Warning, TEXT("Input Key"));
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::InputForwardBackward);
 	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::InputLeftRight);
 	PlayerInputComponent->BindAction(TEXT("MoveJump"), IE_Pressed, this, &APlayerCharacter::MoveJump);
 	PlayerInputComponent->BindAction(TEXT("MoveDash"), IE_Pressed, this, &APlayerCharacter::MoveDashBegin);
 	PlayerInputComponent->BindAction(TEXT("MoveDash"), IE_Released, this, &APlayerCharacter::MoveDashEnd);
 	PlayerInputComponent->BindAction(TEXT("Interaction"), IE_Pressed, this, &APlayerCharacter::Interaction);
+	PlayerInputComponent->BindAction(TEXT("CallMenu"), IE_Pressed, this, &APlayerCharacter::CallMenu);
 }
 
 void APlayerCharacter::InputForwardBackward(float value)
@@ -294,7 +302,7 @@ void APlayerCharacter::MoveDashBegin()
 		GetCharacterMovement()->GravityScale = 0.0f;
 		GetCharacterMovement()->Velocity.Z = 0.0f;
 
-		state = ECharacterState::Dash;
+		SetCharacterState(ECharacterState::Dash);
 
 		animInstance->SetDash(true);
 		UGameplayStatics::PlaySound2D(GetWorld(), dashEffect);
@@ -314,20 +322,20 @@ void APlayerCharacter::MoveDashEnd()
 		// 중력 원상복귀
 		GetCharacterMovement()->GravityScale = 1.0f;
 
-		state = ECharacterState::Idle;
+		SetCharacterState(ECharacterState::Idle);
 
 		animInstance->SetDash(false);
 	}
 }
 void APlayerCharacter::Interaction()
 {
-	if (!(WaGMB->GetGameState() == EGameState::CutScene))
+	if (WaGMB->GetGameState() != EGameState::CutScene)
 	{
-		InteractionWithPuzzle.Broadcast();
+		if (!isMenuOpen)
+			InteractionWithPuzzle.Broadcast();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NextCutScene"));
 		UWorld* world = GetWorld();
 		if (world)
 		{
@@ -337,17 +345,38 @@ void APlayerCharacter::Interaction()
 				if (inGameUI->NextCutScene(waInstance->GetCurrentStage()))
 				{
 					inGameUI->DisableCutScene();
-					SetBlockPlayerMoveDirection(false, false, false, false);
 					WaGMB->SetGameState(EGameState::Load);
+
+					SetCharacterState(ECharacterState::Idle);
+					SetBlockPlayerMoveDirection(false, false, false, false);
 				}
 			}
 		}
 	}
 }
+void APlayerCharacter::CallMenu()
+{
+	if (ECharacterState::Idle == state)
+	{
+		isMenuOpen = true;
+		SetBlockPlayerMoveDirection(true, true, true, true);
+		WaGMB->DisplayMenu();
+	}
+}
+void APlayerCharacter::CloseMenu()
+{
+	isMenuOpen = false;
+	if (ECharacterState::Idle == state)
+		SetBlockPlayerMoveDirection(false, false, false, false);
+}
 
 void APlayerCharacter::Death()
 {
-	// 리셋
+	// Block all movement for a while(1 sec)
+	SetBlockPlayerMoveDirection(true, true, true, true);
+	GetWorldTimerManager().SetTimer(timerHandle, this, &APlayerCharacter::ResolutionOfRigorMortis, rigorMortis_time);
+
+	// Reset all status
 	WaGMB->RoomReset();
 	SetActorLocation(WaGMB->GetRespawnPoint());
 
@@ -355,14 +384,19 @@ void APlayerCharacter::Death()
 	inGameUI->UpdateHealthBar(health_point);
 
 	velocity = FVector::ZeroVector;
-	SetBlockPlayerMoveDirection(false, false, false, false);
 
-	state = ECharacterState::Idle;
+	SetCharacterState(ECharacterState::Idle);
 
 	cur_invincibleTime = 0.0f;
 
 	animInstance->SetDamaged(false);
 	UGameplayStatics::PlaySound2D(GetWorld(), dieEffect);
+}
+void APlayerCharacter::ResolutionOfRigorMortis()
+{
+	if (!isMenuOpen)
+		SetBlockPlayerMoveDirection(false, false, false, false);
+	GetWorldTimerManager().ClearTimer(timerHandle);
 }
 
 void APlayerCharacter::SetCharacterState(ECharacterState cs)
@@ -490,6 +524,8 @@ void APlayerCharacter::StartCutScene()
 {
 	if (inGameUI)
 	{
+		SetCharacterState(ECharacterState::CutScene);
+		
 		UWorld* world = GetWorld();
 		if (world)
 		{
@@ -518,10 +554,10 @@ void APlayerCharacter::ConnectWithCharacter(AMovableBox* HoldingMovableBox)
 	
 	if (HoldingMovableBox)
 	{
-		state = ECharacterState::BoxMoving;
+		SetCharacterState(ECharacterState::BoxMoving);
 	}
 	else
 	{
-		state = ECharacterState::Idle;
+		SetCharacterState(ECharacterState::Idle);
 	}
 }

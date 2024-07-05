@@ -4,9 +4,11 @@
 #include "PlayerCharacter.h"
 #include "Components/BillboardComponent.h"
 #include "Door.h"
+#include "MenuUI.h"
 #include "WAViewportClient.h"
 #include "WAAmbientSound.h"
 #include "WA.h"
+#include "Blueprint/UserWidget.h"
 
 AWAGameModeBase::AWAGameModeBase()
 {
@@ -184,7 +186,8 @@ void AWAGameModeBase::Tick(float DeltaTime)
 	case EGameState::CutScene:  break;
 	case EGameState::Load: Init(); break;
 	case EGameState::Play: break;
-	case EGameState::End: break;
+	case EGameState::Menu: break;
+	case EGameState::Clear: break;
 	}
 }
 
@@ -277,3 +280,36 @@ void AWAGameModeBase::SetRoomSpawnPoint(int roomNum, FVector location)
 	rooms[roomNum - 1]->SetRoomSpawnPoint(location);
 }
 
+void AWAGameModeBase::DisplayMenu()
+{
+	state = EGameState::Menu;
+	if (!menuUI)
+	{
+		FStringClassReference tempMenuWidgetClassRef(TEXT("/Game/BluePrints/BP_MenuUI.BP_MenuUI_C"));
+		if (UClass* tempMenuWidgetClass = tempMenuWidgetClassRef.TryLoadClass<UUserWidget>())
+		{
+			UUserWidget* tempMenuWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), tempMenuWidgetClass);
+			menuUI = Cast<UMenuUI>(tempMenuWidget);
+		}
+	}
+	menuUI->AddToViewport(10);
+}
+void AWAGameModeBase::CloseMenu(int code)
+{
+	state = EGameState::Play;
+	pc->CloseMenu();
+	
+	switch (code)
+	{
+	case 0:
+		break;
+
+	case 1:
+		//// Save game data ////
+		UGameplayStatics::OpenLevel(this, FName("Title"));
+		break;
+
+	default:
+		break;
+	}
+}

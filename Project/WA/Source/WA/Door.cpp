@@ -10,7 +10,8 @@ ADoor::ADoor() : ADefaultPuzzle()
 	activatedColor = FColor::Green;
 	deactivatedColor = FColor::Red;
 
-	lampLight = nullptr;
+	frontLamp = nullptr;
+	rearLamp = nullptr;
 }
 
 void ADoor::BeginPlay()
@@ -23,7 +24,9 @@ void ADoor::BeginPlay()
 
 	spawnPoint = FindComponentByClass<UBillboardComponent>();
 
-	lampLight = FindComponentByClass<UPointLightComponent>();
+	TArray<UActorComponent*> lamps = GetComponentsByClass(UPointLightComponent::StaticClass());
+	frontLamp = Cast<UPointLightComponent>(lamps[0]);
+	rearLamp = Cast<UPointLightComponent>(lamps[1]);
 	SetLampLightColor(puzzleActive);
 }
 
@@ -93,7 +96,13 @@ void ADoor::OnSwitch()
 void ADoor::SetLampLightColor(bool PuzzleActive)
 {
 	if (PuzzleActive)
-		lampLight->SetLightColor(activatedColor);
+	{
+		frontLamp->SetLightColor(activatedColor);
+		rearLamp->SetLightColor(activatedColor);
+	}
 	else
-		lampLight->SetLightColor(deactivatedColor);
+	{
+		frontLamp->SetLightColor(deactivatedColor);
+		rearLamp->SetLightColor(deactivatedColor);
+	}
 }

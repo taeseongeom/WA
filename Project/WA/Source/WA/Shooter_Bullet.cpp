@@ -1,18 +1,19 @@
 #include "Shooter_Bullet.h"
 #include "WA.h"
 
-// Sets default values
+
 AShooter_Bullet::AShooter_Bullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+ 	PrimaryActorTick.bCanEverTick = true;
 	Tags.Add(FName("Bullet"));
 }
 
-// Called when the game starts or when spawned
 void AShooter_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Set life time(10sec)
+	SetLifeSpan(10.0f);
 }
 
 void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -33,7 +34,6 @@ void AShooter_Bullet::NotifyActorBeginOverlap(AActor * OtherActor)
 	}
 }
 
-// Called every frame
 void AShooter_Bullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

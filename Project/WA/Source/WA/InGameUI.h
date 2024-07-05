@@ -54,6 +54,6 @@ private:
 	TMap<FString, UTexture2D*> cutScenes;
 
 	int cutSceneNum;
-
+	bool isCutSceneDisplaying;
 	float timer;
 };

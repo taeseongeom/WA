@@ -73,6 +73,9 @@ public:
 	/// <param name="Rotation">ViewportChanger에 지정된 상대적 회전</param>
 	void RevertViewport(const FVector& Position, const FRotator& Rotation);
 
+	void SetFOV(float field_of_view = 90.0f);
+	float GetFOV() const;
+
 	void AddLight();
 	void RemoveLight();
 };

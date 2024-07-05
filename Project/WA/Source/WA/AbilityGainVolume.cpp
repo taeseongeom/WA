@@ -47,12 +47,13 @@ void AAbilityGainVolume::NotifyActorBeginOverlap(AActor* OtherActor)
 
 				
 				// 캐릭터 이동 제한
+				playerCharacter->SetCharacterState(ECharacterState::CutScene);
 				playerCharacter->SetBlockPlayerMoveDirection(true, true, true, true);
 				playerCharacter->GetCharacterMovement()->StopMovementImmediately();
 				playerCharacter->DecreaseDashCount(1);
 				// 캐릭터를 해당 객체의 위치로 강제 이동
 				playerCharacter->SetActorLocation(characterPosition);
-				playerCharacter->SetActorRotation(FQuat::Identity + FQuat(0.0f, 0.0f, 180.0f, 0.0f));
+				playerCharacter->SetActorRotation(FQuat(FVector::UpVector, PI*17.0f / 18.0f));
 				// UI 비활성화
 				playerCharacter->DeactivateInGameUI();
 
@@ -131,14 +132,16 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 	// 클로즈 업, 윙크
 	else if (timeline >= 4.2f && timeline < 5.0f)
 	{
-		FVector dist = FMath::Lerp<FVector>(playerCam->GetActorLocation(), characterPosition + FVector(-100.0f, 0.0f, 80.0f), DeltaTime * 10.0f);
+		FVector dist = FMath::Lerp<FVector>(playerCam->GetActorLocation(), characterPosition + FVector(-80.0f, 0.0f, 60.0f), DeltaTime * 10.0f);
 		playerCam->SetActorLocation(dist);
+		playerCam->SetFOV(FMath::Lerp<float>(playerCam->GetFOV(), 120.0f, DeltaTime * 10.0f));
 	}
 	// 부들부들 떨기 (휘파람)
 	else if (timeline >= 5.5f && timeline < 7.5f)
 	{
 		float height = FMath::Sin(FMath::DegreesToRadians((timeline - 5.5f) * 1440.0f)) * 20.0f;
 		playerCam->SetActorLocation(characterPosition + FVector(-200.0f, 0.0f, 20.0f + height));
+		playerCam->SetFOV();
 	}
 	// 종료
 	else if (timeline >= 7.5f)
@@ -146,7 +149,9 @@ void AAbilityGainVolume::CameraDirecting(float DeltaTime)
 		isDirectingWork = false;
 
 		// 캐릭터 이동과 UI 원상 복귀
+		playerCharacter->SetCharacterState(ECharacterState::Idle);
 		playerCharacter->SetBlockPlayerMoveDirection(false, false, false, false);
+		playerCharacter->CloseMenu();
 		playerCharacter->ActivateInGameUI();
 		playerCharacter->DisplayMessage(noticeMessage, 5.0f);
 

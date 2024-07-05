@@ -20,7 +20,8 @@ enum class ECharacterState : uint8
 	BoxMoving UMETA(DisplayName = "Moving MovableBox"),
 	Shooting UMETA(DisplayName = "Shooting"),
 	Dash UMETA(DisplayName = "Dash"),
-	KnockBack UMETA(DisplayName = "Knock-Back")
+	KnockBack UMETA(DisplayName = "Knock-Back"),
+	CutScene UMETA(DisplayName = "Displaying CutScene")
 };
 
 UCLASS()
@@ -50,6 +51,9 @@ private:
 	// After damaged by enemy, character do not take damage during this time. Measure is a sec.
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float invincible_time;
+	// After dead, character can not take movement during this time. Measure is a sec.
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float rigorMortis_time;
 
 	// Speed of linear movement.
 	UPROPERTY(EditAnywhere, Category = "Movement")
@@ -138,6 +142,11 @@ private:
 
 	int8 interactionRegionOverlap;
 
+	// 사후경직 타이머
+	FTimerHandle timerHandle;
+
+	bool isMenuOpen;
+
 
 	void InputForwardBackward(float value);
 	void InputLeftRight(float value);
@@ -145,8 +154,11 @@ private:
 	void MoveDashBegin();
 	void MoveDashEnd();
 	void Interaction();
+	void CallMenu();
 
 	void Death();
+	// 사후경직 해제
+	void ResolutionOfRigorMortis();
 
 public:
 	FInteractDelegate InteractionWithPuzzle;
@@ -171,6 +183,7 @@ public:
 	void StartCutScene();
 
 	void DisplayInteractionUI(bool IsShown);
+	void CloseMenu();
 
 	// 해당 캐릭터와 Movable Box를 연결합니다. nullptr인 경우 연결을 해제합니다.
 	void ConnectWithCharacter(AMovableBox* HoldingMovableBox);
