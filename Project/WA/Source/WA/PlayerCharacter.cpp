@@ -345,9 +345,10 @@ void APlayerCharacter::Interaction()
 				if (inGameUI->NextCutScene(waInstance->GetCurrentStage()))
 				{
 					inGameUI->DisableCutScene();
-					SetBlockPlayerMoveDirection(false, false, false, false);
 					WaGMB->SetGameState(EGameState::Load);
+
 					SetCharacterState(ECharacterState::Idle);
+					SetBlockPlayerMoveDirection(false, false, false, false);
 				}
 			}
 		}
